@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Reflection;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using TradingJournal.Modules.Trades.Infrastructure;
@@ -11,7 +12,7 @@ public static class DependencyInjection
     public static IServiceCollection AddTradeModule(this IServiceCollection services, IConfiguration configuration,
         bool isDevelopment = false)
     {
-        services.AddFluentValidators();
+        services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 
         services.AddMediatRBehaviors(isDevelopment);
 

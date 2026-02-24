@@ -25,6 +25,7 @@ builder.Services.AddAntiforgery();
 builder.Services.ConfigureHttpJsonOptions(options =>
 {
     options.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+    options.SerializerOptions.PropertyNameCaseInsensitive = true;
 });
 
 bool isDevelopment = builder.Environment.IsDevelopment();
@@ -47,8 +48,8 @@ app.UseAntiforgery();
 app.UseSwaggerDoc();
 app.UseStaticFiles();
 
-app.UseAuthentication();
-//app.UseAuthorization();
+// app.UseAuthentication();
+// app.UseAuthorization();
 
 app.MapOpenApi();
 

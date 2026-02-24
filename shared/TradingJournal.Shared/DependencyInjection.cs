@@ -36,10 +36,4 @@ public static class DependencyInjection
 
         return services;
     }
-
-    public static IServiceCollection AddFluentValidators(this IServiceCollection services)
-    {
-        services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
-        return services;
-    }
 }

@@ -1,14 +1,14 @@
 ﻿using FluentValidation.Results;
 using System.Net;
 using TradingJournal.Modules.Trades.Common.Enum;
-using TradingJournal.Modules.Trades.Domain;
 using TradingJournal.Modules.Trades.Dto;
 using TradingJournal.Modules.Trades.Infrastructure;
 using Mapster;
-using TradingJournal.Shared.Abstractions;
-using TradingJournal.Shared.CQRS;
+using TradingJournal.Modules.Trades.Domain;
+using TradingJournal.Modules.Trades.Common.Constants;
+using MediatR;
 
-namespace TradingJournal.Modules.Trades.Features;
+namespace TradingJournal.Modules.Trades.Features.V1.Trade;
 
 public static class CreateTrade
 {
@@ -32,8 +32,6 @@ public static class CreateTrade
         List<int> PretradeChecklist,
         int TradingSession,
         RiskGuardrailsDto RiskGuardrails) : ICommand<Result<int>>;
-
-    public record Response(Result<int> Result);
 
     public class Validator : AbstractValidator<Request>
     {
@@ -93,34 +91,39 @@ public static class CreateTrade
         }
     }
 
+    public class Handler(ITradeDbContext context) : IRequestHandler<Request, Result<int>>
+    {
+        public async Task<Result<int>> Handle(Request request, CancellationToken cancellationToken)
+        {
+            TradeHistory tradeHistory = request.Adapt<TradeHistory>();
+
+            context.TradeHistories.Add(tradeHistory);
+
+            int insertedRow = await context.SaveChangesAsync(cancellationToken);
+
+            return insertedRow > 0 ? Result<int>.Success(tradeHistory.Id)
+                : Result<int>.Failure(Error.Create("Failed to create trade history."));
+        }
+    }
 
     public class Endpoint : ICarterModule
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            var group = app.MapGroup("api/v{version:apiVersion}/trades");
+            RouteGroupBuilder group = app.MapGroup("api/v1/trades");
 
-            group.MapPost("/create", Handle);
-        }
+            group.MapPost("/create", async ([FromBody] Request request, ISender sender) => {
+                Result<int> result = await sender.Send(request);
 
-        public static async Task<IResult> Handle([FromBody] Request request, 
-            IValidator<Request> validator,
-            ITradeDbContext context)
-        {
-            ValidationResult result = await validator.ValidateAsync(request);
-
-            if (!result.IsValid)
-            {
-                return Results.BadRequest(result.Errors);
-            }
-
-            TradeHistory tradeHistory = request.Adapt<TradeHistory>();
-
-            context.TradeHistories.Add(tradeHistory);
-
-            await context.SaveChangesAsync();
-
-            return Results.Ok();
+                return result.IsSuccess ? Results.Created() 
+                    : Results.BadRequest(result);
+            })
+            .Produces<Result<int>>(StatusCodes.Status201Created)
+            .Produces(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status500InternalServerError)
+            .WithSummary("Create a new trade history.")
+            .WithDescription("Creates a new trade history with the given details.") 
+            .WithTags(Tags.Trades);
         }
     }
 }

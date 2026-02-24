@@ -32,6 +32,8 @@ public class Result
     public static Result Failure(Error error) => new(false, [error]);
 
     public static Result Failure(List<Error> errors) => new(false, errors);
+
+    public static Result NotFound() => new(false, [Error.NotFound]);
 }
 
 public class Result<T> : Result
@@ -57,6 +59,8 @@ public class Result<T> : Result
     public static new Result<T> Failure(Error error) => new([error]);
 
     public static new Result<T> Failure(List<Error> errors) => new(errors);
+
+    public static new Result<T> NotFound() => new([Error.NotFound]);
 
     public static implicit operator Result<T>(T value) => Success(value);
 }
