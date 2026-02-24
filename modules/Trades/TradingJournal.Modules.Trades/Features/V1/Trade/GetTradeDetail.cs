@@ -1,19 +1,8 @@
-using System.Net;
-using Mapster;
-using MediatR;
-using TradingJournal.Modules.Trades.Common.Constants;
-using TradingJournal.Modules.Trades.Common.Enum;
-using TradingJournal.Modules.Trades.Infrastructure;
-using TradingJournal.Modules.Trades.ViewModel;
-
 namespace TradingJournal.Modules.Trades.Features.V1.Trade;
 
 public class GetTradeDetail
 {
-    public class Request : IQuery<Result<TradeHistoryViewModel>>
-    {
-        public int Id { get; set; }
-    }
+    public record Request(int Id) : IQuery<Result<TradeHistoryViewModel>>;
 
     public class Validator : AbstractValidator<Request>
     {
@@ -37,7 +26,7 @@ public class GetTradeDetail
 
             if (trade == null)
             {
-                return Result<TradeHistoryViewModel>.NotFound();
+                return Result<TradeHistoryViewModel>.Failure(Error.NotFound);
             }
 
             return Result<TradeHistoryViewModel>.Success(tradeHistoryViewModel);
@@ -51,7 +40,7 @@ public class GetTradeDetail
             RouteGroupBuilder group = app.MapGroup("api/v1/trades");
 
             group.MapGet("/{id}", async ([FromRoute] int id, ISender sender) => {
-                Result<TradeHistoryViewModel> result = await sender.Send(new Request { Id = id });
+                Result<TradeHistoryViewModel> result = await sender.Send(new Request(id));
 
                 return result.IsSuccess ? Results.Ok(result) 
                     : Results.BadRequest(result);

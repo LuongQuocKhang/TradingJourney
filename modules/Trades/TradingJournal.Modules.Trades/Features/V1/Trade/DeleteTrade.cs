@@ -1,8 +1,3 @@
-using System.Net;
-using MediatR;
-using TradingJournal.Modules.Trades.Common.Constants;
-using TradingJournal.Modules.Trades.Infrastructure;
-
 namespace TradingJournal.Modules.Trades.Features.V1.Trade;
 
 public class DeleteTrade
@@ -32,7 +27,7 @@ public class DeleteTrade
 
             if (trade == null)
             {
-                return Result<int>.NotFound();
+                return Result<int>.Failure(Error.NotFound);
             }
 
             tradeDbContext.TradeHistories.Remove(trade);

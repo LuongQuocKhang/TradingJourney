@@ -1,7 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using TradingJournal.Modules.Trades.Domain;
-
-namespace TradingJournal.Modules.Trades.Infrastructure;
+﻿namespace TradingJournal.Modules.Trades.Infrastructure;
 
 public interface ITradeDbContext
 {
@@ -16,6 +13,12 @@ public interface ITradeDbContext
     DbSet<TradeScreenShot> TradeScreenShots { get; set; }
 
     DbSet<TradingSession> TradingSessions { get; set; }
+
+    DbSet<TradeHistoryChecklist> TradeHistoryChecklists { get; set; }
+
+    DbSet<TradeEmotionTag> TradeEmotionTags { get; set; }
+
+    DbSet<TradeHistorySession> TradeHistorySessions { get; set; }
 
     Task BeginTransaction();
 

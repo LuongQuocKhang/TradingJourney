@@ -8,7 +8,7 @@ public abstract class EntityBase<T>
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     [Key]
     [Required]
-    public required T Id { get; set; }
+    public required T Id { get; set; } = default!;
 
     #region Tracking
 

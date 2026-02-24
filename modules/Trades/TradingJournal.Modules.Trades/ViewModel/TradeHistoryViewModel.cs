@@ -1,4 +1,3 @@
-using TradingJournal.Modules.Trades.Common.Enum;
 using TradingJournal.Modules.Trades.Dto;
 
 namespace TradingJournal.Modules.Trades.ViewModel;

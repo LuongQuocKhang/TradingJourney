@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
-using TradingJournal.Shared.Abstractions;
 
 namespace TradingJournal.Modules.Trades.Domain;
 
@@ -15,4 +14,9 @@ public sealed class RiskGuardrail : EntityBase<int>
     public double? TakeProfit { get; set; }
 
     public double? PositionSize { get; set; }
+
+    public int? TradeHistoryId { get; set; }
+
+    [ForeignKey(nameof(TradeHistoryId))]
+    public TradeHistory? TradeHistory { get; set; }
 }

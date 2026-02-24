@@ -1,7 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
+﻿using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Storage;
-using TradingJournal.Modules.Trades.Domain;
+using TradingJournal.Shared.Common;
 
 namespace TradingJournal.Modules.Trades.Infrastructure;
 
@@ -21,6 +20,12 @@ internal sealed class TradeDbContext(DbContextOptions<TradeDbContext> options)
     public DbSet<TradeScreenShot> TradeScreenShots { get; set; }
 
     public DbSet<TradingSession> TradingSessions { get; set; }
+
+    public DbSet<TradeHistoryChecklist> TradeHistoryChecklists { get; set; }
+
+    public DbSet<TradeEmotionTag> TradeEmotionTags { get; set; }
+    
+    public DbSet<TradeHistorySession> TradeHistorySessions { get; set; }
 
     public async Task BeginTransaction()
     {
@@ -58,16 +63,15 @@ internal sealed class TradeDbContext(DbContextOptions<TradeDbContext> options)
             switch (entry.State)
             {
                 case EntityState.Added:
-                    entry.Entity.CreatedDate = DateTime.UtcNow.AddHours(7);
+                    entry.Entity.CreatedDate = new DateTimeProvider().Now;
                     entry.Entity.CreatedBy = 0;
                     break;
                 case EntityState.Modified:
-                    entry.Entity.UpdatedDate = DateTime.UtcNow.AddHours(7);
-                    entry.Entity.UpdatedBy = 0;
-                    break;
                 case EntityState.Detached:
                 case EntityState.Unchanged:
                 case EntityState.Deleted:
+                    entry.Entity.UpdatedDate = new DateTimeProvider().Now;
+                    entry.Entity.UpdatedBy = 0;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();

@@ -1,13 +1,3 @@
-using System.Net;
-using Mapster;
-using MediatR;
-using Microsoft.EntityFrameworkCore;
-using TradingJournal.Modules.Trades.Common.Constants;
-using TradingJournal.Modules.Trades.Common.Enum;
-using TradingJournal.Modules.Trades.Domain;
-using TradingJournal.Modules.Trades.Infrastructure;
-using TradingJournal.Modules.Trades.ViewModel;
-
 namespace TradingJournal.Modules.Trades.Features.V1.Trade;
 
 public class GetTrades
@@ -54,7 +44,7 @@ public class GetTrades
 
             if (tradeHistories.Count == 0)
             {
-                return Result<IReadOnlyCollection<TradeHistoryViewModel>>.NotFound();
+                return Result<IReadOnlyCollection<TradeHistoryViewModel>>.Failure(Error.NotFound);
             }
 
             IReadOnlyCollection<TradeHistoryViewModel> tradeHistoryViewModels = tradeHistories.Adapt<IReadOnlyCollection<TradeHistoryViewModel>>();
@@ -70,17 +60,19 @@ public class GetTrades
         {
             RouteGroupBuilder group = app.MapGroup("api/v1/trades");
 
-            group.MapGet("/", async ([FromQuery] int page, [FromQuery] int pageSize, ISender sender) => {
-                Result<IReadOnlyCollection<TradeHistoryViewModel>> result = await sender.Send(new Request { Page = page, PageSize = pageSize });
+            group.MapGet("/", async (ISender sender, [FromQuery] string? asset, [FromQuery] PositionType? position, [FromQuery] TradeStatus? status,
+                [FromQuery] int page = 1, [FromQuery] int pageSize = 10) =>
+            {
+                Result<IReadOnlyCollection<TradeHistoryViewModel>> result = await sender.Send(new Request { Page = page, PageSize = pageSize, Asset = asset, Position = position, Status = status });
 
-                return result.IsSuccess ? Results.Ok(result) 
+                return result.IsSuccess ? Results.Ok(result)
                     : Results.BadRequest(result);
             })
             .Produces<Result<IReadOnlyCollection<TradeHistoryViewModel>>>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status500InternalServerError)
             .WithSummary("Get a list of trade histories.")
-            .WithDescription("Retrieves a list of trade histories.") 
+            .WithDescription("Retrieves a list of trade histories.")
             .WithTags(Tags.Trades);
         }
     }

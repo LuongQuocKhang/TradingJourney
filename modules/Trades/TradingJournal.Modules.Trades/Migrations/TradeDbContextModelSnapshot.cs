@@ -46,9 +46,6 @@ namespace TradingJournal.Modules.Trades.Migrations
                     b.Property<int>("PsychologyType")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("TradeHistoryId")
-                        .HasColumnType("integer");
-
                     b.Property<int?>("UpdatedBy")
                         .HasColumnType("integer");
 
@@ -56,8 +53,6 @@ namespace TradingJournal.Modules.Trades.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("TradeHistoryId");
 
                     b.ToTable("EmotionTags", "Trades");
                 });
@@ -86,9 +81,6 @@ namespace TradingJournal.Modules.Trades.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int?>("TradeHistoryId")
-                        .HasColumnType("integer");
-
                     b.Property<int?>("UpdatedBy")
                         .HasColumnType("integer");
 
@@ -96,8 +88,6 @@ namespace TradingJournal.Modules.Trades.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("TradeHistoryId");
 
                     b.ToTable("PretradeChecklists", "Trades");
                 });
@@ -145,6 +135,44 @@ namespace TradingJournal.Modules.Trades.Migrations
                     b.ToTable("RiskGuardrails", "Trades");
                 });
 
+            modelBuilder.Entity("TradingJournal.Modules.Trades.Domain.TradeEmotionTag", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("EmotionTagId")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsDisabled")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("TradeHistoryId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("UpdatedBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmotionTagId");
+
+                    b.HasIndex("TradeHistoryId");
+
+                    b.ToTable("TradeEmotionTags", "Trades");
+                });
+
             modelBuilder.Entity("TradingJournal.Modules.Trades.Domain.TradeHistory", b =>
                 {
                     b.Property<int>("Id")
@@ -152,6 +180,10 @@ namespace TradingJournal.Modules.Trades.Migrations
                         .HasColumnType("integer");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Asset")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<DateTime?>("ClosedDate")
                         .HasColumnType("timestamp with time zone");
@@ -225,6 +257,44 @@ namespace TradingJournal.Modules.Trades.Migrations
                     b.ToTable("TradeHistorys", "Trades");
                 });
 
+            modelBuilder.Entity("TradingJournal.Modules.Trades.Domain.TradeHistoryChecklist", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsDisabled")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("PretradeChecklistId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("TradeHistoryId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("UpdatedBy")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PretradeChecklistId");
+
+                    b.HasIndex("TradeHistoryId");
+
+                    b.ToTable("TradeHistoryChecklists", "Trades");
+                });
+
             modelBuilder.Entity("TradingJournal.Modules.Trades.Domain.TradeScreenShot", b =>
                 {
                     b.Property<int>("Id")
@@ -242,7 +312,7 @@ namespace TradingJournal.Modules.Trades.Migrations
                     b.Property<bool>("IsDisabled")
                         .HasColumnType("boolean");
 
-                    b.Property<int?>("TradeHistoryId")
+                    b.Property<int>("TradeHistoryId")
                         .HasColumnType("integer");
 
                     b.Property<int?>("UpdatedBy")
@@ -302,18 +372,23 @@ namespace TradingJournal.Modules.Trades.Migrations
                     b.ToTable("TradingSessions", "Trades");
                 });
 
-            modelBuilder.Entity("TradingJournal.Modules.Trades.Domain.EmotionTag", b =>
+            modelBuilder.Entity("TradingJournal.Modules.Trades.Domain.TradeEmotionTag", b =>
                 {
-                    b.HasOne("TradingJournal.Modules.Trades.Domain.TradeHistory", null)
-                        .WithMany("EmotionTags")
-                        .HasForeignKey("TradeHistoryId");
-                });
+                    b.HasOne("TradingJournal.Modules.Trades.Domain.EmotionTag", "EmotionTag")
+                        .WithMany()
+                        .HasForeignKey("EmotionTagId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-            modelBuilder.Entity("TradingJournal.Modules.Trades.Domain.PretradeChecklist", b =>
-                {
-                    b.HasOne("TradingJournal.Modules.Trades.Domain.TradeHistory", null)
-                        .WithMany("PretradeChecklists")
-                        .HasForeignKey("TradeHistoryId");
+                    b.HasOne("TradingJournal.Modules.Trades.Domain.TradeHistory", "TradeHistory")
+                        .WithMany("EmotionTags")
+                        .HasForeignKey("TradeHistoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("EmotionTag");
+
+                    b.Navigation("TradeHistory");
                 });
 
             modelBuilder.Entity("TradingJournal.Modules.Trades.Domain.TradeHistory", b =>
@@ -331,11 +406,34 @@ namespace TradingJournal.Modules.Trades.Migrations
                     b.Navigation("TradingSession");
                 });
 
+            modelBuilder.Entity("TradingJournal.Modules.Trades.Domain.TradeHistoryChecklist", b =>
+                {
+                    b.HasOne("TradingJournal.Modules.Trades.Domain.PretradeChecklist", "PretradeChecklist")
+                        .WithMany()
+                        .HasForeignKey("PretradeChecklistId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TradingJournal.Modules.Trades.Domain.TradeHistory", "TradeHistory")
+                        .WithMany("PretradeChecklists")
+                        .HasForeignKey("TradeHistoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("PretradeChecklist");
+
+                    b.Navigation("TradeHistory");
+                });
+
             modelBuilder.Entity("TradingJournal.Modules.Trades.Domain.TradeScreenShot", b =>
                 {
-                    b.HasOne("TradingJournal.Modules.Trades.Domain.TradeHistory", null)
+                    b.HasOne("TradingJournal.Modules.Trades.Domain.TradeHistory", "TradeHistory")
                         .WithMany("Screenshots")
-                        .HasForeignKey("TradeHistoryId");
+                        .HasForeignKey("TradeHistoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("TradeHistory");
                 });
 
             modelBuilder.Entity("TradingJournal.Modules.Trades.Domain.TradeHistory", b =>

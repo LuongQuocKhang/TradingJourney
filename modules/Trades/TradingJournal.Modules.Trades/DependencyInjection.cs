@@ -1,9 +1,7 @@
 ﻿using System.Reflection;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using TradingJournal.Modules.Trades.Infrastructure;
-using TradingJournal.Shared;
+using TradingJournal.Shared.Behaviors;
 
 namespace TradingJournal.Modules.Trades;
 
@@ -14,7 +12,17 @@ public static class DependencyInjection
     {
         services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 
-        services.AddMediatRBehaviors(isDevelopment);
+        services.AddMediatR(config =>
+        {
+            config.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
+
+            config.AddOpenBehavior(typeof(ValidationBehavior<,>));
+
+            if (isDevelopment)
+            {
+                config.AddOpenBehavior(typeof(LoggingBehavior<,>));
+            }
+        });
 
         services.AddDbContext<TradeDbContext>(options =>
         {

@@ -7,13 +7,53 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace TradingJournal.Modules.Trades.Migrations
 {
     /// <inheritdoc />
-    public partial class inittradedatabase : Migration
+    public partial class initdatabase : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.EnsureSchema(
                 name: "Trades");
+
+            migrationBuilder.CreateTable(
+                name: "EmotionTags",
+                schema: "Trades",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    PsychologyType = table.Column<int>(type: "integer", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    CreatedBy = table.Column<int>(type: "integer", nullable: false),
+                    IsDisabled = table.Column<bool>(type: "boolean", nullable: false),
+                    UpdatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    UpdatedBy = table.Column<int>(type: "integer", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EmotionTags", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PretradeChecklists",
+                schema: "Trades",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    CheckListType = table.Column<int>(type: "integer", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    CreatedBy = table.Column<int>(type: "integer", nullable: false),
+                    IsDisabled = table.Column<bool>(type: "boolean", nullable: false),
+                    UpdatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    UpdatedBy = table.Column<int>(type: "integer", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PretradeChecklists", x => x.Id);
+                });
 
             migrationBuilder.CreateTable(
                 name: "RiskGuardrails",
@@ -66,6 +106,7 @@ namespace TradingJournal.Modules.Trades.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Asset = table.Column<string>(type: "text", nullable: false),
                     Position = table.Column<int>(type: "integer", nullable: false),
                     EntryPrice = table.Column<double>(type: "double precision", nullable: false),
                     TargetTier1 = table.Column<double>(type: "double precision", nullable: false),
@@ -106,60 +147,6 @@ namespace TradingJournal.Modules.Trades.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "EmotionTags",
-                schema: "Trades",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Name = table.Column<string>(type: "text", nullable: false),
-                    PsychologyType = table.Column<int>(type: "integer", nullable: false),
-                    TradeHistoryId = table.Column<int>(type: "integer", nullable: true),
-                    CreatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    CreatedBy = table.Column<int>(type: "integer", nullable: false),
-                    IsDisabled = table.Column<bool>(type: "boolean", nullable: false),
-                    UpdatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    UpdatedBy = table.Column<int>(type: "integer", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_EmotionTags", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_EmotionTags_TradeHistorys_TradeHistoryId",
-                        column: x => x.TradeHistoryId,
-                        principalSchema: "Trades",
-                        principalTable: "TradeHistorys",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "PretradeChecklists",
-                schema: "Trades",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Name = table.Column<string>(type: "text", nullable: false),
-                    CheckListType = table.Column<int>(type: "integer", nullable: false),
-                    TradeHistoryId = table.Column<int>(type: "integer", nullable: true),
-                    CreatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    CreatedBy = table.Column<int>(type: "integer", nullable: false),
-                    IsDisabled = table.Column<bool>(type: "boolean", nullable: false),
-                    UpdatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    UpdatedBy = table.Column<int>(type: "integer", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_PretradeChecklists", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_PretradeChecklists_TradeHistorys_TradeHistoryId",
-                        column: x => x.TradeHistoryId,
-                        principalSchema: "Trades",
-                        principalTable: "TradeHistorys",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Screenshots",
                 schema: "Trades",
                 columns: table => new
@@ -167,7 +154,7 @@ namespace TradingJournal.Modules.Trades.Migrations
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Url = table.Column<string>(type: "text", nullable: false),
-                    TradeHistoryId = table.Column<int>(type: "integer", nullable: true),
+                    TradeHistoryId = table.Column<int>(type: "integer", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     CreatedBy = table.Column<int>(type: "integer", nullable: false),
                     IsDisabled = table.Column<bool>(type: "boolean", nullable: false),
@@ -182,25 +169,106 @@ namespace TradingJournal.Modules.Trades.Migrations
                         column: x => x.TradeHistoryId,
                         principalSchema: "Trades",
                         principalTable: "TradeHistorys",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.CreateIndex(
-                name: "IX_EmotionTags_TradeHistoryId",
+            migrationBuilder.CreateTable(
+                name: "TradeEmotionTags",
                 schema: "Trades",
-                table: "EmotionTags",
-                column: "TradeHistoryId");
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    TradeHistoryId = table.Column<int>(type: "integer", nullable: false),
+                    EmotionTagId = table.Column<int>(type: "integer", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    CreatedBy = table.Column<int>(type: "integer", nullable: false),
+                    IsDisabled = table.Column<bool>(type: "boolean", nullable: false),
+                    UpdatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    UpdatedBy = table.Column<int>(type: "integer", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TradeEmotionTags", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_TradeEmotionTags_EmotionTags_EmotionTagId",
+                        column: x => x.EmotionTagId,
+                        principalSchema: "Trades",
+                        principalTable: "EmotionTags",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_TradeEmotionTags_TradeHistorys_TradeHistoryId",
+                        column: x => x.TradeHistoryId,
+                        principalSchema: "Trades",
+                        principalTable: "TradeHistorys",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
 
-            migrationBuilder.CreateIndex(
-                name: "IX_PretradeChecklists_TradeHistoryId",
+            migrationBuilder.CreateTable(
+                name: "TradeHistoryChecklists",
                 schema: "Trades",
-                table: "PretradeChecklists",
-                column: "TradeHistoryId");
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    TradeHistoryId = table.Column<int>(type: "integer", nullable: false),
+                    PretradeChecklistId = table.Column<int>(type: "integer", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    CreatedBy = table.Column<int>(type: "integer", nullable: false),
+                    IsDisabled = table.Column<bool>(type: "boolean", nullable: false),
+                    UpdatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    UpdatedBy = table.Column<int>(type: "integer", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TradeHistoryChecklists", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_TradeHistoryChecklists_PretradeChecklists_PretradeChecklist~",
+                        column: x => x.PretradeChecklistId,
+                        principalSchema: "Trades",
+                        principalTable: "PretradeChecklists",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_TradeHistoryChecklists_TradeHistorys_TradeHistoryId",
+                        column: x => x.TradeHistoryId,
+                        principalSchema: "Trades",
+                        principalTable: "TradeHistorys",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Screenshots_TradeHistoryId",
                 schema: "Trades",
                 table: "Screenshots",
+                column: "TradeHistoryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TradeEmotionTags_EmotionTagId",
+                schema: "Trades",
+                table: "TradeEmotionTags",
+                column: "EmotionTagId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TradeEmotionTags_TradeHistoryId",
+                schema: "Trades",
+                table: "TradeEmotionTags",
+                column: "TradeHistoryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TradeHistoryChecklists_PretradeChecklistId",
+                schema: "Trades",
+                table: "TradeHistoryChecklists",
+                column: "PretradeChecklistId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TradeHistoryChecklists_TradeHistoryId",
+                schema: "Trades",
+                table: "TradeHistoryChecklists",
                 column: "TradeHistoryId");
 
             migrationBuilder.CreateIndex(
@@ -220,15 +288,23 @@ namespace TradingJournal.Modules.Trades.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "Screenshots",
+                schema: "Trades");
+
+            migrationBuilder.DropTable(
+                name: "TradeEmotionTags",
+                schema: "Trades");
+
+            migrationBuilder.DropTable(
+                name: "TradeHistoryChecklists",
+                schema: "Trades");
+
+            migrationBuilder.DropTable(
                 name: "EmotionTags",
                 schema: "Trades");
 
             migrationBuilder.DropTable(
                 name: "PretradeChecklists",
-                schema: "Trades");
-
-            migrationBuilder.DropTable(
-                name: "Screenshots",
                 schema: "Trades");
 
             migrationBuilder.DropTable(

@@ -1,6 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
-using TradingJournal.Modules.Trades.Common.Enum;
-using TradingJournal.Shared.Abstractions;
 
 namespace TradingJournal.Modules.Trades.Domain;
 

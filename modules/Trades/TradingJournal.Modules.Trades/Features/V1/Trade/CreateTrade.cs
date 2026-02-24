@@ -1,16 +1,8 @@
-﻿using FluentValidation.Results;
-using System.Net;
-using TradingJournal.Modules.Trades.Common.Enum;
-using TradingJournal.Modules.Trades.Dto;
-using TradingJournal.Modules.Trades.Infrastructure;
-using Mapster;
-using TradingJournal.Modules.Trades.Domain;
-using TradingJournal.Modules.Trades.Common.Constants;
-using MediatR;
+﻿using TradingJournal.Modules.Trades.Dto;
 
 namespace TradingJournal.Modules.Trades.Features.V1.Trade;
 
-public static class CreateTrade
+public sealed class CreateTrade
 {
     public record Request(string Asset,
         PositionType Position,
@@ -29,11 +21,11 @@ public static class CreateTrade
         List<int>? EmotionTags,
         ConfidenceLevel ConfidenceLevel,
         string? PsychologyNotes,
-        List<int> PretradeChecklist,
+        List<int> PretradeChecklists,
         int TradingSession,
-        RiskGuardrailsDto RiskGuardrails) : ICommand<Result<int>>;
+        RiskGuardrailsDto? RiskGuardrail) : ICommand<Result<int>>;
 
-    public class Validator : AbstractValidator<Request>
+    internal sealed class Validator : AbstractValidator<Request>
     {
         public Validator()
         {
@@ -73,36 +65,81 @@ public static class CreateTrade
                 .NotNull().WithErrorCode(HttpStatusCode.BadRequest.ToString())
                 .WithMessage("Date of the trade must be entered.");
 
-             RuleFor(x => x.Status)
+            RuleFor(x => x.Status)
                 .Cascade(CascadeMode.Stop)
                 .Must(status => Enum.IsDefined(status))
                 .WithErrorCode(HttpStatusCode.BadRequest.ToString())
                 .WithMessage("Status must be a valid TradeStatus value.");
 
-            RuleFor(x => x.PretradeChecklist)
+            RuleFor(x => x.PretradeChecklists)
                 .Cascade(CascadeMode.Stop)
                 .NotNull().WithErrorCode(HttpStatusCode.BadRequest.ToString())
                 .WithMessage("Pretrade checklist must be entered.");
 
-             RuleFor(x => x.TradingSession)
+            RuleFor(x => x.TradingSession)
                 .Cascade(CascadeMode.Stop)
                 .GreaterThan(0).WithErrorCode(HttpStatusCode.BadRequest.ToString())
                 .WithMessage("Trading Session must be entered and greater than 0.");
         }
     }
 
-    public class Handler(ITradeDbContext context) : IRequestHandler<Request, Result<int>>
+    internal sealed class Handler(ITradeDbContext context) : ICommandHandler<Request, Result<int>>
     {
         public async Task<Result<int>> Handle(Request request, CancellationToken cancellationToken)
         {
-            TradeHistory tradeHistory = request.Adapt<TradeHistory>();
+            await context.BeginTransaction();
 
-            context.TradeHistories.Add(tradeHistory);
+            try
+            {
+                TradeHistory tradeHistory = request.Adapt<TradeHistory>();
 
-            int insertedRow = await context.SaveChangesAsync(cancellationToken);
+                await context.TradeHistories.AddAsync(tradeHistory, cancellationToken);
 
-            return insertedRow > 0 ? Result<int>.Success(tradeHistory.Id)
-                : Result<int>.Failure(Error.Create("Failed to create trade history."));
+                await context.TradeHistoryChecklists.AddRangeAsync(request.PretradeChecklists.Select(checklistId => new TradeHistoryChecklist
+                {
+                    Id = 0,
+                    PretradeChecklistId = checklistId,
+                    TradeHistory = tradeHistory
+                }), cancellationToken);
+
+                await context.TradeEmotionTags.AddRangeAsync(request.EmotionTags?.Select(tagId => new TradeEmotionTag
+                {
+                    Id = 0,
+                    EmotionTagId = tagId,
+                    TradeHistory = tradeHistory
+                }) ?? [], cancellationToken);
+
+                await context.TradeScreenShots.AddRangeAsync(request.Screenshots?.Select(screenshot => new TradeScreenShot
+                {
+                    Id = 0,
+                    Url = screenshot.Url,
+                    TradeHistory = tradeHistory
+                }) ?? [], cancellationToken);
+
+                await context.TradeHistorySessions.AddAsync(new TradeHistorySession
+                {
+                    Id = 0,
+                    TradeHistory = tradeHistory,
+                    TradingSessionId = request.TradingSession
+                }, cancellationToken);
+
+                if (request.RiskGuardrail != null)
+                {
+                    tradeHistory.RiskGuardrail = request.RiskGuardrail.Adapt<RiskGuardrail>();
+                }
+
+                int insertedRow = await context.SaveChangesAsync(cancellationToken);
+
+                await context.CommitTransaction();
+
+                return insertedRow > 0 ? Result<int>.Success(tradeHistory.Id)
+                    : Result<int>.Failure(Error.Create("Failed to create trade history."));
+            }
+            catch
+            {
+                await context.RollbackTransaction();
+                throw;
+            }
         }
     }
 
@@ -115,7 +152,7 @@ public static class CreateTrade
             group.MapPost("/create", async ([FromBody] Request request, ISender sender) => {
                 Result<int> result = await sender.Send(request);
 
-                return result.IsSuccess ? Results.Created() 
+                return result.IsSuccess ? Results.Created($"/api/v1/trades/{result.Value}", result) 
                     : Results.BadRequest(result);
             })
             .Produces<Result<int>>(StatusCodes.Status201Created)

@@ -1,11 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
-using TradingJournal.Modules.Trades.Common.Enum;
 
 namespace TradingJournal.Modules.Trades.Domain;
 
 [Table(name: "TradeHistorys", Schema = "Trades")]
 public sealed class TradeHistory : EntityBase<int>
 {
+    public string Asset { get; set; } = string.Empty;
+    
     public PositionType Position { get; set; }
 
     public double EntryPrice { get; set; }
@@ -34,13 +35,19 @@ public sealed class TradeHistory : EntityBase<int>
 
     public string? PsychologyNotes { get; set; }
 
+    public int? TradingSessionId { get; set; }
+
+    public int? RiskGuardrailId { get; set; }
+
     public ICollection<TradeScreenShot> Screenshots { get; set; } = [];
 
-    public ICollection<EmotionTag> EmotionTags { get; set; } = [];
+    public ICollection<TradeEmotionTag>? TradeEmotionTags { get; set; } = [];
 
-    public ICollection<PretradeChecklist> PretradeChecklists { get; set; } = [];
+    public ICollection<TradeHistoryChecklist> PretradeChecklists { get; set; } = [];
 
-    public TradingSession? TradingSession { get; set; }
+    [ForeignKey(nameof(TradingSessionId))]
+    public TradeHistorySession? TradeHistorySession { get; set; }
 
+    [ForeignKey(nameof(RiskGuardrailId))]
     public RiskGuardrail? RiskGuardrail { get; set; }
 }
