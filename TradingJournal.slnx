@@ -1,4 +1,8 @@
 <Solution>
+  <Folder Name="/aspire/">
+    <Project Path="aspire/TradingJournal.AppHost/TradingJournal.AppHost.csproj" Id="e33aac70-f014-4117-aa65-60b4203630b4" />
+    <Project Path="aspire/TradingJournal.ServiceDefaults/TradingJournal.ServiceDefaults.csproj" Id="b6edde32-abdd-4625-a8a1-0cbac916f1ac" />
+  </Folder>
   <Folder Name="/bootstrapper/">
     <Project Path="bootstrapper/TradingJournal.ApiGateWay/TradingJournal.ApiGateWay.csproj" />
   </Folder>

@@ -1,12 +1,16 @@
 using Carter;
+using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 using System.Text.Json.Serialization;
 using TradingJournal.ApiGateWay.Extensions;
 using TradingJournal.Modules.Trades;
+using TradingJournal.ServiceDefaults;
 using TradingJournal.Shared;
 using TradingJournal.Shared.Middlewares;
 
-var builder = WebApplication.CreateBuilder(args);
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+
+builder.AddServiceDefaults();
 
 // Add services to the container.
 
@@ -30,6 +34,8 @@ builder.Services.ConfigureHttpJsonOptions(options =>
 
 bool isDevelopment = builder.Environment.IsDevelopment();
 
+builder.ConfigureAspireDatabase();
+
 builder.Services
     .AddSharedModule()
     .AddTradeModule(configuration, isDevelopment);
@@ -42,6 +48,13 @@ builder.Services.AddOpenApi(options =>
 builder.Services.AddHttpContextAccessor();
 
 WebApplication app = builder.Build();
+
+if (app.Environment.IsDevelopment())
+{
+    await app.MigrateTradingDatabase();
+}
+
+app.MapDefaultEndpoints();
 
 app.MapCarter();
 app.UseAntiforgery();

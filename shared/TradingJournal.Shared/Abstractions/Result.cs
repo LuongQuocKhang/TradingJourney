@@ -48,9 +48,7 @@ public class Result<T> : Result
         _value = default;
     }
 
-    public T Value => IsSuccess
-        ? _value!
-        : throw new InvalidOperationException("Cannot access Value on a failed result.");
+    public T Value => _value;
 
     public static Result<T> Success(T value) => new(value);
 

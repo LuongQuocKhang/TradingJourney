@@ -48,12 +48,6 @@ internal sealed class TradeDbContext(DbContextOptions<TradeDbContext> options)
         await _transaction.DisposeAsync();
         _transaction = null;
     }
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        base.OnConfiguring(optionsBuilder);
-
-        optionsBuilder.EnableSensitiveDataLogging();
-    }
 
     public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {

@@ -10,7 +10,7 @@
     <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" Version="8.1.1" />
     <PackageReference Include="Azure.Identity" Version="1.17.1" />
     <PackageReference Include="Carter" Version="10.0.0" />
-    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.23.0" />
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="3.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="10.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.3" />
@@ -37,6 +37,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\aspire\TradingJournal.ServiceDefaults\TradingJournal.ServiceDefaults.csproj" />
     <ProjectReference Include="..\..\modules\Trades\TradingJournal.Modules.Trades\TradingJournal.Modules.Trades.csproj" />
     <ProjectReference Include="..\..\shared\TradingJournal.Shared\TradingJournal.Shared.csproj" />
   </ItemGroup>
