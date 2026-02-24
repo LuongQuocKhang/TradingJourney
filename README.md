@@ -1,1 +1,1 @@
-# TradingJourney
+# TradingJournal

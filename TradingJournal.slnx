@@ -1,0 +1,30 @@
+<Solution>
+  <Folder Name="/aspire/">
+    <Project Path="aspire/TradingJournal.AppHost/TradingJournal.AppHost.csproj" Id="e33aac70-f014-4117-aa65-60b4203630b4" />
+    <Project Path="aspire/TradingJournal.ServiceDefaults/TradingJournal.ServiceDefaults.csproj" Id="b6edde32-abdd-4625-a8a1-0cbac916f1ac" />
+  </Folder>
+  <Folder Name="/bootstrapper/">
+    <Project Path="bootstrapper/TradingJournal.ApiGateWay/TradingJournal.ApiGateWay.csproj" />
+  </Folder>
+  <Folder Name="/docs/" />
+  <Folder Name="/jobs/">
+    <Project Path="jobs/TradingJournal.Jobs.BackTestEngine/TradingJournal.Jobs.BackTestEngine.csproj" />
+  </Folder>
+  <Folder Name="/modules/">
+    <Project Path="modules/Analytics/TradingJournal.Modules.Analytics/TradingJournal.Modules.Analytics.csproj" />
+    <Project Path="modules/Playbook/TradingJournal.Modules.Playbook/TradingJournal.Modules.Playbook.csproj" />
+    <Project Path="modules/Psychology/TradingJournal.Modules.Psychology/TradingJournal.Modules.Psychology.csproj" />
+    <Project Path="modules/Strategies/TradingJournal.Modules.Strategies/TradingJournal.Modules.Strategies.csproj" />
+    <Project Path="modules/Trades/TradingJournal.Modules.Trades/TradingJournal.Modules.Trades.csproj" />
+  </Folder>
+  <Folder Name="/shared/">
+    <Project Path="shared/TradingJournal.Shared/TradingJournal.Shared.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/TradingJournal.Tests.Analytics/TradingJournal.Tests.Analytics.csproj" />
+    <Project Path="tests/TradingJournal.Tests.Playbook/TradingJournal.Tests.Playbook.csproj" />
+    <Project Path="tests/TradingJournal.Tests.Psychology/TradingJournal.Tests.Psychology.csproj" />
+    <Project Path="tests/TradingJournal.Tests.Strategies/TradingJournal.Tests.Strategies.csproj" />
+    <Project Path="tests/TradingJournal.Tests.Trades/TradingJournal.Tests.Trades.csproj" />
+  </Folder>
+</Solution>

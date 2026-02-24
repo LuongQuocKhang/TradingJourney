@@ -1,6 +1,6 @@
 ﻿namespace TradingJournal.Shared.Abstractions;
 
-public sealed record Error(string Code, string Description, string? stackTrace = null)
+public sealed record Error(string Code, string Description, string? StackTrace = null)
 {
     public static readonly Error None = new(string.Empty, string.Empty);
 
@@ -12,5 +12,7 @@ public sealed record Error(string Code, string Description, string? stackTrace =
 
     public static Error InvalidInput => new("Error.InvalidInput", $"Invalid input.");
 
-    public static Error LoggedPhoneNumberNotFound => new("Error.LoggedPhoneNumberNotFound", $"Không tìm thấy số điện thoại đăng nhập trong JWT.");
+    public static Error NotFound => new("Error.NotFound", $"Resource not found.");
+
+    public static Error Create(string errorMessage) => new("Error.Create", errorMessage);
 }

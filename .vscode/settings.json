@@ -1,0 +1,6 @@
+{
+    "sonarlint.connectedMode.project": {
+        "connectionId": "trading-journey",
+        "projectKey": "LuongQuocKhang_TradingJournal"
+    }
+}
