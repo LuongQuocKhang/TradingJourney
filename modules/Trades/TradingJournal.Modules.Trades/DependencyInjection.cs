@@ -1,29 +1,26 @@
-﻿using System.Reflection;
-using FluentValidation;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using TradingJournal.Shared.Behaviors;
+using TradingJournal.Modules.Trades.Infrastructure;
+using TradingJournal.Shared;
 
 namespace TradingJournal.Modules.Trades;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddApplicationService(this IServiceCollection services, IConfiguration configuration,
+    public static IServiceCollection AddTradeModule(this IServiceCollection services, IConfiguration configuration,
         bool isDevelopment = false)
     {
-        services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
+        services.AddFluentValidators();
 
-        services.AddMediatR(config =>
+        services.AddMediatRBehaviors(isDevelopment);
+
+        services.AddDbContext<TradeDbContext>(options =>
         {
-            config.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
-
-            config.AddOpenBehavior(typeof(ValidationBehavior<,>));
-
-            if (isDevelopment)
-            {
-                config.AddOpenBehavior(typeof(LoggingBehavior<,>));
-            }
+            options.UseNpgsql(configuration.GetConnectionString("TradingJournalDbContext"));
         });
+
+        services.AddScoped<ITradeDbContext, TradeDbContext>();
 
         return services;
     }

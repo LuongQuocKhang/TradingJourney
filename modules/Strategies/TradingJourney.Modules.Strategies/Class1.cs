@@ -1,4 +1,4 @@
-﻿namespace TradingJourney.Modules.Strategies
+﻿namespace TradingJournal.Modules.Strategies
 {
     public class Class1
     {

@@ -1,4 +1,4 @@
-﻿namespace TradingJourney.Tests.Psychology
+﻿namespace TradingJournal.Tests.Psychology
 {
     public class UnitTest1
     {

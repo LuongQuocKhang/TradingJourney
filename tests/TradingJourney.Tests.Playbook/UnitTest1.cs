@@ -1,4 +1,4 @@
-﻿namespace TradingJourney.Tests.Playbook
+﻿namespace TradingJournal.Tests.Playbook
 {
     public class UnitTest1
     {

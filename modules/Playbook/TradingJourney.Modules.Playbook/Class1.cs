@@ -1,4 +1,4 @@
-﻿namespace TradingJourney.Modules.Playbook
+﻿namespace TradingJournal.Modules.Playbook
 {
     public class Class1
     {

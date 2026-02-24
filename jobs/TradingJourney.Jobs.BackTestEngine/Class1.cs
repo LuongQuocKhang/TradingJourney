@@ -1,4 +1,4 @@
-﻿namespace TradingJourney.Jobs.BackTestEngine
+﻿namespace TradingJournal.Jobs.BackTestEngine
 {
     public class Class1
     {

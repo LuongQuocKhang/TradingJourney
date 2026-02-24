@@ -1,26 +1,26 @@
 <Solution>
   <Folder Name="/bootstrapper/">
-    <Project Path="bootstrapper/TradingJourney.ApiGateWay/TradingJourney.ApiGateWay.csproj" />
+    <Project Path="bootstrapper/TradingJourney.ApiGateWay/TradingJournal.ApiGateWay.csproj" />
   </Folder>
   <Folder Name="/docs/" />
   <Folder Name="/jobs/">
-    <Project Path="jobs/TradingJourney.Jobs.BackTestEngine/TradingJourney.Jobs.BackTestEngine.csproj" />
+    <Project Path="jobs/TradingJourney.Jobs.BackTestEngine/TradingJournal.Jobs.BackTestEngine.csproj" />
   </Folder>
   <Folder Name="/modules/">
     <Project Path="modules/Analytics/TradingJournal.Modules.Analytics/TradingJournal.Modules.Analytics.csproj" />
-    <Project Path="modules/Playbook/TradingJourney.Modules.Playbook/TradingJourney.Modules.Playbook.csproj" />
-    <Project Path="modules/Psychology/TradingJourney.Modules.Psychology/TradingJourney.Modules.Psychology.csproj" />
-    <Project Path="modules/Strategies/TradingJourney.Modules.Strategies/TradingJourney.Modules.Strategies.csproj" />
+    <Project Path="modules/Playbook/TradingJourney.Modules.Playbook/TradingJournal.Modules.Playbook.csproj" />
+    <Project Path="modules/Psychology/TradingJourney.Modules.Psychology/TradingJournal.Modules.Psychology.csproj" />
+    <Project Path="modules/Strategies/TradingJourney.Modules.Strategies/TradingJournal.Modules.Strategies.csproj" />
     <Project Path="modules/Trades/TradingJournal.Modules.Trades/TradingJournal.Modules.Trades.csproj" />
   </Folder>
   <Folder Name="/shared/">
     <Project Path="shared/TradingJournal.Shared/TradingJournal.Shared.csproj" />
   </Folder>
   <Folder Name="/tests/">
-    <Project Path="tests/TradingJourney.Tests.Analytics/TradingJourney.Tests.Analytics.csproj" />
-    <Project Path="tests/TradingJourney.Tests.Playbook/TradingJourney.Tests.Playbook.csproj" />
-    <Project Path="tests/TradingJourney.Tests.Psychology/TradingJourney.Tests.Psychology.csproj" />
-    <Project Path="tests/TradingJourney.Tests.Strategies/TradingJourney.Tests.Strategies.csproj" />
+    <Project Path="tests/TradingJourney.Tests.Analytics/TradingJournal.Tests.Analytics.csproj" />
+    <Project Path="tests/TradingJourney.Tests.Playbook/TradingJournal.Tests.Playbook.csproj" />
+    <Project Path="tests/TradingJourney.Tests.Psychology/TradingJournal.Tests.Psychology.csproj" />
+    <Project Path="tests/TradingJourney.Tests.Strategies/TradingJournal.Tests.Strategies.csproj" />
     <Project Path="tests/TradingJourney.Tests.Trades/TradingJourney.Tests.Trades.csproj" />
   </Folder>
 </Solution>

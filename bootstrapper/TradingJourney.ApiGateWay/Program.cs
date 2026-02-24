@@ -1,34 +1,68 @@
+using Carter;
+using Scalar.AspNetCore;
+using System.Text.Json.Serialization;
+using TradingJournal.ApiGateWay.Extensions;
+using TradingJournal.Modules.Trades;
+using TradingJournal.Shared;
+using TradingJournal.Shared.Middlewares;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-var app = builder.Build();
+builder.Services.AddEndpointsApiExplorer();
 
-// Configure the HTTP request pipeline.
+builder.Services.AddSwagger();
+
+ConfigurationManager configuration = builder.Configuration;
+
+builder.Services.AddCors();
+
+builder.Services.AddCarter();
+
+builder.Services.AddAntiforgery();
+
+builder.Services.ConfigureHttpJsonOptions(options =>
+{
+    options.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+});
+
+bool isDevelopment = builder.Environment.IsDevelopment();
+
+builder.Services
+    .AddSharedModule()
+    .AddTradeModule(configuration, isDevelopment);
+
+builder.Services.AddOpenApi(options =>
+{
+    options.UseJwtBearerAuthentication();
+});
+
+builder.Services.AddHttpContextAccessor();
+
+WebApplication app = builder.Build();
+
+app.MapCarter();
+app.UseAntiforgery();
+app.UseSwaggerDoc();
+app.UseStaticFiles();
+
+app.UseAuthentication();
+//app.UseAuthorization();
+
+app.MapOpenApi();
+
+app.UseCustomExceptionHandler();
+
+app.MapScalarApiReference(options =>
+{
+});
+
+app.UseCors(cors => cors
+    .AllowAnyOrigin()
+    .AllowAnyMethod()
+    .AllowAnyHeader());
 
 app.UseHttpsRedirection();
 
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast = Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-});
-
-app.Run();
-
-internal record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
+await app.RunAsync();

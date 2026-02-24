@@ -1,4 +1,4 @@
-﻿namespace TradingJourney.Modules.Psychology
+﻿namespace TradingJournal.Modules.Psychology
 {
     public class Class1
     {

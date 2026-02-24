@@ -1,4 +1,4 @@
-﻿namespace TradingJourney.Tests.Analytics
+﻿namespace TradingJournal.Tests.Analytics
 {
     public class UnitTest1
     {
