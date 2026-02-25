@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Storage;
 using TradingJournal.Modules.Psychology.Domain;
-using TradingJournal.Shared.Common;
 
 namespace TradingJournal.Modules.Psychology.Infrastructure.Persistance;
 
@@ -11,6 +10,10 @@ internal sealed class PsychologyDbContext(DbContextOptions<PsychologyDbContext> 
     private IDbContextTransaction? _transaction;
 
     public DbSet<EmotionTag> EmotionTags { get; set; }
+
+    public DbSet<PsychologyJournal> PsychologyJournals { get; set; }
+
+    public DbSet<PsychologyJournalEmotion> PsychologyJournalEmotions { get; set; }
 
     public async Task BeginTransaction()
     {

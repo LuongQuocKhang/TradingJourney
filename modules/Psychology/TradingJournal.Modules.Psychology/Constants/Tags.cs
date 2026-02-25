@@ -1,8 +1,8 @@
 namespace TradingJournal.Modules.Psychology.Constants;
 
-public class Tags
+public static class Tags
 {
-    public const string Psychology = "Psychology";
+    public const string PsychologyJournal = "Psychology Journal";
 
     public const string Emotions = "Emotions";
 }

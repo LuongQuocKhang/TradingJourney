@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using System.Text.Json.Serialization;
 using TradingJournal.Modules.Psychology.Infrastructure.Persistance;
 using TradingJournal.Shared.Behaviors;
 
@@ -24,7 +25,7 @@ public static class DependencyInjection
         });
 
         services.AddScoped<IPsychologyDbContext, PsychologyDbContext>();
-
+        
         return services;
     }
 
@@ -40,7 +41,7 @@ public static class DependencyInjection
         using IServiceScope scope = app.ApplicationServices.CreateScope();
 
         PsychologyDbContext dbContext = scope.ServiceProvider.GetRequiredService<PsychologyDbContext>();
-        await dbContext.Database.EnsureCreatedAsync();
+        await dbContext.Database.MigrateAsync();
 
         return app;
     }

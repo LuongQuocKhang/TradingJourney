@@ -1,5 +1,58 @@
-﻿namespace TradingJournal.Modules.Psychology.Features.V1.Psychology;
+﻿using Microsoft.AspNetCore.Mvc;
+using TradingJournal.Modules.Psychology.Common.Enum;
+using TradingJournal.Modules.Psychology.Constants;
+using TradingJournal.Modules.Psychology.Domain;
+using TradingJournal.Modules.Psychology.Infrastructure.Persistance;
+
+namespace TradingJournal.Modules.Psychology.Features.V1.Psychology;
 
 public sealed class CreateTodayPsychology
 {
+    public record Request(DateTime Date, string TodayTradingReview, List<int> EmotionTags, 
+        OverallMood OverallMood = OverallMood.Neutral, 
+        ConfidentLevel ConfidentLevel = ConfidentLevel.None) : ICommand<Result<int>>;
+
+    internal sealed class Handler(IPsychologyDbContext context) : ICommandHandler<Request, Result<int>>
+    {
+        public async Task<Result<int>> Handle([FromBody] Request request, CancellationToken cancellationToken)
+        {
+            PsychologyJournal todayPsychology = new()
+            {
+                Id = 0,
+                Date = request.Date,
+                TodayTradingReview = request.TodayTradingReview,
+                OverallMood = request.OverallMood,
+                ConfidentLevel = request.ConfidentLevel,
+                EmotionTags = [.. request.EmotionTags.Select(e => new PsychologyJournalEmotion
+                { 
+                    Id = 0,
+                    EmotionTagId = e
+                })]
+            };
+            await context.PsychologyJournals.AddAsync(todayPsychology, cancellationToken);
+
+            int affectedRow = await context.SaveChangesAsync(cancellationToken);
+
+            return affectedRow > 0 ? Result<int>.Success(todayPsychology.Id) 
+                : Result<int>.Failure(Error.Create("Failed to create today's psychology journal."));
+        }
+    }
+
+    public class Endpoint : ICarterModule
+    {
+        public void AddRoutes(IEndpointRouteBuilder app)
+        {
+            app.MapPost("/api/v1/psychology-journals", async (Request request, IMediator mediator) =>
+            {
+                Result<int> result = await mediator.Send(request);
+                return result;
+            })
+            .Produces<Result<int>>(StatusCodes.Status201Created)
+            .Produces(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status500InternalServerError)
+            .WithSummary("Create a new psychology journal entry.")
+            .WithDescription("Creates a new psychology journal entry for today.")
+            .WithTags(Tags.PsychologyJournal);
+        }
+    }
 }

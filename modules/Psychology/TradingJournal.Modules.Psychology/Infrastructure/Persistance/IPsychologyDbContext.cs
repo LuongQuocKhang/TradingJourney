@@ -1,17 +1,20 @@
 ﻿using TradingJournal.Modules.Psychology.Domain;
 
-namespace TradingJournal.Modules.Psychology.Infrastructure.Persistance
+namespace TradingJournal.Modules.Psychology.Infrastructure.Persistance;
+
+public interface IPsychologyDbContext
 {
-    public interface IPsychologyDbContext
-    {
-        public DbSet<EmotionTag> EmotionTags { get; set; }
+    public DbSet<EmotionTag> EmotionTags { get; set; }
 
-        Task BeginTransaction();
+    public DbSet<PsychologyJournal> PsychologyJournals { get; set; }
 
-        Task CommitTransaction();
+    public DbSet<PsychologyJournalEmotion> PsychologyJournalEmotions { get; set; }
 
-        Task RollbackTransaction();
+    Task BeginTransaction();
 
-        Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
-    }
+    Task CommitTransaction();
+
+    Task RollbackTransaction();
+
+    Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }
