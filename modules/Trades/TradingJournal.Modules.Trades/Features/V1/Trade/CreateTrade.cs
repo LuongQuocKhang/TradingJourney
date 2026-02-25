@@ -17,7 +17,8 @@ public sealed class CreateTrade
         double? ExitPrice,
         double? Pnl,
         DateTime? ClosedDate,
-        List<TradeScreenShotDto>? Screenshots,
+        List<string>? Screenshots,
+        List<int>? TechnicalAnalysisTags,
         List<int>? EmotionTags,
         ConfidenceLevel ConfidenceLevel,
         string? PsychologyNotes,
@@ -112,7 +113,7 @@ public sealed class CreateTrade
                 await context.TradeScreenShots.AddRangeAsync(request.Screenshots?.Select(screenshot => new TradeScreenShot
                 {
                     Id = 0,
-                    Url = screenshot.Url,
+                    Url = screenshot,
                     TradeHistory = tradeHistory
                 }) ?? [], cancellationToken);
 
@@ -122,6 +123,13 @@ public sealed class CreateTrade
                     TradeHistory = tradeHistory,
                     TradingSessionId = request.TradingSession
                 }, cancellationToken);
+
+                await context.TradeTechnicalAnalysisTags.AddRangeAsync(request.TechnicalAnalysisTags?.Select(tagId => new TradeTechnicalAnalysisTag
+                {
+                    Id = 0,
+                    TechnicalAnalysisId = tagId,
+                    TradeHistory = tradeHistory
+                }) ?? [], cancellationToken);
 
                 if (request.RiskGuardrail != null)
                 {

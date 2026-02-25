@@ -11,8 +11,6 @@ internal sealed class TradeDbContext(DbContextOptions<TradeDbContext> options)
 
     public DbSet<TradeHistory> TradeHistories { get; set; }
 
-    public DbSet<EmotionTag> EmotionTags { get; set; }
-
     public DbSet<PretradeChecklist> PretradeChecklists { get; set; }
 
     public DbSet<RiskGuardrail> RiskGuardrails { get; set; }
@@ -26,6 +24,10 @@ internal sealed class TradeDbContext(DbContextOptions<TradeDbContext> options)
     public DbSet<TradeEmotionTag> TradeEmotionTags { get; set; }
     
     public DbSet<TradeHistorySession> TradeHistorySessions { get; set; }
+
+    public DbSet<TechnicalAnalysis> TechnicalAnalyses { get; set; }
+
+    public DbSet<TradeTechnicalAnalysisTag> TradeTechnicalAnalysisTags { get; set; }
 
     public async Task BeginTransaction()
     {

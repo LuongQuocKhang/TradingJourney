@@ -2,7 +2,7 @@ namespace TradingJournal.Modules.Trades.Features.V1.Trade;
 
 public class GetTradeDetail
 {
-    public record Request(int Id) : IQuery<Result<TradeHistoryViewModel>>;
+    public record Request(int Id) : IQuery<Result<TradeHistoryDetailViewModel>>;
 
     public class Validator : AbstractValidator<Request>
     {
@@ -16,20 +16,20 @@ public class GetTradeDetail
         }
     }   
 
-    public class Handler(ITradeDbContext tradeDbContext) : IQueryHandler<Request, Result<TradeHistoryViewModel>>
+    public class Handler(ITradeDbContext tradeDbContext) : IQueryHandler<Request, Result<TradeHistoryDetailViewModel>>
     {
-        public async Task<Result<TradeHistoryViewModel>> Handle(Request request, CancellationToken cancellationToken)
+        public async Task<Result<TradeHistoryDetailViewModel>> Handle(Request request, CancellationToken cancellationToken)
         {
             Domain.TradeHistory? trade = await tradeDbContext.TradeHistories.FindAsync([request.Id], cancellationToken: cancellationToken);
 
-            TradeHistoryViewModel tradeHistoryViewModel = trade.Adapt<TradeHistoryViewModel>();
+            TradeHistoryDetailViewModel TradeHistoryDetailViewModel = trade.Adapt<TradeHistoryDetailViewModel>();
 
             if (trade == null)
             {
-                return Result<TradeHistoryViewModel>.Failure(Error.NotFound);
+                return Result<TradeHistoryDetailViewModel>.Failure(Error.NotFound);
             }
 
-            return Result<TradeHistoryViewModel>.Success(tradeHistoryViewModel);
+            return Result<TradeHistoryDetailViewModel>.Success(TradeHistoryDetailViewModel);
         }
     }
 
@@ -40,12 +40,12 @@ public class GetTradeDetail
             RouteGroupBuilder group = app.MapGroup("api/v1/trades");
 
             group.MapGet("/{id}", async ([FromRoute] int id, ISender sender) => {
-                Result<TradeHistoryViewModel> result = await sender.Send(new Request(id));
+                Result<TradeHistoryDetailViewModel> result = await sender.Send(new Request(id));
 
                 return result.IsSuccess ? Results.Ok(result) 
                     : Results.BadRequest(result);
             })
-            .Produces<Result<TradeHistoryViewModel>>(StatusCodes.Status200OK)
+            .Produces<Result<TradeHistoryDetailViewModel>>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status500InternalServerError)
             .WithSummary("Get a trade history by ID.")

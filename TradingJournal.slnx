@@ -18,6 +18,7 @@
     <Project Path="modules/Trades/TradingJournal.Modules.Trades/TradingJournal.Modules.Trades.csproj" />
   </Folder>
   <Folder Name="/shared/">
+    <Project Path="shared/TradingJournal.Messaging.Shared/TradingJournal.Messaging.Shared.csproj" Id="96e200b6-2bea-42bb-8320-806a6773ac3c" />
     <Project Path="shared/TradingJournal.Shared/TradingJournal.Shared.csproj" />
   </Folder>
   <Folder Name="/tests/">

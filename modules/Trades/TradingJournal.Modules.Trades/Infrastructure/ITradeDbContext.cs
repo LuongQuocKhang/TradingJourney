@@ -3,8 +3,6 @@
 public interface ITradeDbContext
 {
     DbSet<TradeHistory> TradeHistories { get; set; }
-
-    DbSet<EmotionTag> EmotionTags { get; set; }
     
     DbSet<PretradeChecklist> PretradeChecklists { get; set; }
 
@@ -19,6 +17,10 @@ public interface ITradeDbContext
     DbSet<TradeEmotionTag> TradeEmotionTags { get; set; }
 
     DbSet<TradeHistorySession> TradeHistorySessions { get; set; }
+
+    DbSet<TechnicalAnalysis> TechnicalAnalyses { get; set; }
+
+    DbSet<TradeTechnicalAnalysisTag> TradeTechnicalAnalysisTags { get; set; }
 
     Task BeginTransaction();
 

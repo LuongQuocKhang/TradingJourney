@@ -12,6 +12,6 @@ public sealed class TradeEmotionTag : EntityBase<int>
     [ForeignKey(nameof(TradeHistoryId))]
     public TradeHistory TradeHistory { get; set; }
 
-    [ForeignKey(nameof(EmotionTagId))]
-    public EmotionTag EmotionTag { get; set; }
+    //[ForeignKey(nameof(EmotionTagId))]
+    //public EmotionTag EmotionTag { get; set; }
 }

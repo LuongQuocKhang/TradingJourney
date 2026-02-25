@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.OpenApi;
 using Microsoft.OpenApi;
 
-namespace TradingJournal.ApiGateWay.Extensions;
+namespace TradingJournal.Modules.Trades.Extensions;
 
 /// <summary>
 /// Scalar API Extensions

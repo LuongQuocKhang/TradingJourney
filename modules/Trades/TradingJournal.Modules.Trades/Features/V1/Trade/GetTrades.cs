@@ -1,14 +1,22 @@
+using TradingJournal.Shared.Common;
+using TradingJournal.Shared.Extensions;
+using TradingJournal.Shared.Interfaces;
+
 namespace TradingJournal.Modules.Trades.Features.V1.Trade;
 
 public class GetTrades
 {
-    public class Request : IQuery<Result<IReadOnlyCollection<TradeHistoryViewModel>>>
+    public class Request : IQuery<Result<PaginationViewModel<TradeHistoryViewModel>>>
     {
         public string? Asset { get; set; }
 
         public PositionType? Position { get; set; }
 
         public TradeStatus? Status { get; set; }
+
+        public DateTime? FromDate { get; set; }
+
+        public DateTime? ToDate { get; set; }
 
         public int Page { get; set; } = 1;
 
@@ -33,24 +41,102 @@ public class GetTrades
         }
     }
 
-    public class Handler(ITradeDbContext tradeDbContext) : IQueryHandler<Request, Result<IReadOnlyCollection<TradeHistoryViewModel>>>
+    public class Handler(ITradeDbContext tradeDbContext, ICacheRepository cacheRepository) : IQueryHandler<Request, Result<PaginationViewModel<TradeHistoryViewModel>>>
     {
-        public async Task<Result<IReadOnlyCollection<TradeHistoryViewModel>>> Handle(Request request, CancellationToken cancellationToken)
+        public async Task<Result<PaginationViewModel<TradeHistoryViewModel>>> Handle(Request request, CancellationToken cancellationToken)
         {
-            List<TradeHistory> tradeHistories = await tradeDbContext.TradeHistories
+            string queryHash = request.ToHashString();
+
+            Result<PaginationViewModel<TradeHistoryViewModel>>? result = await cacheRepository.GetOrCreateAsync<Result<PaginationViewModel<TradeHistoryViewModel>>>(
+                queryHash, async cancellationToken =>
+                {
+                Result<PaginationViewModel<TradeHistoryViewModel>> result = await GetTradesFromDatabase(request, cancellationToken);
+                return result;
+            }, 
+            expiration: TimeSpan.FromMinutes(5),
+            cancellationToken: cancellationToken);
+
+            return result ?? Result<PaginationViewModel<TradeHistoryViewModel>>.Failure(Error.NotFound);
+        }
+
+        private async Task<Result<PaginationViewModel<TradeHistoryViewModel>>> GetTradesFromDatabase(Request request, CancellationToken cancellationToken)
+        {
+            IQueryable<TradeHistory> query = tradeDbContext.TradeHistories
+                .AsNoTracking();
+
+            if (!string.IsNullOrEmpty(request.Asset))
+            {
+                query = query.Where(th => th.Asset.Contains(request.Asset));
+            }
+
+            if (request.Position.HasValue)
+            {
+                query = query.Where(th => th.Position == request.Position.Value);
+            }
+
+            if (request.Status.HasValue)
+            {
+                query = query.Where(th => th.Status == request.Status.Value);
+            }
+
+            if (request.FromDate.HasValue)
+            {
+                query = query.Where(th => th.Date >= request.FromDate.Value);
+            }
+
+            if (request.ToDate.HasValue)
+            {
+                query = query.Where(th => th.Date <= request.ToDate.Value);
+            }
+
+            int totalItems = await query.CountAsync(cancellationToken);
+
+            List<TradeHistory> tradeHistories = await query
+                .OrderByDescending(th => th.Date)
                 .Skip((request.Page - 1) * request.PageSize)
                 .Take(request.PageSize)
                 .ToListAsync(cancellationToken);
 
             if (tradeHistories.Count == 0)
             {
-                return Result<IReadOnlyCollection<TradeHistoryViewModel>>.Failure(Error.NotFound);
+                return Result<PaginationViewModel<TradeHistoryViewModel>>.Failure(Error.NotFound);
             }
 
             IReadOnlyCollection<TradeHistoryViewModel> tradeHistoryViewModels = tradeHistories.Adapt<IReadOnlyCollection<TradeHistoryViewModel>>();
 
+            foreach (TradeHistoryViewModel viewModel in tradeHistoryViewModels)
+            {
+                //List<string> emotionTags = await tradeDbContext.TradeEmotionTags
+                //    .Where(tet => tet.TradeHistoryId == viewModel.Id)
+                //    .Select(tet => tet.EmotionTag.Name)
+                //    .ToListAsync(cancellationToken);
+                //viewModel.EmotionTags = emotionTags;
 
-            return Result<IReadOnlyCollection<TradeHistoryViewModel>>.Success(tradeHistoryViewModels);
+                // get emotion tags from cache
+
+                viewModel.Position = viewModel.Position switch
+                {
+                    "Long" => "Long",
+                    "Short" => "Short",
+                    _ => viewModel.Position
+                };
+
+                viewModel.Status = viewModel.Status switch
+                {
+                    "Open" => "Open",
+                    "Closed" => "Closed",
+                    _ => viewModel.Status
+                };
+            }
+
+            PaginationViewModel<TradeHistoryViewModel> result = new()
+            {
+                TotalItems = totalItems,
+                HasMore = (request.Page * request.PageSize) < totalItems,
+                Values = tradeHistoryViewModels
+            };
+
+            return Result<PaginationViewModel<TradeHistoryViewModel>>.Success(result);
         }
     }
 
@@ -60,18 +146,17 @@ public class GetTrades
         {
             RouteGroupBuilder group = app.MapGroup("api/v1/trades");
 
-            group.MapGet("/", async (ISender sender, [FromQuery] string? asset, [FromQuery] PositionType? position, [FromQuery] TradeStatus? status,
-                [FromQuery] int page = 1, [FromQuery] int pageSize = 10) =>
+            group.MapPost("/", async (ISender sender, [FromBody] Request request) =>
             {
-                Result<IReadOnlyCollection<TradeHistoryViewModel>> result = await sender.Send(new Request { Page = page, PageSize = pageSize, Asset = asset, Position = position, Status = status });
+                Result<PaginationViewModel<TradeHistoryViewModel>> result = await sender.Send(request);
 
                 return result.IsSuccess ? Results.Ok(result)
                     : Results.BadRequest(result);
             })
-            .Produces<Result<IReadOnlyCollection<TradeHistoryViewModel>>>(StatusCodes.Status200OK)
+            .Produces<Result<PaginationViewModel<TradeHistoryViewModel>>>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status500InternalServerError)
-            .WithSummary("Get a list of trade histories.")
+            .WithSummary("Search trade histories.")
             .WithDescription("Retrieves a list of trade histories.")
             .WithTags(Tags.Trades);
         }

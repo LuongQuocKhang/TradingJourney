@@ -45,6 +45,8 @@ public sealed class TradeHistory : EntityBase<int>
 
     public ICollection<TradeHistoryChecklist> PretradeChecklists { get; set; } = [];
 
+    public ICollection<TradeTechnicalAnalysisTag> TechnicalAnalysisTagss { get; set; } = [];
+
     [ForeignKey(nameof(TradingSessionId))]
     public TradeHistorySession? TradeHistorySession { get; set; }
 

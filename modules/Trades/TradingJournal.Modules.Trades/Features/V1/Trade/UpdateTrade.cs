@@ -19,7 +19,8 @@ public sealed class UpdateTrade
         double? ExitPrice,
         double? Pnl,
         DateTime? ClosedDate,
-        List<TradeScreenShotDto>? Screenshots,
+        List<string>? Screenshots,
+        List<int>? TechnicalAnalysisTags,
         List<int>? EmotionTags,
         ConfidenceLevel ConfidenceLevel,
         string? PsychologyNotes,
@@ -128,6 +129,7 @@ public sealed class UpdateTrade
                 context.TradeScreenShots.RemoveRange(tradeHistory.Screenshots);
                 context.TradeEmotionTags.RemoveRange(tradeHistory.TradeEmotionTags ?? []);
                 context.TradeHistoryChecklists.RemoveRange(tradeHistory.PretradeChecklists);
+                context.TradeTechnicalAnalysisTags.RemoveRange(tradeHistory.TechnicalAnalysisTagss ?? []);
 
                 await context.TradeHistoryChecklists.AddRangeAsync(request.PretradeChecklists.Select(checklistId => new TradeHistoryChecklist
                 {
@@ -147,7 +149,14 @@ public sealed class UpdateTrade
                 {
                     Id = 0,
                     TradeHistoryId = tradeHistory.Id,
-                    Url = screenshot.Url
+                    Url = screenshot
+                }) ?? [], cancellationToken);
+
+                await context.TradeTechnicalAnalysisTags.AddRangeAsync(request.TechnicalAnalysisTags?.Select(tagId => new TradeTechnicalAnalysisTag
+                {
+                    Id = 0,
+                    TradeHistoryId = tradeHistory.Id,
+                    TechnicalAnalysisId = tagId
                 }) ?? [], cancellationToken);
                 #endregion
 

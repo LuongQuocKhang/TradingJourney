@@ -1,7 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using System.Reflection;
+﻿using System.Reflection;
 using TradingJournal.Shared.Behaviors;
 
 namespace TradingJournal.Modules.Trades;
