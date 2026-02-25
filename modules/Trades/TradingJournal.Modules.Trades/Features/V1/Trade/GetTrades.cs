@@ -1,4 +1,5 @@
 using TradingJournal.Shared.Common;
+using TradingJournal.Shared.Contracts;
 using TradingJournal.Shared.Extensions;
 using TradingJournal.Shared.Interfaces;
 
@@ -47,12 +48,12 @@ public class GetTrades
         {
             string queryHash = request.ToHashString();
 
-            Result<PaginationViewModel<TradeHistoryViewModel>>? result = await cacheRepository.GetOrCreateAsync<Result<PaginationViewModel<TradeHistoryViewModel>>>(
+            Result<PaginationViewModel<TradeHistoryViewModel>>? result = await cacheRepository.GetOrCreateAsync(
                 queryHash, async cancellationToken =>
                 {
-                Result<PaginationViewModel<TradeHistoryViewModel>> result = await GetTradesFromDatabase(request, cancellationToken);
-                return result;
-            }, 
+                    Result<PaginationViewModel<TradeHistoryViewModel>> result = await GetTradesFromDatabase(request, cancellationToken);
+                    return result;
+                },
             expiration: TimeSpan.FromMinutes(5),
             cancellationToken: cancellationToken);
 
@@ -104,15 +105,32 @@ public class GetTrades
 
             IReadOnlyCollection<TradeHistoryViewModel> tradeHistoryViewModels = tradeHistories.Adapt<IReadOnlyCollection<TradeHistoryViewModel>>();
 
+            // Batch-fetch EmotionTagIds for all trades on this page (single query, no N+1)
+            List<int> tradeIds = tradeHistories.Select(t => t.Id).ToList();
+
+            List<TradeEmotionTag> tradeEmotionTags = await tradeDbContext.TradeEmotionTags
+                .AsNoTracking()
+                .Where(tet => tradeIds.Contains(tet.TradeHistoryId))
+                .ToListAsync(cancellationToken);
+
+            // Read EmotionTag names from shared Redis cache (written by Psychology module)
+            List<EmotionTagCacheDto>? cachedEmotionTags = await cacheRepository.GetAsync<List<EmotionTagCacheDto>>(
+                CacheKeys.EmotionTags,
+                cancellationToken);
+
+            Dictionary<int, string> emotionTagLookup = cachedEmotionTags?
+                .ToDictionary(e => e.Id, e => e.Name) ?? [];
+
+            // Group EmotionTagIds by TradeHistoryId
+            ILookup<int, int> emotionTagIdsByTrade = tradeEmotionTags
+                .ToLookup(tet => tet.TradeHistoryId, tet => tet.EmotionTagId);
+
             foreach (TradeHistoryViewModel viewModel in tradeHistoryViewModels)
             {
-                //List<string> emotionTags = await tradeDbContext.TradeEmotionTags
-                //    .Where(tet => tet.TradeHistoryId == viewModel.Id)
-                //    .Select(tet => tet.EmotionTag.Name)
-                //    .ToListAsync(cancellationToken);
-                //viewModel.EmotionTags = emotionTags;
-
-                // get emotion tags from cache
+                // Resolve EmotionTagIds to names via cache lookup
+                viewModel.EmotionTags = [.. emotionTagIdsByTrade[viewModel.Id]
+                    .Where(emotionTagLookup.ContainsKey)
+                    .Select(id => emotionTagLookup[id])];
 
                 viewModel.Position = viewModel.Position switch
                 {

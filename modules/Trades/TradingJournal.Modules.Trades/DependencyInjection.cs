@@ -29,7 +29,7 @@ public static class DependencyInjection
 
     public static WebApplicationBuilder ConfigureAspireDatabase(this WebApplicationBuilder builder)
     {
-        builder.AddNpgsqlDbContext<TradeDbContext>("postgresdb");
+        builder.AddNpgsqlDbContext<TradeDbContext>("tradingHistoryDb");
 
         return builder;
     }

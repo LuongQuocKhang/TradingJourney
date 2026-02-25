@@ -25,7 +25,7 @@ IResourceBuilder<PostgresDatabaseResource> psychologyDb = postgres.AddDatabase("
 #region Redis
 IResourceBuilder<ParameterResource> redisPassword = builder.AddParameter("redisPassword",
     secret: true,
-    value: builder.Configuration.GetValue<string>("Aspire:Redis:redisPassword") ?? string.Empty);
+    value: builder.Configuration.GetValue<string>("Aspire:StackExchange:Redis:redisPassword") ?? string.Empty);
 
 var redis = builder.AddRedis("redis")
     .WithDataVolume()

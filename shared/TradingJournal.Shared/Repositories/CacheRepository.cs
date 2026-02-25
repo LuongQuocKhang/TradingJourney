@@ -8,6 +8,13 @@ public class CacheRepository(IDistributedCache distributedCache) : ICacheReposit
 {
     private static readonly TimeSpan DefaultExpiration = TimeSpan.FromSeconds(30);
 
+    public async Task<T?> GetAsync<T>(string key, CancellationToken cancellationToken = default)
+    {
+        string? cached = await distributedCache.GetStringAsync(key, cancellationToken);
+
+        return cached is not null ? JsonSerializer.Deserialize<T>(cached) : default;
+    }
+
     public async Task<T?> GetOrCreateAsync<T>(string key,
         Func<CancellationToken, Task<T>> handle,
         TimeSpan? expiration,

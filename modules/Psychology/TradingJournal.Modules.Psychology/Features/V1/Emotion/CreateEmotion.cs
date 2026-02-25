@@ -2,6 +2,7 @@
 using TradingJournal.Modules.Psychology.Constants;
 using TradingJournal.Modules.Psychology.Domain;
 using TradingJournal.Modules.Psychology.Infrastructure.Persistance;
+using TradingJournal.Shared.Contracts;
 using TradingJournal.Shared.Interfaces;
 
 namespace TradingJournal.Modules.Psychology.Features.V1.Emotion;
@@ -50,13 +51,7 @@ public sealed class CreateEmotion
 
             await context.SaveChangesAsync(cancellationToken);
 
-            // invalidate cache
-            await cacheRepository.RemoveCache("emotions", cancellationToken);
-
-            // update cache
-            await cacheRepository.GetOrCreateAsync("emotions", async (ct) => await context.EmotionTags
-                .AsNoTracking()
-                .ToListAsync(ct), TimeSpan.FromMinutes(5), cancellationToken);
+            await cacheRepository.RemoveCache(CacheKeys.EmotionTags, cancellationToken);
 
             return Result<int>.Success(emotionTag.Id);
         }

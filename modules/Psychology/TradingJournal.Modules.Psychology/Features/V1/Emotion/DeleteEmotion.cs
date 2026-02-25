@@ -1,6 +1,8 @@
 ﻿using TradingJournal.Modules.Psychology.Constants;
 using TradingJournal.Modules.Psychology.Domain;
 using TradingJournal.Modules.Psychology.Infrastructure.Persistance;
+using TradingJournal.Shared.Contracts;
+using TradingJournal.Shared.Interfaces;
 
 namespace TradingJournal.Modules.Psychology.Features.V1.Emotion;
 
@@ -23,7 +25,7 @@ public sealed class DeleteEmotion
         }
     }
 
-    internal sealed class Handler(IPsychologyDbContext context) : ICommandHandler<Request, Result<bool>>
+    internal sealed class Handler(IPsychologyDbContext context, ICacheRepository cacheRepository) : ICommandHandler<Request, Result<bool>>
     {
         public async Task<Result<bool>> Handle(Request request, CancellationToken cancellationToken)
         {
@@ -37,6 +39,8 @@ public sealed class DeleteEmotion
             context.EmotionTags.Remove(emotionTag);
 
             await context.SaveChangesAsync(cancellationToken);
+
+            await cacheRepository.RemoveCache(CacheKeys.EmotionTags, cancellationToken);
 
             return Result<bool>.Success(true);
         }
