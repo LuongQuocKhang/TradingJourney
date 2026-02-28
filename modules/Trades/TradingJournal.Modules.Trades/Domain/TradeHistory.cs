@@ -39,13 +39,13 @@ public sealed class TradeHistory : EntityBase<int>
 
     public int? RiskGuardrailId { get; set; }
 
-    public ICollection<TradeScreenShot> Screenshots { get; set; } = [];
+    public ICollection<TradeScreenShot> TradeScreenShots { get; set; } = [];
 
     public ICollection<TradeEmotionTag>? TradeEmotionTags { get; set; } = [];
 
     public ICollection<TradeHistoryChecklist> PretradeChecklists { get; set; } = [];
 
-    public ICollection<TradeTechnicalAnalysisTag> TechnicalAnalysisTagss { get; set; } = [];
+    public ICollection<TradeTechnicalAnalysisTag> TechnicalAnalysisTags { get; set; } = [];
 
     [ForeignKey(nameof(TradingSessionId))]
     public TradeHistorySession? TradeHistorySession { get; set; }

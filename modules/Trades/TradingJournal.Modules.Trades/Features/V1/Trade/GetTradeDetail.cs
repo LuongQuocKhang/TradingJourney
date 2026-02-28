@@ -37,7 +37,7 @@ public class GetTradeDetail
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            RouteGroupBuilder group = app.MapGroup("api/v1/trades");
+            RouteGroupBuilder group = app.MapGroup("api/v1/trade-histories");
 
             group.MapGet("/{id}", async ([FromRoute] int id, ISender sender) => {
                 Result<TradeHistoryDetailViewModel> result = await sender.Send(new Request(id));
@@ -50,7 +50,7 @@ public class GetTradeDetail
             .Produces(StatusCodes.Status500InternalServerError)
             .WithSummary("Get a trade history by ID.")
             .WithDescription("Retrieves a trade history by its ID.") 
-            .WithTags(Tags.Trades);
+            .WithTags(Tags.TradeHistory);
         }
     }
 }

@@ -23,7 +23,14 @@ public class DeleteTrade
     {
         public async Task<Result<int>> Handle(Request request, CancellationToken cancellationToken)
         {
-            Domain.TradeHistory? trade = await tradeDbContext.TradeHistories.FindAsync([request.Id], cancellationToken: cancellationToken);
+            Domain.TradeHistory? trade = await tradeDbContext.TradeHistories
+                .Include(x => x.TradeEmotionTags)
+                .Include(x => x.TradeHistorySession)
+                .Include(x => x.RiskGuardrail)
+                .Include(x => x.TradeScreenShots)
+                .Include(x => x.PretradeChecklists)
+                .Include(x => x.TechnicalAnalysisTags)
+                .FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken: cancellationToken);
 
             if (trade == null)
             {
@@ -42,7 +49,7 @@ public class DeleteTrade
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            RouteGroupBuilder group = app.MapGroup("api/v1/trades");
+            RouteGroupBuilder group = app.MapGroup("api/v1/trade-histories");
 
             group.MapDelete("/{id}", async ([FromRoute] int id, ISender sender) => {
                 Result<int> result = await sender.Send(new Request { Id = id });
@@ -55,7 +62,7 @@ public class DeleteTrade
             .Produces(StatusCodes.Status500InternalServerError)
             .WithSummary("Delete a trade history by ID.")
             .WithDescription("Deletes a trade history by its ID.") 
-            .WithTags(Tags.Trades);
+            .WithTags(Tags.TradeHistory);
         }
     }
 }

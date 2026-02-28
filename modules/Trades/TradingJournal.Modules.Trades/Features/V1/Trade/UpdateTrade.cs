@@ -20,11 +20,11 @@ public sealed class UpdateTrade
         double? Pnl,
         DateTime? ClosedDate,
         List<string>? Screenshots,
-        List<int>? TechnicalAnalysisTags,
+        List<int>? TradeTechnicalAnalysisTags,
         List<int>? EmotionTags,
         ConfidenceLevel ConfidenceLevel,
         string? PsychologyNotes,
-        List<int> PretradeChecklists,
+        List<int> TradeHistoryChecklists,
         int TradingSession,
         RiskGuardrailsDto? RiskGuardrail) : ICommand<Result<bool>>;
 
@@ -74,10 +74,13 @@ public sealed class UpdateTrade
                 .WithErrorCode(HttpStatusCode.BadRequest.ToString())
                 .WithMessage("Status must be a valid TradeStatus value.");
 
-            RuleFor(x => x.PretradeChecklists)
+            RuleFor(x => x.TradeHistoryChecklists)
                 .Cascade(CascadeMode.Stop)
                 .NotNull().WithErrorCode(HttpStatusCode.BadRequest.ToString())
-                .WithMessage("Pretrade checklists must be entered.");
+                .WithMessage("Pretrade checklists must be entered.")
+                .Must(checklistIds => checklistIds != null && checklistIds.Count > 0)
+                .WithErrorCode(HttpStatusCode.BadRequest.ToString())
+                .WithMessage("At least one pretrade checklist must be provided.");
 
             RuleFor(x => x.TradingSession)
                 .Cascade(CascadeMode.Stop)
@@ -90,12 +93,11 @@ public sealed class UpdateTrade
     {
         public async Task<Result<bool>> Handle(Request request, CancellationToken cancellationToken)
         {
-            await context.BeginTransaction();
 
             try
             {
                 TradeHistory? tradeHistory = await context.TradeHistories
-                    .Include(th => th.Screenshots)
+                    .Include(th => th.TradeScreenShots)
                     .Include(th => th.TradeEmotionTags)
                     .Include(th => th.PretradeChecklists)
                     .Include(th => th.TradeHistorySession)
@@ -126,12 +128,12 @@ public sealed class UpdateTrade
                 tradeHistory.TradingSessionId = request.TradingSession;
 
                 #region remove all existing screenshots, emotion tags, pretrade checklists, and trading session associations
-                context.TradeScreenShots.RemoveRange(tradeHistory.Screenshots);
+                context.TradeScreenShots.RemoveRange(tradeHistory.TradeScreenShots);
                 context.TradeEmotionTags.RemoveRange(tradeHistory.TradeEmotionTags ?? []);
                 context.TradeHistoryChecklists.RemoveRange(tradeHistory.PretradeChecklists);
-                context.TradeTechnicalAnalysisTags.RemoveRange(tradeHistory.TechnicalAnalysisTagss ?? []);
+                context.TradeTechnicalAnalysisTags.RemoveRange(tradeHistory.TechnicalAnalysisTags ?? []);
 
-                await context.TradeHistoryChecklists.AddRangeAsync(request.PretradeChecklists.Select(checklistId => new TradeHistoryChecklist
+                await context.TradeHistoryChecklists.AddRangeAsync(request.TradeHistoryChecklists.Select(checklistId => new TradeHistoryChecklist
                 {
                     Id = 0,
                     TradeHistoryId = tradeHistory.Id,
@@ -152,7 +154,7 @@ public sealed class UpdateTrade
                     Url = screenshot
                 }) ?? [], cancellationToken);
 
-                await context.TradeTechnicalAnalysisTags.AddRangeAsync(request.TechnicalAnalysisTags?.Select(tagId => new TradeTechnicalAnalysisTag
+                await context.TradeTechnicalAnalysisTags.AddRangeAsync(request.TradeTechnicalAnalysisTags?.Select(tagId => new TradeTechnicalAnalysisTag
                 {
                     Id = 0,
                     TradeHistoryId = tradeHistory.Id,
@@ -191,15 +193,32 @@ public sealed class UpdateTrade
 
                 await context.SaveChangesAsync(cancellationToken);
 
-                await context.CommitTransaction();
-
                 return Result<bool>.Success(true);
             }
             catch
             {
-                await context.RollbackTransaction();
                 throw;
             }
+        }
+    }
+
+    public class Endpoint : ICarterModule
+    {
+        public void AddRoutes(IEndpointRouteBuilder app)
+        {
+            RouteGroupBuilder group = app.MapGroup("api/v1/trade-histories");
+
+            group.MapPut("/", async ([FromBody] Request request, ISender sender) => {
+                Result<bool> result = await sender.Send(request);
+
+                return result.IsSuccess ? Results.Ok(result) : Results.BadRequest(result);
+            })
+            .Produces<Result<bool>>(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status500InternalServerError)
+            .WithSummary("Update an existing trade history.")
+            .WithDescription("Updates an existing trade history with the given details.")
+            .WithTags(Tags.TradeHistory);
         }
     }
 }

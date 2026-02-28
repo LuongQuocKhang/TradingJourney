@@ -38,8 +38,14 @@ public static class DependencyInjection
     {
         using IServiceScope scope = app.ApplicationServices.CreateScope();
 
-        TradeDbContext dbContext = scope.ServiceProvider.GetRequiredService<TradeDbContext>();
-        await dbContext.Database.EnsureCreatedAsync();
+        try
+        {
+            TradeDbContext dbContext = scope.ServiceProvider.GetRequiredService<TradeDbContext>();
+            await dbContext.Database.MigrateAsync();
+        }
+        catch
+        {
+        }
 
         return app;
     }

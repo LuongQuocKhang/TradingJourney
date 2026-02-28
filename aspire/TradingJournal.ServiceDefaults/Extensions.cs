@@ -36,7 +36,7 @@ namespace TradingJournal.ServiceDefaults
             // Uncomment the following to restrict the allowed schemes for service discovery.
             builder.Services.Configure<ServiceDiscoveryOptions>(options =>
             {
-                options.AllowedSchemes = ["https"];
+                options.AllowedSchemes = ["https", "http"];
             });
 
             return builder;

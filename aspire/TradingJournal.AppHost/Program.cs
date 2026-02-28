@@ -40,7 +40,8 @@ IResourceBuilder<ProjectResource> tradingJournalModulesTrades = builder.AddProje
     .WithReference(tradingHistoryDb)
     .WaitFor(tradingHistoryDb)
     .WithReference(redis)
-    .WaitFor(redis);
+    .WaitFor(redis)
+    .WithDeveloperCertificateTrust(true);
 
 builder.AddProject<Projects.TradingJournal_Jobs_BackTestEngine>("tradingjournal-jobs-backtestengine");
 
@@ -60,6 +61,7 @@ IResourceBuilder<ProjectResource> tradingJournalModulesStrategies = builder.AddP
 
 builder.AddProject<Projects.TradingJournal_ApiGateWay>("tradingjournal-apigateway")
     .WithReference(tradingJournalModulesTrades)
+    .WithDeveloperCertificateTrust(true)
     .WaitFor(tradingJournalModulesTrades)
     .WithReference(tradingJournalModulesAnalytics)
     .WaitFor(tradingJournalModulesAnalytics)

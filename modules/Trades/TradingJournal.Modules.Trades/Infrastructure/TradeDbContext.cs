@@ -59,14 +59,14 @@ internal sealed class TradeDbContext(DbContextOptions<TradeDbContext> options)
             switch (entry.State)
             {
                 case EntityState.Added:
-                    entry.Entity.CreatedDate = new DateTimeProvider().Now;
+                    entry.Entity.CreatedDate = DateTime.UtcNow;
                     entry.Entity.CreatedBy = 0;
                     break;
                 case EntityState.Modified:
                 case EntityState.Detached:
                 case EntityState.Unchanged:
                 case EntityState.Deleted:
-                    entry.Entity.UpdatedDate = new DateTimeProvider().Now;
+                    entry.Entity.UpdatedDate = DateTime.UtcNow;
                     entry.Entity.UpdatedBy = 0;
                     break;
                 default:

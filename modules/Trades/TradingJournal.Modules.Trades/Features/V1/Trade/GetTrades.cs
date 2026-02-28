@@ -7,7 +7,7 @@ namespace TradingJournal.Modules.Trades.Features.V1.Trade;
 
 public class GetTrades
 {
-    public class Request : IQuery<Result<PaginationViewModel<TradeHistoryViewModel>>>
+    internal class Request : IQuery<Result<PaginationViewModel<TradeHistoryViewModel>>>
     {
         public string? Asset { get; set; }
 
@@ -24,7 +24,7 @@ public class GetTrades
         public int PageSize { get; set; } = 10;
     }
 
-    public class Validator : AbstractValidator<Request>
+    internal sealed class Validator : AbstractValidator<GetTrades.Request>
     {
         public Validator()
         {
@@ -42,9 +42,9 @@ public class GetTrades
         }
     }
 
-    public class Handler(ITradeDbContext tradeDbContext, ICacheRepository cacheRepository) : IQueryHandler<Request, Result<PaginationViewModel<TradeHistoryViewModel>>>
+    internal sealed class Handler(ITradeDbContext tradeDbContext, ICacheRepository cacheRepository) : IQueryHandler<GetTrades.Request, Result<PaginationViewModel<TradeHistoryViewModel>>>
     {
-        public async Task<Result<PaginationViewModel<TradeHistoryViewModel>>> Handle(Request request, CancellationToken cancellationToken)
+        public async Task<Result<PaginationViewModel<TradeHistoryViewModel>>> Handle(GetTrades.Request request, CancellationToken cancellationToken)
         {
             string queryHash = request.ToHashString();
 
@@ -60,7 +60,7 @@ public class GetTrades
             return result ?? Result<PaginationViewModel<TradeHistoryViewModel>>.Failure(Error.NotFound);
         }
 
-        private async Task<Result<PaginationViewModel<TradeHistoryViewModel>>> GetTradesFromDatabase(Request request, CancellationToken cancellationToken)
+        private async Task<Result<PaginationViewModel<TradeHistoryViewModel>>> GetTradesFromDatabase(GetTrades.Request request, CancellationToken cancellationToken)
         {
             IQueryable<TradeHistory> query = tradeDbContext.TradeHistories
                 .AsNoTracking();
@@ -106,7 +106,7 @@ public class GetTrades
             IReadOnlyCollection<TradeHistoryViewModel> tradeHistoryViewModels = tradeHistories.Adapt<IReadOnlyCollection<TradeHistoryViewModel>>();
 
             // Batch-fetch EmotionTagIds for all trades on this page (single query, no N+1)
-            List<int> tradeIds = tradeHistories.Select(t => t.Id).ToList();
+            List<int> tradeIds = [.. tradeHistories.Select(t => t.Id)];
 
             List<TradeEmotionTag> tradeEmotionTags = await tradeDbContext.TradeEmotionTags
                 .AsNoTracking()
@@ -162,9 +162,9 @@ public class GetTrades
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            RouteGroupBuilder group = app.MapGroup("api/v1/trades");
+            RouteGroupBuilder group = app.MapGroup("api/v1/trade-histories");
 
-            group.MapPost("/", async (ISender sender, [FromBody] Request request) =>
+            group.MapPost("/search", async (ISender sender, [FromBody] GetTrades.Request request) =>
             {
                 Result<PaginationViewModel<TradeHistoryViewModel>> result = await sender.Send(request);
 
@@ -176,7 +176,7 @@ public class GetTrades
             .Produces(StatusCodes.Status500InternalServerError)
             .WithSummary("Search trade histories.")
             .WithDescription("Retrieves a list of trade histories.")
-            .WithTags(Tags.Trades);
+            .WithTags(Tags.TradeHistory);
         }
     }
 }
