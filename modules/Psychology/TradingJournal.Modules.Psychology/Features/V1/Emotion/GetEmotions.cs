@@ -1,7 +1,7 @@
 ﻿using TradingJournal.Modules.Psychology.Constants;
 using TradingJournal.Modules.Psychology.Domain;
 using TradingJournal.Modules.Psychology.Infrastructure.Persistance;
-using TradingJournal.Shared.Contracts;
+using TradingJournal.Shared.Dtos;
 using TradingJournal.Shared.Interfaces;
 
 namespace TradingJournal.Modules.Psychology.Features.V1.Emotion;
@@ -39,7 +39,9 @@ public sealed class GetEmotions
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            app.MapGet("/api/v1/emotions", async (IMediator mediator) =>
+            RouteGroupBuilder group = app.MapGroup("api/v1/emotions");
+
+            group.MapGet("/", async (IMediator mediator) =>
             {
                 Result<List<EmotionTagCacheDto>> result = await mediator.Send(new Request());
                 return result;

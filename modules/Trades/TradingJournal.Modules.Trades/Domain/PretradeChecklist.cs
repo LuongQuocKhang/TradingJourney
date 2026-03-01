@@ -7,5 +7,5 @@ public sealed class PretradeChecklist : EntityBase<int>
 {
     public string Name { get; set; } = string.Empty;
 
-    public RetradeCheckListType CheckListType { get; set; }
+    public PretradeChecklistType CheckListType { get; set; }
 }

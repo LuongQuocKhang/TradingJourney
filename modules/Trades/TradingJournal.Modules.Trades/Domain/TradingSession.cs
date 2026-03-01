@@ -5,9 +5,9 @@ namespace TradingJournal.Modules.Trades.Domain;
 [Table(name: "TradingSessions", Schema = "Trades")]
 public sealed class TradingSession : EntityBase<int>
 {
-    public string Name { get; set; } = string.Empty;
+    public DateTime StartTime { get; set; }
 
-    public string FromTime { get; set; } = string.Empty;
+    public DateTime? EndTime { get; set; }
 
-    public string ToTime { get; set; } = string.Empty;
+    public TradingSessionStatus Status { get; set; }
 }

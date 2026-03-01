@@ -1,6 +1,6 @@
 ﻿namespace TradingJournal.Modules.Trades.Common.Enum;
 
-public enum RetradeCheckListType
+public enum PretradeChecklistType
 {
     RiskManagement = 1,
     TradePlanning = 2,

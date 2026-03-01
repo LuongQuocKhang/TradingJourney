@@ -1,3 +1,4 @@
+using Mapster;
 using TradingJournal.Modules.Trades.Dto;
 
 namespace TradingJournal.Modules.Trades.Features.V1.Trade;
@@ -25,7 +26,8 @@ public sealed class UpdateTrade
         ConfidenceLevel ConfidenceLevel,
         string? PsychologyNotes,
         List<int> TradeHistoryChecklists,
-        int TradingSession,
+        int TradingZoneId,
+        int? TradingSessionId,
         RiskGuardrailsDto? RiskGuardrail) : ICommand<Result<bool>>;
 
     internal sealed class Validator : AbstractValidator<Request>
@@ -82,10 +84,10 @@ public sealed class UpdateTrade
                 .WithErrorCode(HttpStatusCode.BadRequest.ToString())
                 .WithMessage("At least one pretrade checklist must be provided.");
 
-            RuleFor(x => x.TradingSession)
+            RuleFor(x => x.TradingZoneId)
                 .Cascade(CascadeMode.Stop)
                 .GreaterThan(0).WithErrorCode(HttpStatusCode.BadRequest.ToString())
-                .WithMessage("Trading Session must be entered and greater than 0.");
+                .WithMessage("Trading Zone must be entered and greater than 0.");
         }
     }
 
@@ -99,8 +101,8 @@ public sealed class UpdateTrade
                 TradeHistory? tradeHistory = await context.TradeHistories
                     .Include(th => th.TradeScreenShots)
                     .Include(th => th.TradeEmotionTags)
-                    .Include(th => th.PretradeChecklists)
-                    .Include(th => th.TradeHistorySession)
+                    .Include(th => th.TradeChecklists)
+                    .Include(x => x.TradeTechnicalAnalysisTags)
                     .Include(th => th.RiskGuardrail)
                     .FirstOrDefaultAsync(th => th.Id == request.Id, cancellationToken: cancellationToken);
 
@@ -124,16 +126,16 @@ public sealed class UpdateTrade
                 tradeHistory.ClosedDate = request.ClosedDate;
                 tradeHistory.ConfidenceLevel = request.ConfidenceLevel;
                 tradeHistory.PsychologyNotes = request.PsychologyNotes;
-
-                tradeHistory.TradingSessionId = request.TradingSession;
+                tradeHistory.TradingZoneId = request.TradingZoneId;
+                tradeHistory.TradingSessionId = request.TradingSessionId;
 
                 #region remove all existing screenshots, emotion tags, pretrade checklists, and trading session associations
                 context.TradeScreenShots.RemoveRange(tradeHistory.TradeScreenShots);
                 context.TradeEmotionTags.RemoveRange(tradeHistory.TradeEmotionTags ?? []);
-                context.TradeHistoryChecklists.RemoveRange(tradeHistory.PretradeChecklists);
-                context.TradeTechnicalAnalysisTags.RemoveRange(tradeHistory.TechnicalAnalysisTags ?? []);
+                context.TradeHistoryChecklist.RemoveRange(tradeHistory.TradeChecklists);
+                context.TradeTechnicalAnalysisTags.RemoveRange(tradeHistory.TradeTechnicalAnalysisTags ?? []);
 
-                await context.TradeHistoryChecklists.AddRangeAsync(request.TradeHistoryChecklists.Select(checklistId => new TradeHistoryChecklist
+                await context.TradeHistoryChecklist.AddRangeAsync(request.TradeHistoryChecklists.Select(checklistId => new TradeHistoryChecklist
                 {
                     Id = 0,
                     TradeHistoryId = tradeHistory.Id,
@@ -160,22 +162,6 @@ public sealed class UpdateTrade
                     TradeHistoryId = tradeHistory.Id,
                     TechnicalAnalysisId = tagId
                 }) ?? [], cancellationToken);
-                #endregion
-
-                #region update or create trading session association
-                if (tradeHistory.TradeHistorySession != null)
-                {
-                    tradeHistory.TradeHistorySession.TradingSessionId = request.TradingSession;
-                }
-                else
-                {
-                    tradeHistory.TradeHistorySession = new TradeHistorySession
-                    {
-                        Id = 0,
-                        TradeHistoryId = tradeHistory.Id,
-                        TradingSessionId = request.TradingSession
-                    };
-                }
                 #endregion
 
                 #region update or create risk guardrail association

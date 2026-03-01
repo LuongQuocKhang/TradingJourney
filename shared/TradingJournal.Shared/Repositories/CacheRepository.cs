@@ -1,66 +1,70 @@
-using System.Text.Json;
-using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Caching.Hybrid;
 using TradingJournal.Shared.Interfaces;
 
 namespace TradingJournal.Shared.Repositories;
 
-public class CacheRepository(IDistributedCache distributedCache) : ICacheRepository
+public class CacheRepository(HybridCache hybridCache) : ICacheRepository
 {
     private static readonly TimeSpan DefaultExpiration = TimeSpan.FromSeconds(30);
-
-    public async Task<T?> GetAsync<T>(string key, CancellationToken cancellationToken = default)
-    {
-        string? cached = await distributedCache.GetStringAsync(key, cancellationToken);
-
-        return cached is not null ? JsonSerializer.Deserialize<T>(cached) : default;
-    }
 
     public async Task<T?> GetOrCreateAsync<T>(string key,
         Func<CancellationToken, Task<T>> handle,
         TimeSpan? expiration,
         CancellationToken cancellationToken = default)
     {
-        string? cached = await distributedCache.GetStringAsync(key, cancellationToken);
+        TimeSpan? expiredTime = expiration ?? DefaultExpiration;
 
-        if (cached is not null)
+        HybridCacheEntryOptions entryOptions = new()
         {
-            return JsonSerializer.Deserialize<T>(cached);
-        }
-
-        T result = await handle(cancellationToken);
-
-        TimeSpan expiredTime = expiration ?? DefaultExpiration;
-
-        DistributedCacheEntryOptions entryOptions = new()
-        {
-            AbsoluteExpirationRelativeToNow = expiredTime
+            Expiration = expiredTime,
+            LocalCacheExpiration = expiredTime
         };
 
-        string serialized = JsonSerializer.Serialize(result);
-        await distributedCache.SetStringAsync(key, serialized, entryOptions, cancellationToken);
+        T? result = await hybridCache.GetOrCreateAsync<T>(
+            key,
+            async (entry) => await handle(cancellationToken),
+            entryOptions,
+            tags: [],
+            cancellationToken: cancellationToken);
 
         return result;
     }
 
     public async Task UpdateCache<T>(string key, Func<CancellationToken, Task<T>> handle, TimeSpan? expiration, CancellationToken cancellationToken = default)
     {
-        await distributedCache.RemoveAsync(key, cancellationToken);
+        await hybridCache.RemoveAsync(key, cancellationToken);
+
+        TimeSpan? expiredTime = expiration ?? DefaultExpiration;
+
+        HybridCacheEntryOptions entryOptions = new()
+        {
+            Expiration = expiredTime,
+            LocalCacheExpiration = expiredTime
+        };
 
         T? value = await handle(cancellationToken);
 
-        TimeSpan expiredTime = expiration ?? DefaultExpiration;
-
-        DistributedCacheEntryOptions entryOptions = new()
-        {
-            AbsoluteExpirationRelativeToNow = expiredTime
-        };
-
-        string serialized = JsonSerializer.Serialize(value);
-        await distributedCache.SetStringAsync(key, serialized, entryOptions, cancellationToken);
+        await hybridCache.SetAsync(key, value, entryOptions, cancellationToken: cancellationToken);
     }
 
     public async Task RemoveCache(string key, CancellationToken cancellationToken = default)
     {
-        await distributedCache.RemoveAsync(key, cancellationToken);
+        await hybridCache.RemoveAsync(key, cancellationToken);
+    }
+
+    public async Task<T?> GetAsync<T>(string key, CancellationToken cancellationToken = default)
+    {
+        T? result = await hybridCache.GetOrCreateAsync<T>(
+            key,
+            async (entry) => default(T),
+            new HybridCacheEntryOptions
+            {
+                Expiration = TimeSpan.FromSeconds(0),
+                LocalCacheExpiration = TimeSpan.FromSeconds(0)
+            },
+            tags: [],
+            cancellationToken: cancellationToken);
+
+        return result;
     }
 }

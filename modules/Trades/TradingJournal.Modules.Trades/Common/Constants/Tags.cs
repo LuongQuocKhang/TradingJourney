@@ -11,4 +11,6 @@ public static class Tags
     public const string RiskGuardrails = "Risk Guardrails";
 
     public const string TradingSessions = "Trading Sessions";
+
+    public const string TradingZones = "Trading Zones";
 }

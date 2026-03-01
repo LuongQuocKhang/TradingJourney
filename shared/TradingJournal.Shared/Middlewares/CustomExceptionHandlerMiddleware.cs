@@ -1,10 +1,10 @@
-using System.Net;
 using FluentValidation;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using System.Net;
 using TradingJournal.Shared.Abstractions;
 using TradingJournal.Shared.Exceptions;
 

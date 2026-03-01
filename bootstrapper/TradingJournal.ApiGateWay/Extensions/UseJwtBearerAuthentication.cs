@@ -2,8 +2,9 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.OpenApi;
 using Microsoft.OpenApi;
+using Microsoft.OpenApi.Models;
 
-namespace TradingJournal.Modules.Trades.Extensions;
+namespace TradingJournal.ApiGateWay.Extensions;
 
 /// <summary>
 /// Scalar API Extensions
@@ -21,13 +22,18 @@ public static class OpenApiExtensions
         {
             Type = SecuritySchemeType.Http,
             Name = JwtBearerDefaults.AuthenticationScheme,
-            Scheme = JwtBearerDefaults.AuthenticationScheme
+            Scheme = JwtBearerDefaults.AuthenticationScheme,
+            Reference = new OpenApiReference()
+            {
+                Type = ReferenceType.SecurityScheme,
+                Id = JwtBearerDefaults.AuthenticationScheme
+            }
         };
 
         options.AddDocumentTransformer((document, context, ct) =>
         {
             document.Components ??= new OpenApiComponents();
-            document.Components.SecuritySchemes?.Add(JwtBearerDefaults.AuthenticationScheme, schema);
+            document.Components.SecuritySchemes.Add(JwtBearerDefaults.AuthenticationScheme, schema);
             return Task.CompletedTask;
         });
 
@@ -35,9 +41,8 @@ public static class OpenApiExtensions
         {
             if (context.Description.ActionDescriptor.EndpointMetadata.OfType<IAuthorizeData>().Any())
             {
-                var schemeReference = new OpenApiSecuritySchemeReference(JwtBearerDefaults.AuthenticationScheme);
                 operation.Security = [new OpenApiSecurityRequirement() {
-                    [schemeReference] = []
+                    [schema] = []
                 }];
             }
 

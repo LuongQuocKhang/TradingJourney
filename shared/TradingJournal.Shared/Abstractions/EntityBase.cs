@@ -12,11 +12,11 @@ public abstract class EntityBase<T>
 
     #region Tracking
 
-    public DateTime CreatedDate { get; set; }
+    public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
 
-    public int CreatedBy { get; set; }
+    public int CreatedBy { get; set; } = 0;
 
-    public bool IsDisabled { get; set; }
+    public bool IsDisabled { get; set; } = false;
 
     public DateTime? UpdatedDate { get; set; }
 

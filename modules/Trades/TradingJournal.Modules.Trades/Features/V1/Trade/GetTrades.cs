@@ -1,5 +1,7 @@
+using Mapster;
 using TradingJournal.Shared.Common;
 using TradingJournal.Shared.Contracts;
+using TradingJournal.Shared.Dtos;
 using TradingJournal.Shared.Extensions;
 using TradingJournal.Shared.Interfaces;
 

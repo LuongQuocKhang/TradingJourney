@@ -1,7 +1,7 @@
 using Asp.Versioning;
 using Asp.Versioning.ApiExplorer;
 
-namespace TradingJournal.Modules.Trades.Extensions;
+namespace TradingJournal.ApiGateWay.Extensions;
 
 public static class SwaggerExtensions
 {

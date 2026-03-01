@@ -11,6 +11,9 @@ public static class DependencyInjection
     {
         services.AddSingleton<ICacheRepository, CacheRepository>();
         services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
+
+        services.AddHybridCache();
+
         return services;
     }
 }

@@ -50,7 +50,9 @@ public sealed class DeleteEmotion
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            app.MapDelete("/api/v1/emotions/{id}", async (int id, IMediator mediator) =>
+            RouteGroupBuilder group = app.MapGroup("api/v1/emotions");
+
+            group.MapDelete("{id}", async (int id, IMediator mediator) =>
             {
                 Result<bool> result = await mediator.Send(new Request { Id = id });
                 return result;

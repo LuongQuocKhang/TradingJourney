@@ -1,4 +1,3 @@
-global using Carter;
 global using Microsoft.AspNetCore.Mvc;
 global using Microsoft.AspNetCore.Routing;
 global using Microsoft.AspNetCore.Http;
@@ -7,7 +6,6 @@ global using Microsoft.AspNetCore.Builder;
 global using TradingJournal.Shared.Abstractions;
 global using TradingJournal.Shared.CQRS;
 global using System.Net;
-global using Mapster;
 global using MediatR;
 global using Microsoft.EntityFrameworkCore;
 global using TradingJournal.Modules.Trades.Common.Constants;
@@ -15,3 +13,4 @@ global using TradingJournal.Modules.Trades.Common.Enum;
 global using TradingJournal.Modules.Trades.Domain;
 global using TradingJournal.Modules.Trades.Infrastructure;
 global using TradingJournal.Modules.Trades.ViewModel;
+global using Carter;

@@ -1,4 +1,5 @@
-﻿using TradingJournal.Modules.Trades.Dto;
+﻿using Mapster;
+using TradingJournal.Modules.Trades.Dto;
 
 namespace TradingJournal.Modules.Trades.Features.V1.Trade;
 
@@ -23,7 +24,8 @@ public sealed class CreateTrade
         ConfidenceLevel ConfidenceLevel,
         string? PsychologyNotes,
         List<int> TradeHistoryChecklists,
-        int TradingSession,
+        int TradingZoneId,
+        int? TradingSessionId,
         RiskGuardrailsDto? RiskGuardrail) : ICommand<Result<int>>;
 
     internal sealed class Validator : AbstractValidator<Request>
@@ -80,10 +82,10 @@ public sealed class CreateTrade
                 .WithErrorCode(HttpStatusCode.BadRequest.ToString())
                 .WithMessage("At least one pretrade checklist must be provided.");
 
-            RuleFor(x => x.TradingSession)
+            RuleFor(x => x.TradingZoneId)
                 .Cascade(CascadeMode.Stop)
                 .GreaterThan(0).WithErrorCode(HttpStatusCode.BadRequest.ToString())
-                .WithMessage("Trading Session must be entered and greater than 0.");
+                .WithMessage("Trading Zone must be entered and greater than 0.");
         }
     }
 
@@ -95,7 +97,7 @@ public sealed class CreateTrade
 
             await context.TradeHistories.AddAsync(tradeHistory, cancellationToken);
 
-            await context.TradeHistoryChecklists.AddRangeAsync(request.TradeHistoryChecklists.Select(checklistId => new TradeHistoryChecklist
+            await context.TradeHistoryChecklist.AddRangeAsync(request.TradeHistoryChecklists.Select(checklistId => new TradeHistoryChecklist
             {
                 Id = 0,
                 PretradeChecklistId = checklistId,
@@ -115,13 +117,6 @@ public sealed class CreateTrade
                 Url = screenshot,
                 TradeHistory = tradeHistory
             }) ?? [], cancellationToken);
-
-            await context.TradeHistorySessions.AddAsync(new TradeHistorySession
-            {
-                Id = 0,
-                TradeHistory = tradeHistory,
-                TradingSessionId = request.TradingSession
-            }, cancellationToken);
 
             await context.TradeTechnicalAnalysisTags.AddRangeAsync(request.TradeTechnicalAnalysisTags?.Select(tagId => new TradeTechnicalAnalysisTag
             {

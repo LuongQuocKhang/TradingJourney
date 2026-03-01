@@ -1,4 +1,4 @@
-﻿namespace TradingJournal.Modules.Psychology.Common.Enum;
+﻿namespace TradingJournal.Shared.Common;
 
 public enum EmotionType
 {

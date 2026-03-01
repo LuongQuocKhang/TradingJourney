@@ -1,9 +1,4 @@
-﻿using TradingJournal.Modules.Psychology.Common.Enum;
-using TradingJournal.Modules.Psychology.Constants;
-using TradingJournal.Modules.Psychology.Domain;
-using TradingJournal.Modules.Psychology.Infrastructure.Persistance;
-using TradingJournal.Shared.Contracts;
-using TradingJournal.Shared.Interfaces;
+﻿using TradingJournal.Shared.Common;
 
 namespace TradingJournal.Modules.Psychology.Features.V1.Emotion;
 
@@ -61,9 +56,11 @@ public sealed class CreateEmotion
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            app.MapPost("/api/v1/emotions", async (Request request, IMediator mediator) =>
+            RouteGroupBuilder group = app.MapGroup("api/v1/emotions");
+
+            group.MapPost("/", async ([FromBody] Request request, ISender sender) =>
             {
-                Result<int> result = await mediator.Send(request);
+                Result<int> result = await sender.Send(request);
                 return result;
             })
             .Produces<Result<int>>(StatusCodes.Status201Created)

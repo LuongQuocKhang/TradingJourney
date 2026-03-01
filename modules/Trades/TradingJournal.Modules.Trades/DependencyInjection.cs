@@ -1,4 +1,6 @@
-﻿using System.Reflection;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using System.Reflection;
 using TradingJournal.Shared.Behaviors;
 
 namespace TradingJournal.Modules.Trades;
@@ -24,14 +26,12 @@ public static class DependencyInjection
 
         services.AddScoped<ITradeDbContext, TradeDbContext>();
 
+        services.AddDbContext<TradeDbContext>(options =>
+        {
+            options.UseSqlServer(configuration.GetConnectionString("TradeDatabase"));
+        });
+
         return services;
-    }
-
-    public static WebApplicationBuilder ConfigureAspireDatabase(this WebApplicationBuilder builder)
-    {
-        builder.AddNpgsqlDbContext<TradeDbContext>("tradingHistoryDb");
-
-        return builder;
     }
 
     public static async Task<IApplicationBuilder> MigrateTradingDatabase(this IApplicationBuilder app)

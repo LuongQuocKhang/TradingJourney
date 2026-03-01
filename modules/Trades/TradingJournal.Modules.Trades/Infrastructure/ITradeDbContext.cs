@@ -10,13 +10,11 @@ public interface ITradeDbContext
 
     DbSet<TradeScreenShot> TradeScreenShots { get; set; }
 
-    DbSet<TradingSession> TradingSessions { get; set; }
+    DbSet<TradingZone> TradingZones { get; set; }
 
-    DbSet<TradeHistoryChecklist> TradeHistoryChecklists { get; set; }
+    DbSet<TradeHistoryChecklist> TradeHistoryChecklist { get; set; }
 
     DbSet<TradeEmotionTag> TradeEmotionTags { get; set; }
-
-    DbSet<TradeHistorySession> TradeHistorySessions { get; set; }
 
     DbSet<TechnicalAnalysis> TechnicalAnalyses { get; set; }
 

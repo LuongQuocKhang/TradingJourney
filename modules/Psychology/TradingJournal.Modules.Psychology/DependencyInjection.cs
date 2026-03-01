@@ -1,6 +1,6 @@
-﻿using System.Reflection;
-using System.Text.Json.Serialization;
-using TradingJournal.Modules.Psychology.Infrastructure.Persistance;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using System.Reflection;
 using TradingJournal.Shared.Behaviors;
 
 namespace TradingJournal.Modules.Psychology;
@@ -25,24 +25,26 @@ public static class DependencyInjection
         });
 
         services.AddScoped<IPsychologyDbContext, PsychologyDbContext>();
-        
+
+        services.AddDbContext<PsychologyDbContext>(options =>
+        {
+            options.UseSqlServer(configuration.GetConnectionString("TradeDatabase"));
+        });
+
         return services;
-    }
-
-    public static WebApplicationBuilder ConfigureAspireDatabase(this WebApplicationBuilder builder)
-    {
-        builder.AddNpgsqlDbContext<PsychologyDbContext>("psychologyDb");
-
-        return builder;
     }
 
     public static async Task<IApplicationBuilder> MigratePsychologyDatabase(this IApplicationBuilder app)
     {
-        using IServiceScope scope = app.ApplicationServices.CreateScope();
+        try
+        {
+            using IServiceScope scope = app.ApplicationServices.CreateScope();
 
-        PsychologyDbContext dbContext = scope.ServiceProvider.GetRequiredService<PsychologyDbContext>();
-        await dbContext.Database.MigrateAsync();
+            PsychologyDbContext dbContext = scope.ServiceProvider.GetRequiredService<PsychologyDbContext>();
+            await dbContext.Database.MigrateAsync();
 
+        }
+        catch { }
         return app;
     }
 }

@@ -2,7 +2,7 @@ using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 
-namespace TradingJournal.Modules.Trades.Extensions;
+namespace TradingJournal.ApiGateWay.Extensions;
 
 public static class AuthenticationExtensions
 {

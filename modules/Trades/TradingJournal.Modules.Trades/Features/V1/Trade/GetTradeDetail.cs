@@ -1,3 +1,5 @@
+using Mapster;
+
 namespace TradingJournal.Modules.Trades.Features.V1.Trade;
 
 public class GetTradeDetail

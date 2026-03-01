@@ -25,11 +25,10 @@ public class DeleteTrade
         {
             Domain.TradeHistory? trade = await tradeDbContext.TradeHistories
                 .Include(x => x.TradeEmotionTags)
-                .Include(x => x.TradeHistorySession)
                 .Include(x => x.RiskGuardrail)
                 .Include(x => x.TradeScreenShots)
-                .Include(x => x.PretradeChecklists)
-                .Include(x => x.TechnicalAnalysisTags)
+                .Include(x => x.TradeChecklists)
+                .Include(x => x.TradeTechnicalAnalysisTags)
                 .FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken: cancellationToken);
 
             if (trade == null)

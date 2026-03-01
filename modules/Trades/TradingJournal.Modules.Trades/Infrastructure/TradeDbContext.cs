@@ -17,13 +17,13 @@ internal sealed class TradeDbContext(DbContextOptions<TradeDbContext> options)
 
     public DbSet<TradeScreenShot> TradeScreenShots { get; set; }
 
+    public DbSet<TradingZone> TradingZones { get; set; }
+
     public DbSet<TradingSession> TradingSessions { get; set; }
 
-    public DbSet<TradeHistoryChecklist> TradeHistoryChecklists { get; set; }
+    public DbSet<TradeHistoryChecklist> TradeHistoryChecklist { get; set; }
 
     public DbSet<TradeEmotionTag> TradeEmotionTags { get; set; }
-    
-    public DbSet<TradeHistorySession> TradeHistorySessions { get; set; }
 
     public DbSet<TechnicalAnalysis> TechnicalAnalyses { get; set; }
 
