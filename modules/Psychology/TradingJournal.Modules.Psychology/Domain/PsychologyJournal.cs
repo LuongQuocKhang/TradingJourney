@@ -15,5 +15,5 @@ public sealed class PsychologyJournal : EntityBase<int>
 
     public string TodayTradingReview { get; set; } = string.Empty;
 
-    public ICollection<PsychologyJournalEmotion> EmotionTags { get; set; } = [];
+    public ICollection<PsychologyJournalEmotion> PsychologyJournalEmotions { get; set; } = [];
 }

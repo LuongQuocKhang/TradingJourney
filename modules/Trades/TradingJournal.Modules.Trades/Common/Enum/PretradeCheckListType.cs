@@ -2,7 +2,8 @@
 
 public enum PretradeChecklistType
 {
-    RiskManagement = 1,
-    TradePlanning = 2,
-    Psychology = 3
+    MarketStructure = 1,
+    TradingSetup = 2,
+    RiskManagement = 3,
+    Psychology = 4
 }

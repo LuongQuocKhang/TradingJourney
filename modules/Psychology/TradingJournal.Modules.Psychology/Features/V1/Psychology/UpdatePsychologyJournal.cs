@@ -23,13 +23,13 @@ public sealed class UpdatePsychologyJournal
                 return Result<bool>.Failure(Error.Create("Psychology journal not found."));
             }
 
-            context.PsychologyJournalEmotions.RemoveRange(psychologyJournal.EmotionTags);
+            context.PsychologyJournalEmotions.RemoveRange(psychologyJournal.PsychologyJournalEmotions);
 
             psychologyJournal.Date = request.Date;
             psychologyJournal.TodayTradingReview = request.TodayTradingReview;
             psychologyJournal.OverallMood = request.OverallMood;
             psychologyJournal.ConfidentLevel = request.ConfidentLevel;
-            psychologyJournal.EmotionTags = [.. request.EmotionTags.Select(e => new PsychologyJournalEmotion
+            psychologyJournal.PsychologyJournalEmotions = [.. request.EmotionTags.Select(e => new PsychologyJournalEmotion
             { 
                 Id = 0,
                 EmotionTagId = e
@@ -48,7 +48,9 @@ public sealed class UpdatePsychologyJournal
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            app.MapPut("/api/v1/psychology-journals", async ([FromBody] Request request, IMediator mediator) =>
+            RouteGroupBuilder group = app.MapGroup("api/v1/psychology-journals");
+
+            group.MapPut("/", async ([FromBody] Request request, IMediator mediator) =>
             {
                 Result<bool> result = await mediator.Send(request);
                 return result;

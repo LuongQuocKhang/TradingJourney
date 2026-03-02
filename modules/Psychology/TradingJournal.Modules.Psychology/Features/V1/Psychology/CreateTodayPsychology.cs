@@ -17,7 +17,7 @@ public sealed class CreateTodayPsychology
                 TodayTradingReview = request.TodayTradingReview,
                 OverallMood = request.OverallMood,
                 ConfidentLevel = request.ConfidentLevel,
-                EmotionTags = [.. request.EmotionTags.Select(e => new PsychologyJournalEmotion
+                PsychologyJournalEmotions = [.. request.EmotionTags.Select(e => new PsychologyJournalEmotion
                 { 
                     Id = 0,
                     EmotionTagId = e
@@ -36,7 +36,9 @@ public sealed class CreateTodayPsychology
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            app.MapPost("/api/v1/psychology-journals", async (Request request, IMediator mediator) =>
+            RouteGroupBuilder group = app.MapGroup("api/v1/psychology-journals");
+
+            group.MapPost("/", async (Request request, IMediator mediator) =>
             {
                 Result<int> result = await mediator.Send(request);
                 return result;

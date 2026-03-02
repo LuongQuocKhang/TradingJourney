@@ -46,7 +46,9 @@ public sealed class DeletePsychologyJournal
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            app.MapDelete("/api/v1/psychology-journals/{id}", async (int id, IMediator mediator) =>
+            RouteGroupBuilder group = app.MapGroup("api/v1/psychology-journals");
+
+            group.MapDelete("/{id}", async (int id, IMediator mediator) =>
             {
                 Result<bool> result = await mediator.Send(new Request { Id = id });
                 return result;

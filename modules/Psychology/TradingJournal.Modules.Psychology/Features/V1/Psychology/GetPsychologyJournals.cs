@@ -42,6 +42,8 @@ public sealed class GetPsychologyJournals
         private async Task<PaginationViewModel<PsychologyJournalViewModel>> GetPsychologyJournalsAsync(Request request, CancellationToken cancellationToken)
         {
             IQueryable<PsychologyJournal> query = context.PsychologyJournals
+                .Include(x => x.PsychologyJournalEmotions)
+                .ThenInclude(x => x.EmotionTag)
                 .AsNoTracking();
 
             if (request.StartDate.HasValue)
@@ -66,7 +68,7 @@ public sealed class GetPsychologyJournals
 
             if (request.EmotionTags != null && request.EmotionTags.Count != 0)
             {
-                query = query.Where(x => x.EmotionTags.Any(e => request.EmotionTags.Contains(e.EmotionTagId)));
+                query = query.Where(x => x.PsychologyJournalEmotions.Any(e => request.EmotionTags.Contains(e.EmotionTagId)));
             }
 
             int totalCount = await query.CountAsync(cancellationToken);
@@ -85,7 +87,7 @@ public sealed class GetPsychologyJournals
                     TodayTradingReview = x.TodayTradingReview,
                     OverallMood = x.OverallMood,
                     ConfidentLevel = x.ConfidentLevel,
-                    EmotionTags = [.. x.EmotionTags.Select(e => new PsychologyJournalEmotionViewModel
+                    EmotionTags = [.. x.PsychologyJournalEmotions.Select(e => new PsychologyJournalEmotionViewModel
                     {
                         Id = e.Id,
                         Name = e.EmotionTag.Name
@@ -103,7 +105,9 @@ public sealed class GetPsychologyJournals
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            app.MapPost("/api/v1/psychology-journals/search", async ([FromBody] Request request, IMediator mediator) =>
+            RouteGroupBuilder group = app.MapGroup("api/v1/psychology-journals");
+
+            group.MapPost("/search", async ([FromBody] Request request, IMediator mediator) =>
             {
                 Result<PaginationViewModel<PsychologyJournalViewModel>> result = await mediator.Send(request);
                 return result;
