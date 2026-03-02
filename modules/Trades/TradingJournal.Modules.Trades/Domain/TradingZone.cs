@@ -10,4 +10,6 @@ public sealed class TradingZone : EntityBase<int>
     public string FromTime { get; set; } = string.Empty;
 
     public string ToTime { get; set; } = string.Empty;
+
+    public string? Description { get; set; } = string.Empty;
 }

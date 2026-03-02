@@ -67,13 +67,13 @@ public sealed class CreateTradeSession
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            RouteGroupBuilder group = app.MapGroup("api/v1/trading-zones");
+            RouteGroupBuilder group = app.MapGroup("api/v1/trade-sessions");
 
             group.MapPost("/", async (Request request, ISender sender) =>
             {
                 var result = await sender.Send(request);
 
-                return result.IsSuccess ? Results.Created($"/trading-zones/{result.Value}", result.Value)
+                return result.IsSuccess ? Results.Created($"/trade-sessions/{result.Value}", result.Value)
                     : Results.BadRequest(result.Errors);
             })
             .Produces<Result<int>>(StatusCodes.Status201Created)

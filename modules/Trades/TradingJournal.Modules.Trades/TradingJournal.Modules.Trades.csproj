@@ -17,5 +17,9 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\shared\TradingJournal.Shared\TradingJournal.Shared.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Features\V1\TechinalAnalysis\" />
+  </ItemGroup>
   
 </Project>

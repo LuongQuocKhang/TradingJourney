@@ -13,4 +13,6 @@ public static class Tags
     public const string TradingSessions = "Trading Sessions";
 
     public const string TradingZones = "Trading Zones";
+
+    public const string TradingScreenshoots = "Trading Screenshoots";
 }
