@@ -70,7 +70,7 @@ public sealed class UpdateTradingZone
         {
             RouteGroupBuilder group = app.MapGroup("api/v1/trading-zones");
 
-            group.MapPut("/{id:int}", async (int id, [FromBody] Request request, ISender sender) =>
+            group.MapPut("/", async ([FromBody] Request request, ISender sender) =>
             {
                 Result<bool> result = await sender.Send(request);
 
