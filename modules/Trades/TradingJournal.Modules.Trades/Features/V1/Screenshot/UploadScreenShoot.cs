@@ -39,7 +39,7 @@ public sealed class UploadScreenShoot
 
             HttpContext? httpContext = httpContextAccessor.HttpContext;
 
-            string imageUrl = $"{httpContext.Request.Scheme}://{httpContext.Request.Host}/images/cars/{fileName}";
+            string imageUrl = $"{httpContext.Request.Scheme}://{httpContext.Request.Host}/screenshots/{fileName}";
 
             return Result<string>.Success(imageUrl);
         }

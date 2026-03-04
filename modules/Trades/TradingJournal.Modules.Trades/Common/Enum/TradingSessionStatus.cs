@@ -2,7 +2,6 @@
 
 public enum TradingSessionStatus
 {
-    None = 0,
-    Open = 1,
+    Active = 1,
     Closed = 2
 }

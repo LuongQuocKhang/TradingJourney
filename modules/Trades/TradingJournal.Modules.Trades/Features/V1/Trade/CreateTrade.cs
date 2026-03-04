@@ -1,4 +1,5 @@
 ﻿using Mapster;
+using Microsoft.AspNetCore.Hosting;
 using TradingJournal.Modules.Trades.Dto;
 
 namespace TradingJournal.Modules.Trades.Features.V1.Trade;
@@ -89,51 +90,103 @@ public sealed class CreateTrade
         }
     }
 
-    internal sealed class Handler(ITradeDbContext context) : ICommandHandler<Request, Result<int>>
+    internal sealed class Handler(ITradeDbContext context, IWebHostEnvironment env) : ICommandHandler<Request, Result<int>>
     {
         public async Task<Result<int>> Handle(Request request, CancellationToken cancellationToken)
         {
-            TradeHistory tradeHistory = request.Adapt<TradeHistory>();
-
-            await context.TradeHistories.AddAsync(tradeHistory, cancellationToken);
-
-            await context.TradeHistoryChecklist.AddRangeAsync(request.TradeHistoryChecklists.Select(checklistId => new TradeHistoryChecklist
+            try 
             {
-                Id = 0,
-                PretradeChecklistId = checklistId,
-                TradeHistory = tradeHistory
-            }), cancellationToken);
+                await context.BeginTransaction();
 
-            await context.TradeEmotionTags.AddRangeAsync(request.EmotionTags?.Select(tagId => new TradeEmotionTag
-            {
-                Id = 0,
-                EmotionTagId = tagId,
-                TradeHistory = tradeHistory
-            }) ?? [], cancellationToken);
+                TradeHistory tradeHistory = request.Adapt<TradeHistory>();
 
-            await context.TradeScreenShots.AddRangeAsync(request.Screenshots?.Select(screenshot => new TradeScreenShot
-            {
-                Id = 0,
-                Url = screenshot,
-                TradeHistory = tradeHistory
-            }) ?? [], cancellationToken);
+                // Clear navigation properties to prevent Mapster from creating invalid child entities.
+                // These are manually added below with correct FK references.
+                tradeHistory.TradeTechnicalAnalysisTags = [];
+                tradeHistory.TradeScreenShots = [];
+                tradeHistory.TradeEmotionTags = [];
+                tradeHistory.TradeChecklists = [];
+                tradeHistory.RiskGuardrail = null;
 
-            await context.TradeTechnicalAnalysisTags.AddRangeAsync(request.TradeTechnicalAnalysisTags?.Select(tagId => new TradeTechnicalAnalysisTag
-            {
-                Id = 0,
-                TechnicalAnalysisId = tagId,
-                TradeHistory = tradeHistory
-            }) ?? [], cancellationToken);
+                await context.TradeHistories.AddAsync(tradeHistory, cancellationToken);
 
-            if (request.RiskGuardrail != null)
+                await context.TradeHistoryChecklist.AddRangeAsync(request.TradeHistoryChecklists.Select(checklistId => new TradeHistoryChecklist
+                {
+                    Id = 0,
+                    PretradeChecklistId = checklistId,
+                    TradeHistory = tradeHistory
+                }), cancellationToken);
+
+                await context.TradeEmotionTags.AddRangeAsync(request.EmotionTags?.Select(tagId => new TradeEmotionTag
+                {
+                    Id = 0,
+                    EmotionTagId = tagId,
+                    TradeHistory = tradeHistory
+                }) ?? [], cancellationToken);
+
+                List<string> filteredScreenshots = request.Screenshots?.Where(x => !string.IsNullOrEmpty(x)).ToList() ?? [];
+
+                List<TradeScreenShot> screenshotEntities = [];
+                foreach (string screenshot in filteredScreenshots)
+                {
+                    string url = SaveBase64ToFile(screenshot);
+                    screenshotEntities.Add(new TradeScreenShot
+                    {
+                        Id = 0,
+                        Url = url,
+                        TradeHistory = tradeHistory
+                    });
+                }
+                await context.TradeScreenShots.AddRangeAsync(screenshotEntities, cancellationToken);
+
+                await context.TradeTechnicalAnalysisTags.AddRangeAsync(request.TradeTechnicalAnalysisTags?.Select(tagId => new TradeTechnicalAnalysisTag
+                {
+                    Id = 0,
+                    TechnicalAnalysisId = tagId,
+                    TradeHistory = tradeHistory
+                }) ?? [], cancellationToken);
+
+                if (request.RiskGuardrail != null)
+                {
+                    tradeHistory.RiskGuardrail = request.RiskGuardrail.Adapt<RiskGuardrail>();
+                }
+
+                int insertedRow = await context.SaveChangesAsync(cancellationToken);
+
+                await context.CommitTransaction();
+
+                return insertedRow > 0 ? Result<int>.Success(tradeHistory.Id)
+                    : Result<int>.Failure(Error.Create("Failed to create trade history."));
+            }
+            catch (Exception ex)
             {
-                tradeHistory.RiskGuardrail = request.RiskGuardrail.Adapt<RiskGuardrail>();
+                await context.RollbackTransaction();
+                return Result<int>.Failure(Error.Create(ex.Message));
+            }
+        }
+
+        private string SaveBase64ToFile(string base64String)
+        {
+            // Strip the data URI prefix if present (e.g., "data:image/png;base64,")
+            if (base64String.Contains(','))
+            {
+                base64String = base64String[(base64String.IndexOf(',') + 1)..];
             }
 
-            int insertedRow = await context.SaveChangesAsync(cancellationToken);
+            byte[] imageBytes = Convert.FromBase64String(base64String);
 
-            return insertedRow > 0 ? Result<int>.Success(tradeHistory.Id)
-                : Result<int>.Failure(Error.Create("Failed to create trade history."));
+            var screenshotDir = Path.Combine(env.ContentRootPath, "wwwroot", "screenshots");
+            if (!Directory.Exists(screenshotDir))
+            {
+                Directory.CreateDirectory(screenshotDir);
+            }
+
+            var fileName = Guid.NewGuid().ToString() + ".png";
+            var filePath = Path.Combine(screenshotDir, fileName);
+
+            File.WriteAllBytes(filePath, imageBytes);
+
+            return $"/screenshots/{fileName}";
         }
     }
 

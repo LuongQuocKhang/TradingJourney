@@ -1,4 +1,5 @@
 using Mapster;
+using Microsoft.AspNetCore.Hosting;
 using TradingJournal.Modules.Trades.Dto;
 
 namespace TradingJournal.Modules.Trades.Features.V1.Trade;
@@ -91,7 +92,7 @@ public sealed class UpdateTrade
         }
     }
 
-    internal sealed class Handler(ITradeDbContext context) : ICommandHandler<Request, Result<bool>>
+    internal sealed class Handler(ITradeDbContext context, IWebHostEnvironment env) : ICommandHandler<Request, Result<bool>>
     {
         public async Task<Result<bool>> Handle(Request request, CancellationToken cancellationToken)
         {
@@ -129,8 +130,7 @@ public sealed class UpdateTrade
                 tradeHistory.TradingZoneId = request.TradingZoneId;
                 tradeHistory.TradingSessionId = request.TradingSessionId;
 
-                #region remove all existing screenshots, emotion tags, pretrade checklists, and trading session associations
-                context.TradeScreenShots.RemoveRange(tradeHistory.TradeScreenShots);
+                #region remove all existing emotion tags, pretrade checklists, and technical analysis tags
                 context.TradeEmotionTags.RemoveRange(tradeHistory.TradeEmotionTags ?? []);
                 context.TradeHistoryChecklist.RemoveRange(tradeHistory.TradeChecklists);
                 context.TradeTechnicalAnalysisTags.RemoveRange(tradeHistory.TradeTechnicalAnalysisTags ?? []);
@@ -149,19 +149,44 @@ public sealed class UpdateTrade
                     EmotionTagId = tagId
                 }) ?? [], cancellationToken);
 
-                await context.TradeScreenShots.AddRangeAsync(request.Screenshots?.Select(screenshot => new TradeScreenShot
-                {
-                    Id = 0,
-                    TradeHistoryId = tradeHistory.Id,
-                    Url = screenshot
-                }) ?? [], cancellationToken);
-
                 await context.TradeTechnicalAnalysisTags.AddRangeAsync(request.TradeTechnicalAnalysisTags?.Select(tagId => new TradeTechnicalAnalysisTag
                 {
                     Id = 0,
                     TradeHistoryId = tradeHistory.Id,
                     TechnicalAnalysisId = tagId
                 }) ?? [], cancellationToken);
+                #endregion
+
+                #region handle screenshots: keep existing URLs, save new base64, delete removed files
+                List<string> incomingScreenshots = request.Screenshots?.Where(x => !string.IsNullOrEmpty(x)).ToList() ?? [];
+
+                // Separate incoming into existing URLs (kept) vs new base64 (to save)
+                List<string> incomingUrls = incomingScreenshots.Where(s => !IsBase64Image(s)).ToList();
+                List<string> newBase64Screenshots = incomingScreenshots.Where(s => IsBase64Image(s)).ToList();
+
+                // Find screenshots to delete (old URLs not in the incoming list)
+                List<TradeScreenShot> screenshotsToDelete = tradeHistory.TradeScreenShots
+                    .Where(existing => !incomingUrls.Contains(existing.Url))
+                    .ToList();
+
+                // Delete physical files for removed screenshots
+                foreach (var screenshot in screenshotsToDelete)
+                {
+                    DeleteScreenshotFile(screenshot.Url);
+                }
+                context.TradeScreenShots.RemoveRange(screenshotsToDelete);
+
+                // Save new base64 screenshots as files
+                foreach (string base64 in newBase64Screenshots)
+                {
+                    string url = SaveBase64ToFile(base64);
+                    await context.TradeScreenShots.AddAsync(new TradeScreenShot
+                    {
+                        Id = 0,
+                        TradeHistoryId = tradeHistory.Id,
+                        Url = url
+                    }, cancellationToken);
+                }
                 #endregion
 
                 #region update or create risk guardrail association
@@ -184,6 +209,48 @@ public sealed class UpdateTrade
             catch
             {
                 throw;
+            }
+        }
+
+        private static bool IsBase64Image(string value)
+        {
+            return value.StartsWith("data:image", StringComparison.OrdinalIgnoreCase)
+                || (!value.StartsWith("http", StringComparison.OrdinalIgnoreCase)
+                    && !value.StartsWith("/", StringComparison.Ordinal));
+        }
+
+        private string SaveBase64ToFile(string base64String)
+        {
+            if (base64String.Contains(','))
+            {
+                base64String = base64String[(base64String.IndexOf(',') + 1)..];
+            }
+
+            byte[] imageBytes = Convert.FromBase64String(base64String);
+
+            var screenshotDir = Path.Combine(env.ContentRootPath, "wwwroot", "screenshots");
+            if (!Directory.Exists(screenshotDir))
+            {
+                Directory.CreateDirectory(screenshotDir);
+            }
+
+            var fileName = Guid.NewGuid().ToString() + ".png";
+            var filePath = Path.Combine(screenshotDir, fileName);
+
+            File.WriteAllBytes(filePath, imageBytes);
+
+            return $"/screenshots/{fileName}";
+        }
+
+        private void DeleteScreenshotFile(string url)
+        {
+            if (string.IsNullOrEmpty(url) || !url.StartsWith("/screenshots/"))
+                return;
+
+            var filePath = Path.Combine(env.ContentRootPath, "wwwroot", url.TrimStart('/').Replace('/', Path.DirectorySeparatorChar));
+            if (File.Exists(filePath))
+            {
+                File.Delete(filePath);
             }
         }
     }

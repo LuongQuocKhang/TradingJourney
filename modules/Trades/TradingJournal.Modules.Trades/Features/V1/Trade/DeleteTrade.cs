@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Hosting;
+
 namespace TradingJournal.Modules.Trades.Features.V1.Trade;
 
 public class DeleteTrade
@@ -19,7 +21,7 @@ public class DeleteTrade
         }
     }
 
-    public class Handler(ITradeDbContext tradeDbContext) : ICommandHandler<Request, Result<int>>
+    public class Handler(ITradeDbContext tradeDbContext, IWebHostEnvironment env) : ICommandHandler<Request, Result<int>>
     {
         public async Task<Result<int>> Handle(Request request, CancellationToken cancellationToken)
         {
@@ -36,11 +38,29 @@ public class DeleteTrade
                 return Result<int>.Failure(Error.NotFound);
             }
 
+            // Delete physical screenshot files from disk
+            foreach (var screenshot in trade.TradeScreenShots)
+            {
+                DeleteScreenshotFile(screenshot.Url);
+            }
+
             tradeDbContext.TradeHistories.Remove(trade);
 
             await tradeDbContext.SaveChangesAsync(cancellationToken);
 
             return Result<int>.Success(trade.Id);
+        }
+
+        private void DeleteScreenshotFile(string url)
+        {
+            if (string.IsNullOrEmpty(url) || !url.StartsWith("/screenshots/"))
+                return;
+
+            var filePath = Path.Combine(env.ContentRootPath, "wwwroot", url.TrimStart('/').Replace('/', Path.DirectorySeparatorChar));
+            if (File.Exists(filePath))
+            {
+                File.Delete(filePath);
+            }
         }
     }
 

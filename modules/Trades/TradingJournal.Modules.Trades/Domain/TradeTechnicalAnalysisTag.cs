@@ -10,8 +10,8 @@ public sealed class TradeTechnicalAnalysisTag : EntityBase<int>
     public int TechnicalAnalysisId { get; set; }
 
     [ForeignKey(nameof(TradeHistoryId))]
-    public TradeHistory TradeHistory { get; set; }
+    public TradeHistory? TradeHistory { get; set; }
 
     [ForeignKey(nameof(TechnicalAnalysisId))]
-    public TechnicalAnalysis TechnicalAnalysis { get; set; }
+    public TechnicalAnalysis? TechnicalAnalysis { get; set; }
 }

@@ -6,13 +6,13 @@ public class TradeHistoryViewModel
 
     public string Asset { get; set; } = string.Empty;
 
-    public string Position { get; set; } = string.Empty;
+    public PositionType Position { get; set; }
 
     public double EntryPrice { get; set; }
 
     public DateTime Date { get; set; }
 
-    public string Status { get; set; } = string.Empty;
+    public TradeStatus Status { get; set; }
 
     public double? ExitPrice { get; set; }
 
@@ -21,4 +21,6 @@ public class TradeHistoryViewModel
     public DateTime? ClosedDate { get; set; }
 
     public List<string>? EmotionTags { get; set; }
+
+    public ConfidenceLevel ConfidenceLevel { get; set; }
 }

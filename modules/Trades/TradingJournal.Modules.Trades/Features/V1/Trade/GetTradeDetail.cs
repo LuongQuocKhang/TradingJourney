@@ -1,4 +1,5 @@
 using Mapster;
+using TradingJournal.Modules.Trades.Dto;
 
 namespace TradingJournal.Modules.Trades.Features.V1.Trade;
 
@@ -22,14 +23,45 @@ public class GetTradeDetail
     {
         public async Task<Result<TradeHistoryDetailViewModel>> Handle(Request request, CancellationToken cancellationToken)
         {
-            Domain.TradeHistory? trade = await tradeDbContext.TradeHistories.FindAsync([request.Id], cancellationToken: cancellationToken);
-
-            TradeHistoryDetailViewModel TradeHistoryDetailViewModel = trade.Adapt<TradeHistoryDetailViewModel>();
+            Domain.TradeHistory? trade = await tradeDbContext.TradeHistories
+                .Include(x => x.TradeScreenShots)
+                .Include(x => x.TradeEmotionTags)
+                .Include(x => x.TradeChecklists)
+                .Include(x => x.TradeTechnicalAnalysisTags)
+                .Include(x => x.RiskGuardrail)
+                .FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken: cancellationToken);
 
             if (trade == null)
             {
                 return Result<TradeHistoryDetailViewModel>.Failure(Error.NotFound);
             }
+
+            TradeHistoryDetailViewModel TradeHistoryDetailViewModel = new()
+            {
+                Asset = trade.Asset,
+                Position = trade.Position,
+                EntryPrice = trade.EntryPrice,
+                Date = trade.Date,
+                Status = trade.Status,
+                ExitPrice = trade.ExitPrice,
+                Pnl = trade.Pnl,
+                ClosedDate = trade.ClosedDate,
+                Notes = trade.Notes,
+                TradingSessionId = trade.TradingSessionId,
+                TradingZoneId = trade.TradingZoneId,
+                TargetTier1 = trade.TargetTier1,
+                TargetTier2 = trade.TargetTier2,
+                TargetTier3 = trade.TargetTier3,
+                StopLoss = trade.StopLoss,
+                RiskGuardrailId = trade.RiskGuardrailId,
+                ConfidenceLevel = trade.ConfidenceLevel,
+                PsychologyNotes = trade.PsychologyNotes,
+                EmotionTags = trade.TradeEmotionTags?.Select(x => x.EmotionTagId).ToList(),
+                ScreenShots = [.. trade.TradeScreenShots.Select(x => x.Url)],
+                SelectedChecklists = [.. trade.TradeChecklists.Select(x => x.PretradeChecklistId)],
+                TechnicalAnalysisTags = [.. trade.TradeTechnicalAnalysisTags.Select(x => x.TechnicalAnalysisId)],
+                RiskGuardrail = trade.RiskGuardrail?.Adapt<RiskGuardrailsDto>()
+            };
 
             return Result<TradeHistoryDetailViewModel>.Success(TradeHistoryDetailViewModel);
         }

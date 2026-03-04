@@ -1,9 +1,7 @@
 using Mapster;
 using TradingJournal.Shared.Common;
-using TradingJournal.Shared.Contracts;
 using TradingJournal.Shared.Dtos;
 using TradingJournal.Shared.Extensions;
-using TradingJournal.Shared.Interfaces;
 
 namespace TradingJournal.Modules.Trades.Features.V1.Trade;
 
@@ -26,7 +24,7 @@ public class GetTrades
         public int PageSize { get; set; } = 10;
     }
 
-    internal sealed class Validator : AbstractValidator<GetTrades.Request>
+    internal sealed class Validator : AbstractValidator<Request>
     {
         public Validator()
         {
@@ -44,25 +42,30 @@ public class GetTrades
         }
     }
 
-    internal sealed class Handler(ITradeDbContext tradeDbContext, ICacheRepository cacheRepository) : IQueryHandler<GetTrades.Request, Result<PaginationViewModel<TradeHistoryViewModel>>>
+    internal sealed class Handler(ITradeDbContext tradeDbContext, ICacheRepository cacheRepository, IEmotionTagProvider emotionTagProvider) : IQueryHandler<Request, Result<PaginationViewModel<TradeHistoryViewModel>>>
     {
-        public async Task<Result<PaginationViewModel<TradeHistoryViewModel>>> Handle(GetTrades.Request request, CancellationToken cancellationToken)
+        public async Task<Result<PaginationViewModel<TradeHistoryViewModel>>> Handle(Request request, CancellationToken cancellationToken)
         {
             string queryHash = request.ToHashString();
 
-            Result<PaginationViewModel<TradeHistoryViewModel>>? result = await cacheRepository.GetOrCreateAsync(
+            PaginationViewModel<TradeHistoryViewModel>? result = await cacheRepository.GetOrCreateAsync(
                 queryHash, async cancellationToken =>
                 {
-                    Result<PaginationViewModel<TradeHistoryViewModel>> result = await GetTradesFromDatabase(request, cancellationToken);
+                    PaginationViewModel<TradeHistoryViewModel> result = await GetTradesFromDatabase(request, cancellationToken);
                     return result;
                 },
-            expiration: TimeSpan.FromMinutes(5),
+            expiration: TimeSpan.FromSeconds(30),
             cancellationToken: cancellationToken);
 
-            return result ?? Result<PaginationViewModel<TradeHistoryViewModel>>.Failure(Error.NotFound);
+            if (result == null || result.TotalItems == 0)
+            {
+                return Result<PaginationViewModel<TradeHistoryViewModel>>.Failure(Error.NotFound);
+            }
+
+            return Result<PaginationViewModel<TradeHistoryViewModel>>.Success(result);
         }
 
-        private async Task<Result<PaginationViewModel<TradeHistoryViewModel>>> GetTradesFromDatabase(GetTrades.Request request, CancellationToken cancellationToken)
+        private async Task<PaginationViewModel<TradeHistoryViewModel>> GetTradesFromDatabase(Request request, CancellationToken cancellationToken)
         {
             IQueryable<TradeHistory> query = tradeDbContext.TradeHistories
                 .AsNoTracking();
@@ -100,11 +103,6 @@ public class GetTrades
                 .Take(request.PageSize)
                 .ToListAsync(cancellationToken);
 
-            if (tradeHistories.Count == 0)
-            {
-                return Result<PaginationViewModel<TradeHistoryViewModel>>.Failure(Error.NotFound);
-            }
-
             IReadOnlyCollection<TradeHistoryViewModel> tradeHistoryViewModels = tradeHistories.Adapt<IReadOnlyCollection<TradeHistoryViewModel>>();
 
             // Batch-fetch EmotionTagIds for all trades on this page (single query, no N+1)
@@ -115,13 +113,11 @@ public class GetTrades
                 .Where(tet => tradeIds.Contains(tet.TradeHistoryId))
                 .ToListAsync(cancellationToken);
 
-            // Read EmotionTag names from shared Redis cache (written by Psychology module)
-            List<EmotionTagCacheDto>? cachedEmotionTags = await cacheRepository.GetAsync<List<EmotionTagCacheDto>>(
-                CacheKeys.EmotionTags,
-                cancellationToken);
+            // Resolve EmotionTag names via shared provider (auto-populates cache on miss)
+            List<EmotionTagCacheDto> cachedEmotionTags = await emotionTagProvider.GetEmotionTagsAsync(cancellationToken);
 
-            Dictionary<int, string> emotionTagLookup = cachedEmotionTags?
-                .ToDictionary(e => e.Id, e => e.Name) ?? [];
+            Dictionary<int, string> emotionTagLookup = cachedEmotionTags
+                .ToDictionary(e => e.Id, e => e.Name);
 
             // Group EmotionTagIds by TradeHistoryId
             ILookup<int, int> emotionTagIdsByTrade = tradeEmotionTags
@@ -133,20 +129,6 @@ public class GetTrades
                 viewModel.EmotionTags = [.. emotionTagIdsByTrade[viewModel.Id]
                     .Where(emotionTagLookup.ContainsKey)
                     .Select(id => emotionTagLookup[id])];
-
-                viewModel.Position = viewModel.Position switch
-                {
-                    "Long" => "Long",
-                    "Short" => "Short",
-                    _ => viewModel.Position
-                };
-
-                viewModel.Status = viewModel.Status switch
-                {
-                    "Open" => "Open",
-                    "Closed" => "Closed",
-                    _ => viewModel.Status
-                };
             }
 
             PaginationViewModel<TradeHistoryViewModel> result = new()
@@ -156,7 +138,7 @@ public class GetTrades
                 Values = tradeHistoryViewModels
             };
 
-            return Result<PaginationViewModel<TradeHistoryViewModel>>.Success(result);
+            return result;
         }
     }
 

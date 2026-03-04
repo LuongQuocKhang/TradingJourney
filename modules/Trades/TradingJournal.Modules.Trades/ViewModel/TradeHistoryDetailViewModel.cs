@@ -4,23 +4,11 @@ namespace TradingJournal.Modules.Trades.ViewModel
 {
     public sealed class TradeHistoryDetailViewModel
     {
-        public int Id { get; set; }
-
         public string Asset { get; set; } = string.Empty;
 
         public PositionType Position { get; set; }
 
         public double EntryPrice { get; set; }
-
-        public double TargetTier1 { get; set; }
-
-        public double? TargetTier2 { get; set; }
-
-        public double? TargetTier3 { get; set; }
-
-        public double StopLoss { get; set; }
-
-        public string Notes { get; set; } = string.Empty;
 
         public DateTime Date { get; set; }
 
@@ -32,18 +20,36 @@ namespace TradingJournal.Modules.Trades.ViewModel
 
         public DateTime? ClosedDate { get; set; }
 
-        public List<string>? Screenshots { get; set; }
+        public string? Notes { get; set; } = string.Empty;
 
-        public List<int>? EmotionTags { get; set; }
+        public int? TradingSessionId { get; set; }
+
+        // London / NY / Sydney / Tokyo
+        public int? TradingZoneId { get; set; }
+
+
+        public double TargetTier1 { get; set; }
+
+        public double? TargetTier2 { get; set; }
+
+        public double? TargetTier3 { get; set; }
+
+        public double StopLoss { get; set; }
+
+        public int? RiskGuardrailId { get; set; }
 
         public ConfidenceLevel ConfidenceLevel { get; set; }
 
         public string? PsychologyNotes { get; set; }
 
-        public List<int> PretradeChecklist { get; set; } = [];
+        public List<string> ScreenShots { get; set; } = [];
 
-        public int TradingSession { get; set; }
+        public List<int>? EmotionTags { get; set; } = [];
 
-        public RiskGuardrailsDto RiskGuardrails { get; set; }
+        public List<int> SelectedChecklists { get; set; } = [];
+
+        public List<int> TechnicalAnalysisTags { get; set; } = [];
+
+        public RiskGuardrailsDto? RiskGuardrail { get; set; }
     }
 }

@@ -20,6 +20,8 @@ public interface ITradeDbContext
 
     DbSet<TradeTechnicalAnalysisTag> TradeTechnicalAnalysisTags { get; set; }
 
+    DbSet<TradingSession> TradingSessions { get; set; }
+
     Task BeginTransaction();
 
     Task CommitTransaction();

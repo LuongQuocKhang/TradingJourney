@@ -14,3 +14,4 @@ global using TradingJournal.Modules.Trades.Domain;
 global using TradingJournal.Modules.Trades.Infrastructure;
 global using TradingJournal.Modules.Trades.ViewModel;
 global using Carter;
+global using TradingJournal.Shared.Interfaces;

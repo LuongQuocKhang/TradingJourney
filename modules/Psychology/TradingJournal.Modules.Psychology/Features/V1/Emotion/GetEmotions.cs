@@ -12,27 +12,16 @@ public sealed class GetEmotions
     {
     }
 
-    internal sealed class Handler(IPsychologyDbContext context, ICacheRepository cacheRepository) : IQueryHandler<Request, Result<List<EmotionTagCacheDto>>>
+    internal sealed class Handler(IEmotionTagProvider emotionTagProvider) : IQueryHandler<Request, Result<List<EmotionTagCacheDto>>>
     {
         public async Task<Result<List<EmotionTagCacheDto>>> Handle(Request request, CancellationToken cancellationToken)
         {
-            var emotions = await cacheRepository.GetOrCreateAsync<List<EmotionTagCacheDto>>(CacheKeys.EmotionTags,
-                async (cancellationToken) =>
-                {
-                    List<EmotionTag> emotionTags = await context.EmotionTags
-                        .AsNoTracking()
-                        .OrderBy(x => x.Name)
-                        .ToListAsync(cancellationToken);
-                    return [.. emotionTags.Select(e => new EmotionTagCacheDto { Id = e.Id, Name = e.Name })];
-                },
-                expiration: TimeSpan.FromMinutes(5),
-                cancellationToken: cancellationToken) ?? [];
+            List<EmotionTagCacheDto> emotions = await emotionTagProvider.GetEmotionTagsAsync(cancellationToken);
 
             return emotions.Count > 0
                 ? Result<List<EmotionTagCacheDto>>.Success(emotions)
                 : Result<List<EmotionTagCacheDto>>.Failure(Error.NotFound);
         }
-
     }
 
     public class Endpoint : ICarterModule
