@@ -1,7 +1,7 @@
 ﻿using TradingJournal.Modules.Psychology.ViewModel;
 using TradingJournal.Shared.Extensions;
 
-namespace TradingJournal.Modules.Psychology.Features.V1.Psychology;
+namespace TradingJournal.Modules.Psychology.Features.V1.Dashboard;
 
 public sealed class GetPsychologyStatistic
 {
@@ -14,7 +14,7 @@ public sealed class GetPsychologyStatistic
             string cacheKey = $"psychology-statistic-{request.ToHashString()}";
             Result<PsychologyStatisticViewModel?> result = await cacheRepository.GetOrCreateAsync(
                 cacheKey,
-                async (CancellationToken cancellationToken) =>
+                async cancellationToken =>
                 {
                     return await GetPsychologyStatisticAsync(request, cancellationToken);
                 },
@@ -63,7 +63,7 @@ public sealed class GetPsychologyStatistic
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            RouteGroupBuilder group = app.MapGroup("api/v1/psychology-journals");
+            RouteGroupBuilder group = app.MapGroup("api/v1/dashboard");
 
             group.MapGet("/statistic", async (IMediator mediator) =>
             {

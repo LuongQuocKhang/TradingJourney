@@ -1,3 +1,5 @@
+using TradingJournal.Shared.Dtos;
+
 namespace TradingJournal.Modules.Trades.ViewModel;
 
 public class TradeHistoryViewModel
@@ -20,7 +22,7 @@ public class TradeHistoryViewModel
 
     public DateTime? ClosedDate { get; set; }
 
-    public List<string>? EmotionTags { get; set; }
+    public List<EmotionTagCacheDto>? EmotionTags { get; set; }
 
     public ConfidenceLevel ConfidenceLevel { get; set; }
 }

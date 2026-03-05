@@ -48,19 +48,7 @@ public class GetTrades
         {
             string queryHash = request.ToHashString();
 
-            PaginationViewModel<TradeHistoryViewModel>? result = await cacheRepository.GetOrCreateAsync(
-                queryHash, async cancellationToken =>
-                {
-                    PaginationViewModel<TradeHistoryViewModel> result = await GetTradesFromDatabase(request, cancellationToken);
-                    return result;
-                },
-            expiration: TimeSpan.FromSeconds(30),
-            cancellationToken: cancellationToken);
-
-            if (result == null || result.TotalItems == 0)
-            {
-                return Result<PaginationViewModel<TradeHistoryViewModel>>.Failure(Error.NotFound);
-            }
+            PaginationViewModel<TradeHistoryViewModel> result = await GetTradesFromDatabase(request, cancellationToken);
 
             return Result<PaginationViewModel<TradeHistoryViewModel>>.Success(result);
         }
@@ -128,7 +116,12 @@ public class GetTrades
                 // Resolve EmotionTagIds to names via cache lookup
                 viewModel.EmotionTags = [.. emotionTagIdsByTrade[viewModel.Id]
                     .Where(emotionTagLookup.ContainsKey)
-                    .Select(id => emotionTagLookup[id])];
+                    .Select(x => new EmotionTagCacheDto
+                    {
+                        Id = x,
+                        Name = emotionTagLookup[x],
+                        EmotionType = cachedEmotionTags.First(et => et.Id == x).EmotionType
+                    })];
             }
 
             PaginationViewModel<TradeHistoryViewModel> result = new()
