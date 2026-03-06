@@ -17,7 +17,7 @@ public sealed class GetEmotionFrequency
             List<TradeCacheDto> trades = await tradeProvider.GetTradesAsync(cancellationToken);
             List<EmotionTagCacheDto> tags = await emotionTagProvider.GetEmotionTagsAsync(cancellationToken);
 
-            Dictionary<int, int> freq = new();
+            Dictionary<int, int> freq = [];
 
             foreach (var trade in trades)
             {

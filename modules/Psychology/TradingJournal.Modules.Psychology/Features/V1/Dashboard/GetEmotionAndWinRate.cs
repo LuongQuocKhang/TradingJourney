@@ -19,7 +19,7 @@ public sealed class GetEmotionAndWinRate
 
             var closedTrades = allTrades.Where(t => t.ClosedDate.HasValue && t.Pnl.HasValue).ToList();
 
-            Dictionary<int, (int wins, int total)> tagStats = new();
+            Dictionary<int, (int wins, int total)> tagStats = [];
 
             foreach (var trade in closedTrades)
             {
@@ -44,14 +44,14 @@ public sealed class GetEmotionAndWinRate
                 .Where(t => tagStats.ContainsKey(t.Id))
                 .Select(t =>
                 {
-                    var stat = tagStats[t.Id];
+                    var (wins, total) = tagStats[t.Id];
                     return new EmotionWinRateViewModel
                     {
                         Id = t.Id,
                         Name = t.Name,
                         Label = t.Name,
-                        WinRate = (int)Math.Round((double)stat.wins / stat.total * 100),
-                        Total = stat.total
+                        WinRate = (int)Math.Round((double)wins / total * 100),
+                        Total = total
                     };
                 })
                 .Where(x => x.Total >= 1)
