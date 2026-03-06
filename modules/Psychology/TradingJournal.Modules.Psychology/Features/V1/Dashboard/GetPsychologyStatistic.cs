@@ -73,7 +73,8 @@ public sealed class GetPsychologyStatistic
             .Produces<Result<PsychologyStatisticViewModel>>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status500InternalServerError)
             .WithSummary("Get psychology statistic.")
-            .WithDescription("Gets psychology statistic based on the psychology journals in a specific period.");
+            .WithDescription("Gets psychology statistic based on the psychology journals in a specific period.")
+            .WithTags("Dashboard");
         }
     }
 }

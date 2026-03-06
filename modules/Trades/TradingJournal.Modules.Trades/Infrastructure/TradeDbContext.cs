@@ -29,6 +29,29 @@ internal sealed class TradeDbContext(DbContextOptions<TradeDbContext> options)
 
     public DbSet<TradeTechnicalAnalysisTag> TradeTechnicalAnalysisTags { get; set; }
 
+    public DbSet<TradingSetup> TradingSetups { get; set; }
+
+    public DbSet<SetupStep> SetupSteps { get; set; }
+
+    public DbSet<SetupConnection> SetupConnections { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<SetupConnection>()
+            .HasOne(e => e.SourceStep)
+            .WithMany()
+            .HasForeignKey(e => e.SourceStepId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<SetupConnection>()
+            .HasOne(e => e.TargetStep)
+            .WithMany()
+            .HasForeignKey(e => e.TargetStepId)
+            .OnDelete(DeleteBehavior.Restrict);
+    }
+
     public async Task BeginTransaction()
     {
         _transaction = await Database.BeginTransactionAsync();

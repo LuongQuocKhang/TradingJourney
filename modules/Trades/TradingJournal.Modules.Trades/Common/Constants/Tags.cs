@@ -17,4 +17,6 @@ public static class Tags
     public const string TradingScreenshoots = "Trading Screenshoots";
 
     public const string Dashboard = "Dashboard";
+
+    public const string TradingSetups = "Trading Setups";
 }

@@ -31,6 +31,8 @@ public static class DependencyInjection
             options.UseSqlServer(configuration.GetConnectionString("TradeDatabase"));
         });
 
+        services.AddScoped<ITradeProvider, TradeProvider>();
+
         return services;
     }
 
