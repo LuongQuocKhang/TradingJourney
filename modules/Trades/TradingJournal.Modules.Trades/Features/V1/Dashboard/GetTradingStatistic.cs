@@ -1,8 +1,11 @@
+using TradingJournal.Shared.Common;
+
+
 namespace TradingJournal.Modules.Trades.Features.V1.Dashboard;
 
 public sealed class GetTradingStatistic
 {
-    internal sealed record Request : IQuery<Result<TradingStatisticViewModel>>;
+    internal sealed record Request(DashboardFilter Filter) : IQuery<Result<TradingStatisticViewModel>>;
 
     internal sealed class Handler(ITradeDbContext context) : IQueryHandler<Request, Result<TradingStatisticViewModel>>
     {
@@ -10,9 +13,11 @@ public sealed class GetTradingStatistic
         {
             int userId = 0; // TODO: Get user ID from context
 
+            DateTime fromDate = DashboardFilterHelper.GetFromDate(request.Filter);
+
             List<TradeHistory>? trades = await context.TradeHistories
                 .AsNoTracking()
-                .Where(t => t.CreatedBy == userId)
+                .Where(t => t.CreatedBy == userId && t.Date >= fromDate)
                 .ToListAsync(cancellationToken);
 
             if (trades is null || trades.Count == 0)
@@ -48,9 +53,9 @@ public sealed class GetTradingStatistic
         {
             RouteGroupBuilder group = app.MapGroup("api/v1/dashboard");
 
-            group.MapGet("/statistics", async (IMediator sender) =>
+            group.MapGet("/statistics", async (DashboardFilter filter, IMediator sender) =>
             {
-                Result<TradingStatisticViewModel> result = await sender.Send(new Request());
+                Result<TradingStatisticViewModel> result = await sender.Send(new Request(filter));
 
                 return result.IsSuccess ? Results.Ok(result.Value) : Results.Problem(result.Errors[0].Description);
             })

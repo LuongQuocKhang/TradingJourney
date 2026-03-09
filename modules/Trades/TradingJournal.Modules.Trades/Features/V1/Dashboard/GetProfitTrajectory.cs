@@ -1,10 +1,11 @@
 using TradingJournal.Shared.Common;
 
+
 namespace TradingJournal.Modules.Trades.Features.V1.Dashboard;
 
 public sealed class GetProfitTrajectory
 {
-    internal sealed record Request(ProfitTrajectoryFilter Filter) : IQuery<Result<IReadOnlyCollection<ProfitTrajectoryViewModel>>>; 
+    internal sealed record Request(DashboardFilter Filter) : IQuery<Result<IReadOnlyCollection<ProfitTrajectoryViewModel>>>; 
 
     internal sealed record ProfitTrajectoryViewModel(DateTime Date, double PnL); 
 
@@ -16,7 +17,7 @@ public sealed class GetProfitTrajectory
             .Cascade(CascadeMode.Stop)
             .IsInEnum()
             .WithErrorCode(HttpStatusCode.BadRequest.ToString())
-            .WithMessage("Invalid filter value. Allowed values are: OneWeek, OneMonth, ThreeMonths, AllTime.");
+            .WithMessage("Invalid filter value. Allowed values are: OneDay, OneWeek, OneMonth, ThreeMonths, AllTime.");
         }
     }
 
@@ -26,14 +27,7 @@ public sealed class GetProfitTrajectory
         {
             int userId = 0; // TODO: Get user ID from context
 
-            DateTime fromDate = request.Filter switch
-            {
-                ProfitTrajectoryFilter.OneWeek => DateTime.UtcNow.AddDays(-7),
-                ProfitTrajectoryFilter.OneMonth => DateTime.UtcNow.AddMonths(-1),
-                ProfitTrajectoryFilter.ThreeMonths => DateTime.UtcNow.AddMonths(-3),
-                ProfitTrajectoryFilter.AllTime => DateTime.MinValue,
-                _ => throw new ArgumentOutOfRangeException(nameof(request.Filter), "Invalid filter value.")
-            };
+            DateTime fromDate = DashboardFilterHelper.GetFromDate(request.Filter);
 
             List<TradeHistory>? trades = await context.TradeHistories
                 .AsNoTracking()
@@ -69,7 +63,7 @@ public sealed class GetProfitTrajectory
         {
             RouteGroupBuilder group = app.MapGroup("api/v1/dashboard");
 
-            group.MapGet("/profit-trajectory", async (ProfitTrajectoryFilter filter, IMediator sender) =>
+            group.MapGet("/profit-trajectory", async (DashboardFilter filter, IMediator sender) =>
             {
                 Result<IReadOnlyCollection<ProfitTrajectoryViewModel>> result = await sender.Send(new Request(filter));
 

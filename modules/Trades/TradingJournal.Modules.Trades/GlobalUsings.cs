@@ -8,6 +8,7 @@ global using TradingJournal.Shared.CQRS;
 global using System.Net;
 global using MediatR;
 global using Microsoft.EntityFrameworkCore;
+global using TradingJournal.Modules.Trades.Common;
 global using TradingJournal.Modules.Trades.Common.Constants;
 global using TradingJournal.Modules.Trades.Common.Enum;
 global using TradingJournal.Modules.Trades.Domain;

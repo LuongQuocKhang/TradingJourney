@@ -28,8 +28,7 @@ public sealed class UpdateTrade
         string? PsychologyNotes,
         List<int> TradeHistoryChecklists,
         int TradingZoneId,
-        int? TradingSessionId,
-        RiskGuardrailsDto? RiskGuardrail) : ICommand<Result<bool>>;
+        int? TradingSessionId) : ICommand<Result<bool>>;
 
     internal sealed class Validator : AbstractValidator<Request>
     {
@@ -104,7 +103,6 @@ public sealed class UpdateTrade
                     .Include(th => th.TradeEmotionTags)
                     .Include(th => th.TradeChecklists)
                     .Include(x => x.TradeTechnicalAnalysisTags)
-                    .Include(th => th.RiskGuardrail)
                     .FirstOrDefaultAsync(th => th.Id == request.Id, cancellationToken: cancellationToken);
 
                 if (tradeHistory == null)
@@ -187,19 +185,6 @@ public sealed class UpdateTrade
                         Url = url
                     }, cancellationToken);
                 }
-                #endregion
-
-                #region update or create risk guardrail association
-
-                if (request.RiskGuardrail != null)
-                {
-                    tradeHistory.RiskGuardrail = request.RiskGuardrail.Adapt<RiskGuardrail>();
-                }
-                else
-                {
-                    tradeHistory.RiskGuardrail = null;
-                }
-
                 #endregion
 
                 await context.SaveChangesAsync(cancellationToken);

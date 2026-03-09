@@ -3,10 +3,10 @@
 public interface ITradeDbContext
 {
     DbSet<TradeHistory> TradeHistories { get; set; }
+
+    DbSet<ChecklistModel> ChecklistModels { get; set; }
     
     DbSet<PretradeChecklist> PretradeChecklists { get; set; }
-
-    DbSet<RiskGuardrail> RiskGuardrails { get; set; }
 
     DbSet<TradeScreenShot> TradeScreenShots { get; set; }
 

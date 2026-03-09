@@ -8,4 +8,9 @@ public sealed class PretradeChecklist : EntityBase<int>
     public string Name { get; set; } = string.Empty;
 
     public PretradeChecklistType CheckListType { get; set; }
+
+    public int ChecklistModelId { get; set; }
+
+    [ForeignKey(nameof(ChecklistModelId))]
+    public ChecklistModel ChecklistModel { get; set; }
 }

@@ -26,8 +26,6 @@ public class DeleteTrade
         public async Task<Result<int>> Handle(Request request, CancellationToken cancellationToken)
         {
             Domain.TradeHistory? trade = await tradeDbContext.TradeHistories
-                .Include(x => x.TradeEmotionTags)
-                .Include(x => x.RiskGuardrail)
                 .Include(x => x.TradeScreenShots)
                 .Include(x => x.TradeChecklists)
                 .Include(x => x.TradeTechnicalAnalysisTags)

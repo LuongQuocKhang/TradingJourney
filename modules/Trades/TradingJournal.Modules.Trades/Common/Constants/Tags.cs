@@ -19,4 +19,6 @@ public static class Tags
     public const string Dashboard = "Dashboard";
 
     public const string TradingSetups = "Trading Setups";
+
+    public const string ChecklistModels = "Checklist Models";
 }

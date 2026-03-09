@@ -1,8 +1,10 @@
+
+
 namespace TradingJournal.Modules.Trades.Features.V1.Dashboard;
 
 public sealed class GetWinLossRatio
 {
-    internal sealed record Request : IQuery<Result<IReadOnlyCollection<WinLossRatioViewModel>>>;
+    internal sealed record Request(DashboardFilter Filter) : IQuery<Result<IReadOnlyCollection<WinLossRatioViewModel>>>;
 
     internal sealed class Handler(ITradeDbContext context) : IQueryHandler<Request, Result<IReadOnlyCollection<WinLossRatioViewModel>>>
     {
@@ -10,9 +12,11 @@ public sealed class GetWinLossRatio
         {
             int userId = 0; // TODO: Get user ID from context
 
+            DateTime fromDate = DashboardFilterHelper.GetFromDate(request.Filter);
+
             List<TradeHistory>? trades = await context.TradeHistories
                 .AsNoTracking()
-                .Where(t => t.CreatedBy == userId && t.Status == TradeStatus.Closed && t.Pnl.HasValue)
+                .Where(t => t.CreatedBy == userId && t.Status == TradeStatus.Closed && t.Pnl.HasValue && t.ClosedDate != null && t.ClosedDate.Value >= fromDate)
                 .ToListAsync(cancellationToken);
 
             if (trades is null || trades.Count == 0)
@@ -40,9 +44,9 @@ public sealed class GetWinLossRatio
         {
             RouteGroupBuilder group = app.MapGroup("api/v1/dashboard");
 
-            group.MapGet("/win-loss-ratio", async (IMediator sender) =>
+            group.MapGet("/win-loss-ratio", async (DashboardFilter filter, IMediator sender) =>
             {
-                Result<IReadOnlyCollection<WinLossRatioViewModel>> result = await sender.Send(new Request());
+                Result<IReadOnlyCollection<WinLossRatioViewModel>> result = await sender.Send(new Request(filter));
 
                 return result.IsSuccess ? Results.Ok(result) : Results.Problem(result.Errors[0].Description);
             })

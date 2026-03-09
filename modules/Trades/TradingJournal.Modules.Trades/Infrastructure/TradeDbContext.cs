@@ -11,9 +11,9 @@ internal sealed class TradeDbContext(DbContextOptions<TradeDbContext> options)
 
     public DbSet<TradeHistory> TradeHistories { get; set; }
 
-    public DbSet<PretradeChecklist> PretradeChecklists { get; set; }
+    public DbSet<ChecklistModel> ChecklistModels { get; set; }
 
-    public DbSet<RiskGuardrail> RiskGuardrails { get; set; }
+    public DbSet<PretradeChecklist> PretradeChecklists { get; set; }
 
     public DbSet<TradeScreenShot> TradeScreenShots { get; set; }
 

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TradingJournal.Modules.Trades.Infrastructure;
 
@@ -11,9 +12,11 @@ using TradingJournal.Modules.Trades.Infrastructure;
 namespace TradingJournal.Modules.Trades.Migrations
 {
     [DbContext(typeof(TradeDbContext))]
-    partial class TradeDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260308230843_RemoveRiskGuardrails")]
+    partial class RemoveRiskGuardrails
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,41 +24,6 @@ namespace TradingJournal.Modules.Trades.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("TradingJournal.Modules.Trades.Domain.ChecklistModel", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("CreatedBy")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsDisabled")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("UpdatedBy")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ChecklistModels", "Trades");
-                });
 
             modelBuilder.Entity("TradingJournal.Modules.Trades.Domain.PretradeChecklist", b =>
                 {
@@ -68,9 +36,6 @@ namespace TradingJournal.Modules.Trades.Migrations
                     b.Property<int>("CheckListType")
                         .HasColumnType("int");
 
-                    b.Property<int>("ChecklistModelId")
-                        .HasColumnType("int");
-
                     b.Property<int>("CreatedBy")
                         .HasColumnType("int");
 
@@ -91,8 +56,6 @@ namespace TradingJournal.Modules.Trades.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ChecklistModelId");
 
                     b.ToTable("PretradeChecklists", "Trades");
                 });
@@ -612,17 +575,6 @@ namespace TradingJournal.Modules.Trades.Migrations
                     b.ToTable("TradingZones", "Trades");
                 });
 
-            modelBuilder.Entity("TradingJournal.Modules.Trades.Domain.PretradeChecklist", b =>
-                {
-                    b.HasOne("TradingJournal.Modules.Trades.Domain.ChecklistModel", "ChecklistModel")
-                        .WithMany("Criteria")
-                        .HasForeignKey("ChecklistModelId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ChecklistModel");
-                });
-
             modelBuilder.Entity("TradingJournal.Modules.Trades.Domain.SetupConnection", b =>
                 {
                     b.HasOne("TradingJournal.Modules.Trades.Domain.SetupStep", "SourceStep")
@@ -728,11 +680,6 @@ namespace TradingJournal.Modules.Trades.Migrations
                     b.Navigation("TechnicalAnalysis");
 
                     b.Navigation("TradeHistory");
-                });
-
-            modelBuilder.Entity("TradingJournal.Modules.Trades.Domain.ChecklistModel", b =>
-                {
-                    b.Navigation("Criteria");
                 });
 
             modelBuilder.Entity("TradingJournal.Modules.Trades.Domain.TradeHistory", b =>

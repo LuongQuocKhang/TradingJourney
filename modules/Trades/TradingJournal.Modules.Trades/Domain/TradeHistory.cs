@@ -42,8 +42,6 @@ public sealed class TradeHistory : EntityBase<int>
 
     public double StopLoss { get; set; }
 
-    public int? RiskGuardrailId { get; set; }
-
     #endregion
 
     #region Psychology & Emotions
@@ -61,9 +59,6 @@ public sealed class TradeHistory : EntityBase<int>
     public ICollection<TradeHistoryChecklist> TradeChecklists { get; set; } = [];
 
     public ICollection<TradeTechnicalAnalysisTag> TradeTechnicalAnalysisTags { get; set; } = [];
-
-    [ForeignKey(nameof(RiskGuardrailId))]
-    public RiskGuardrail? RiskGuardrail { get; set; }
 
     [ForeignKey(nameof(TradingSessionId))]
     public TradingSession? TradingSession { get; set; }

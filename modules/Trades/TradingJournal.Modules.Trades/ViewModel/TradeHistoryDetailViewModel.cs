@@ -36,8 +36,6 @@ namespace TradingJournal.Modules.Trades.ViewModel
 
         public double StopLoss { get; set; }
 
-        public int? RiskGuardrailId { get; set; }
-
         public ConfidenceLevel ConfidenceLevel { get; set; }
 
         public string? PsychologyNotes { get; set; }
@@ -49,7 +47,5 @@ namespace TradingJournal.Modules.Trades.ViewModel
         public List<int> SelectedChecklists { get; set; } = [];
 
         public List<int> TechnicalAnalysisTags { get; set; } = [];
-
-        public RiskGuardrailsDto? RiskGuardrail { get; set; }
     }
 }

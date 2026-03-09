@@ -1,10 +1,11 @@
 using TradingJournal.Shared.Common;
 
+
 namespace TradingJournal.Modules.Trades.Features.V1.Dashboard;
 
 public sealed class GetTradingCalendar
 {
-    internal sealed record Request(int Month, int Year) : IQuery<Result<IReadOnlyCollection<TradingCalendarViewModel>>>;
+    internal sealed record Request(int Month, int Year, DashboardFilter Filter) : IQuery<Result<IReadOnlyCollection<TradingCalendarViewModel>>>;
 
     internal sealed record TradingCalendarViewModel(DateTime Date, double PnL);
 
@@ -14,10 +15,13 @@ public sealed class GetTradingCalendar
         {
             int userId = 0; // TODO: Get user ID from context
 
+            DateTime filterFromDate = DashboardFilterHelper.GetFromDate(request.Filter);
+
             List<TradeHistory>? trades = await context.TradeHistories
                 .AsNoTracking()
                 .Where(t => t.CreatedBy == userId && t.Status == TradeStatus.Closed && t.ClosedDate != null && 
-                    t.ClosedDate.Value.Month == request.Month && t.ClosedDate.Value.Year == request.Year)
+                    t.ClosedDate.Value.Month == request.Month && t.ClosedDate.Value.Year == request.Year &&
+                    t.ClosedDate.Value >= filterFromDate)
                 .ToListAsync(cancellationToken);
 
             if (trades is null || trades.Count == 0)
@@ -52,9 +56,9 @@ public sealed class GetTradingCalendar
         {
             RouteGroupBuilder group = app.MapGroup("api/v1/dashboard");
 
-            group.MapGet("/calendar", async (int month, int year, IMediator sender) =>
+            group.MapGet("/calendar", async (int month, int year, DashboardFilter filter, IMediator sender) =>
             {
-                Result<IReadOnlyCollection<TradingCalendarViewModel>> result = await sender.Send(new Request(month, year));
+                Result<IReadOnlyCollection<TradingCalendarViewModel>> result = await sender.Send(new Request(month, year, filter));
 
                 return result.IsSuccess ? Results.Ok(result) : Results.Problem(result.Errors[0].Description);
             })

@@ -26,8 +26,7 @@ public sealed class CreateTrade
         string? PsychologyNotes,
         List<int> TradeHistoryChecklists,
         int TradingZoneId,
-        int? TradingSessionId,
-        RiskGuardrailsDto? RiskGuardrail) : ICommand<Result<int>>;
+        int? TradingSessionId) : ICommand<Result<int>>;
 
     internal sealed class Validator : AbstractValidator<Request>
     {
@@ -106,7 +105,6 @@ public sealed class CreateTrade
                 tradeHistory.TradeScreenShots = [];
                 tradeHistory.TradeEmotionTags = [];
                 tradeHistory.TradeChecklists = [];
-                tradeHistory.RiskGuardrail = null;
 
                 await context.TradeHistories.AddAsync(tradeHistory, cancellationToken);
 
@@ -145,11 +143,6 @@ public sealed class CreateTrade
                     TechnicalAnalysisId = tagId,
                     TradeHistory = tradeHistory
                 }) ?? [], cancellationToken);
-
-                if (request.RiskGuardrail != null)
-                {
-                    tradeHistory.RiskGuardrail = request.RiskGuardrail.Adapt<RiskGuardrail>();
-                }
 
                 int insertedRow = await context.SaveChangesAsync(cancellationToken);
 

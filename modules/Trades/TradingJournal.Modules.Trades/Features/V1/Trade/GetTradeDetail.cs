@@ -28,7 +28,6 @@ public class GetTradeDetail
                 .Include(x => x.TradeEmotionTags)
                 .Include(x => x.TradeChecklists)
                 .Include(x => x.TradeTechnicalAnalysisTags)
-                .Include(x => x.RiskGuardrail)
                 .FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken: cancellationToken);
 
             if (trade == null)
@@ -53,14 +52,12 @@ public class GetTradeDetail
                 TargetTier2 = trade.TargetTier2,
                 TargetTier3 = trade.TargetTier3,
                 StopLoss = trade.StopLoss,
-                RiskGuardrailId = trade.RiskGuardrailId,
                 ConfidenceLevel = trade.ConfidenceLevel,
                 PsychologyNotes = trade.PsychologyNotes,
                 EmotionTags = trade.TradeEmotionTags?.Select(x => x.EmotionTagId).ToList(),
                 ScreenShots = [.. trade.TradeScreenShots.Select(x => x.Url)],
                 SelectedChecklists = [.. trade.TradeChecklists.Select(x => x.PretradeChecklistId)],
-                TechnicalAnalysisTags = [.. trade.TradeTechnicalAnalysisTags.Select(x => x.TechnicalAnalysisId)],
-                RiskGuardrail = trade.RiskGuardrail?.Adapt<RiskGuardrailsDto>()
+                TechnicalAnalysisTags = [.. trade.TradeTechnicalAnalysisTags.Select(x => x.TechnicalAnalysisId)]
             };
 
             return Result<TradeHistoryDetailViewModel>.Success(TradeHistoryDetailViewModel);
