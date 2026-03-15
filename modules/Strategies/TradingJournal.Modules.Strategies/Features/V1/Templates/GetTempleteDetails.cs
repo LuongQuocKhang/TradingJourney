@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
 
-namespace TradingJournal.Modules.Strategies.Features.V1.Templetes;
+namespace TradingJournal.Modules.Strategies.Features.V1.Templates;
 
 public class GetTempleteDetails
 {

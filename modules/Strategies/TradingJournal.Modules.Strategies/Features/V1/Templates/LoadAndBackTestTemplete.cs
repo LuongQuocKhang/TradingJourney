@@ -1,4 +1,4 @@
-﻿namespace TradingJournal.Modules.Strategies.Features.V1.Templetes;
+﻿namespace TradingJournal.Modules.Strategies.Features.V1.Templates;
 
 public sealed class LoadAndBackTestTemplete
 {

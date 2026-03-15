@@ -23,8 +23,17 @@ internal sealed class TradeProvider(ITradeDbContext context, ICacheRepository ca
                 {
                     Id = t.Id,
                     Asset = t.Asset,
+                    Position = (int)t.Position,
+                    EntryPrice = t.EntryPrice,
+                    ExitPrice = t.ExitPrice,
+                    StopLoss = t.StopLoss,
+                    TargetTier1 = t.TargetTier1,
+                    Status = (int)t.Status,
+                    Date = t.Date,
                     Pnl = (decimal?)t.Pnl,
                     ClosedDate = t.ClosedDate,
+                    TradingSessionId = t.TradingSessionId,
+                    TradingZoneId = t.TradingZoneId,
                     EmotionTags = t.TradeEmotionTags?.Select(e => e.EmotionTagId).ToList() ?? []
                 })];
             },

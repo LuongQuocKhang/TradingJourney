@@ -2,6 +2,7 @@ using Carter;
 using System.Text.Json.Serialization;
 using TradingJournal.ApiGateWay.Extensions;
 using TradingJournal.Shared;
+using TradingJournal.Modules.Analytics;
 using TradingJournal.Modules.Trades;
 using TradingJournal.Modules.Psychology;
 using TradingJournal.Modules.Strategies;
@@ -40,6 +41,7 @@ builder.Services
     .AddTradeModule(configuration, isDevelopment)
     .AddPsychologyModule(configuration, isDevelopment)
     .AddStrategyModule(configuration, isDevelopment)
+    .AddAnalyticsModule(isDevelopment)
     ;
 
 builder.Services.AddOpenApi(options =>

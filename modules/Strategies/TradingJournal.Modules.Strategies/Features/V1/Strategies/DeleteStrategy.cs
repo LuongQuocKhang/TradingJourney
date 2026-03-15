@@ -1,6 +1,6 @@
-﻿namespace TradingJournal.Modules.Strategies.Features.V1.Templetes;
+﻿namespace TradingJournal.Modules.Strategies.Features.V1.Strategies;
 
-public class DeleteTemplete
+public class DeleteStrategy
 {
     public class Request : ICommand<Result<int>>
     {
@@ -15,7 +15,7 @@ public class DeleteTemplete
                 .Cascade(CascadeMode.Stop)
                 .GreaterThan(0)
                 .WithErrorCode(HttpStatusCode.BadRequest.ToString())
-                .WithMessage("Template ID must be greater than 0.");
+                .WithMessage("Strategy ID must be greater than 0.");
         }
     }
 
@@ -23,18 +23,18 @@ public class DeleteTemplete
     {
         public async Task<Result<int>> Handle(Request request, CancellationToken cancellationToken)
         {
-            StrategyTemplate? template = await context.StrategyTemplates
+            Strategy? strategy = await context.Strategies
                 .FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken);
 
-            if (template == null)
+            if (strategy == null)
             {
                 return Result<int>.Failure(Error.NotFound);
             }
 
-            context.StrategyTemplates.Remove(template);
+            context.Strategies.Remove(strategy);
             await context.SaveChangesAsync(cancellationToken);
 
-            return Result<int>.Success(template.Id);
+            return Result<int>.Success(strategy.Id);
         }
     }
 
@@ -42,7 +42,7 @@ public class DeleteTemplete
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            RouteGroupBuilder group = app.MapGroup("api/v1/strategy-templates");
+            RouteGroupBuilder group = app.MapGroup("api/v1/strategies");
 
             group.MapDelete("/{id}", async ([FromRoute] int id, ISender sender) =>
             {
@@ -55,9 +55,9 @@ public class DeleteTemplete
             .Produces<Result<int>>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status500InternalServerError)
-            .WithSummary("Delete a strategy template by ID.")
-            .WithDescription("Deletes a strategy template by its ID.")
-            .WithTags(Tags.StrategyTemplate);
+            .WithSummary("Delete a strategy by ID.")
+            .WithDescription("Deletes a trading strategy by its ID.")
+            .WithTags(Tags.Strategy);
         }
     }
 }

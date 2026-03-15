@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
 
-namespace TradingJournal.Modules.Strategies.Features.V1.Stategies;
+namespace TradingJournal.Modules.Strategies.Features.V1.Strategies;
 
 public sealed class DuplicateStrategy
 {

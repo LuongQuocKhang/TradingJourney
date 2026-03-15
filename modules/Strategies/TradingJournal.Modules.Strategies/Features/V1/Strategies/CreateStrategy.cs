@@ -1,13 +1,14 @@
 ﻿using System.Text.Json;
+using Mapster;
 
-namespace TradingJournal.Modules.Strategies.Features.V1.Templetes;
+namespace TradingJournal.Modules.Strategies.Features.V1.Strategies;
 
-public sealed class CreateTemplete
+public sealed class CreateStrategy
 {
     public record Request(
         string Name,
         string Description,
-        StrategyCategory Category,
+        StrategyType Type,
         string Asset,
         string Timeframe,
         DateTime? DateRangeStart,
@@ -29,7 +30,7 @@ public sealed class CreateTemplete
             RuleFor(x => x.Name)
                 .Cascade(CascadeMode.Stop)
                 .NotEmpty().WithErrorCode(HttpStatusCode.BadRequest.ToString())
-                .WithMessage("Template name is required.");
+                .WithMessage("Strategy name is required.");
 
             RuleFor(x => x.Asset)
                 .Cascade(CascadeMode.Stop)
@@ -49,12 +50,13 @@ public sealed class CreateTemplete
         {
             try
             {
-                StrategyTemplate template = new()
+                Strategy strategy = new()
                 {
                     Id = 0,
                     Name = request.Name,
                     Description = request.Description,
-                    Category = request.Category,
+                    Type = request.Type,
+                    Status = StrategyStatus.Draft,
                     Asset = request.Asset,
                     Timeframe = request.Timeframe,
                     DateRangeStart = request.DateRangeStart,
@@ -70,12 +72,12 @@ public sealed class CreateTemplete
                     PositionSizeValue = request.PositionSizeValue
                 };
 
-                await context.StrategyTemplates.AddAsync(template, cancellationToken);
+                await context.Strategies.AddAsync(strategy, cancellationToken);
                 int insertedRow = await context.SaveChangesAsync(cancellationToken);
 
                 return insertedRow > 0
-                    ? Result<int>.Success(template.Id)
-                    : Result<int>.Failure(Error.Create("Failed to create template."));
+                    ? Result<int>.Success(strategy.Id)
+                    : Result<int>.Failure(Error.Create("Failed to create strategy."));
             }
             catch (Exception ex)
             {
@@ -88,22 +90,22 @@ public sealed class CreateTemplete
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            RouteGroupBuilder group = app.MapGroup("api/v1/strategy-templates");
+            RouteGroupBuilder group = app.MapGroup("api/v1/strategies");
 
             group.MapPost("/", async ([FromBody] Request request, ISender sender) =>
             {
                 Result<int> result = await sender.Send(request);
 
                 return result.IsSuccess
-                    ? Results.Created($"/api/v1/strategy-templates/{result.Value}", result)
+                    ? Results.Created($"/api/v1/strategies/{result.Value}", result)
                     : Results.BadRequest(result);
             })
             .Produces<Result<int>>(StatusCodes.Status201Created)
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status500InternalServerError)
-            .WithSummary("Create a new strategy template.")
-            .WithDescription("Creates a new strategy template with the given configuration.")
-            .WithTags(Tags.StrategyTemplate);
+            .WithSummary("Create a new strategy.")
+            .WithDescription("Creates a new trading strategy with the given configuration.")
+            .WithTags(Tags.Strategy);
         }
     }
 }
