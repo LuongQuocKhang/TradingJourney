@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TradingJournal.Modules.Strategies.Infrastructure;
 
@@ -11,9 +12,11 @@ using TradingJournal.Modules.Strategies.Infrastructure;
 namespace TradingJournal.Modules.Strategies.Migrations
 {
     [DbContext(typeof(StrategyDbContext))]
-    partial class StrategyDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260316001929_AddDataFilePathToBacktest")]
+    partial class AddDataFilePathToBacktest
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

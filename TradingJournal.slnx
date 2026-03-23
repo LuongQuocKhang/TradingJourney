@@ -3,7 +3,9 @@
     <Project Path="bootstrapper/TradingJournal.ApiGateWay/TradingJournal.ApiGateWay.csproj" />
   </Folder>
   <Folder Name="/docs/" />
-  <Folder Name="/jobs/" />
+  <Folder Name="/jobs/">
+    <Project Path="jobs/TradingJournal.Jobs.BackTestEngine/TradingJournal.Jobs.BackTestEngine.csproj" />
+  </Folder>
   <Folder Name="/modules/">
     <Project Path="modules/Analytics/TradingJournal.Modules.Analytics/TradingJournal.Modules.Analytics.csproj" />
     <Project Path="modules/Playbook/TradingJournal.Modules.Playbook/TradingJournal.Modules.Playbook.csproj" />

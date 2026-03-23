@@ -1,4 +1,4 @@
-﻿global using Microsoft.AspNetCore.Mvc;
+global using Microsoft.AspNetCore.Mvc;
 global using Microsoft.AspNetCore.Routing;
 global using Microsoft.AspNetCore.Http;
 global using FluentValidation;
@@ -14,3 +14,4 @@ global using TradingJournal.Modules.Strategies.Domain;
 global using TradingJournal.Modules.Strategies.Infrastructure;
 global using TradingJournal.Modules.Strategies.ViewModel;
 global using Carter;
+global using TradingJournal.Shared.Interfaces;

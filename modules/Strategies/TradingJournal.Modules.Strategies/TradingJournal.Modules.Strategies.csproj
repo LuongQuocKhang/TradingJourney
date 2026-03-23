@@ -8,14 +8,18 @@
 
   <ItemGroup>
     <PackageReference Include="Carter" Version="10.0.0" />
+    <PackageReference Include="ClosedXML" Version="0.105.0" />
     <PackageReference Include="Mapster" Version="7.4.0" />
+    <PackageReference Include="MassTransit" Version="9.0.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.3" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.3" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.3" />
+    <PackageReference Include="YahooFinanceApi" Version="2.3.3" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\shared\TradingJournal.Shared\TradingJournal.Shared.csproj" />
+    <ProjectReference Include="..\..\..\shared\TradingJournal.Messaging.Shared\TradingJournal.Messaging.Shared.csproj" />
   </ItemGroup>
 
 </Project>

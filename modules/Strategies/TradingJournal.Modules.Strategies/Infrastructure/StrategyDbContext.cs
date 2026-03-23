@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Storage;
 using TradingJournal.Shared.Abstractions;
@@ -13,6 +13,10 @@ internal sealed class StrategyDbContext(DbContextOptions<StrategyDbContext> opti
     public DbSet<Strategy> Strategies { get; set; }
 
     public DbSet<StrategyTemplate> StrategyTemplates { get; set; }
+
+    public DbSet<Backtest> Backtests { get; set; }
+
+    public DbSet<BacktestTrade> BacktestTrades { get; set; }
 
     public async Task BeginTransaction()
     {

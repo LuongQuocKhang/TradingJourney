@@ -44,6 +44,7 @@
     <ProjectReference Include="..\..\modules\Strategies\TradingJournal.Modules.Strategies\TradingJournal.Modules.Strategies.csproj" />
     <ProjectReference Include="..\..\modules\Trades\TradingJournal.Modules.Trades\TradingJournal.Modules.Trades.csproj" />
     <ProjectReference Include="..\..\shared\TradingJournal.Shared\TradingJournal.Shared.csproj" />
+    <ProjectReference Include="..\..\shared\TradingJournal.Messaging.Shared\TradingJournal.Messaging.Shared.csproj" />
   </ItemGroup>
   
 </Project>

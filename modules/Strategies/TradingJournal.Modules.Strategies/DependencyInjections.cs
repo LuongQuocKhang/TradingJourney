@@ -1,10 +1,11 @@
-﻿using FluentValidation;
+using FluentValidation;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 using TradingJournal.Modules.Strategies.Infrastructure;
+using TradingJournal.Modules.Strategies.Services;
 using TradingJournal.Shared.Behaviors;
 
 namespace TradingJournal.Modules.Strategies;
@@ -29,6 +30,7 @@ public static class DependencyInjections
         });
 
         services.AddScoped<IStrategyDbContext, StrategyDbContext>();
+        services.AddScoped<IHistoricalDataService, HistoricalDataService>();
 
         services.AddDbContext<StrategyDbContext>(options =>
         {

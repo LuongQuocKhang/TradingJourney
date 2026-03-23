@@ -8,10 +8,9 @@ using TradingJournal.Modules.Psychology;
 using TradingJournal.Modules.Strategies;
 using Scalar.AspNetCore;
 using TradingJournal.Shared.Middlewares;
+using MassTransit;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
-
-
 // Add services to the container.
 
 builder.Services.AddEndpointsApiExplorer();
@@ -43,6 +42,18 @@ builder.Services
     .AddStrategyModule(configuration, isDevelopment)
     .AddAnalyticsModule(isDevelopment)
     ;
+
+//builder.Services.AddMassTransit(x =>
+//{
+//    x.UsingRabbitMq((context, cfg) =>
+//    {
+//        cfg.Host("localhost", "/", h =>
+//        {
+//            h.Username("guest");
+//            h.Password("guest");
+//        });
+//    });
+//});
 
 builder.Services.AddOpenApi(options =>
 {
