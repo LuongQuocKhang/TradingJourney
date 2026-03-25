@@ -7,7 +7,7 @@ public sealed class GetTradingCalendar
 {
     internal sealed record Request(int Month, int Year, DashboardFilter Filter) : IQuery<Result<IReadOnlyCollection<TradingCalendarViewModel>>>;
 
-    internal sealed record TradingCalendarViewModel(DateTime Date, double PnL);
+    internal sealed record TradingCalendarViewModel(DateTime Date, double? PnL = 0);
 
     internal sealed class Handler(ITradeDbContext context) : IQueryHandler<Request, Result<IReadOnlyCollection<TradingCalendarViewModel>>>
     {
@@ -26,7 +26,7 @@ public sealed class GetTradingCalendar
 
             if (trades is null || trades.Count == 0)
             {
-                return Result<IReadOnlyCollection<TradingCalendarViewModel>>.Failure(Error.NotFound);
+                return Result<IReadOnlyCollection<TradingCalendarViewModel>>.Success([]);
             }
 
             List<TradingCalendarViewModel> calendars = [];

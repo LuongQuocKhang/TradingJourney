@@ -7,7 +7,7 @@ public sealed class GetProfitTrajectory
 {
     internal sealed record Request(DashboardFilter Filter) : IQuery<Result<IReadOnlyCollection<ProfitTrajectoryViewModel>>>; 
 
-    internal sealed record ProfitTrajectoryViewModel(DateTime Date, double PnL); 
+    internal sealed record ProfitTrajectoryViewModel(DateTime Date, double? PnL = 0); 
 
     internal sealed class Validator : AbstractValidator<Request>
     {
@@ -36,7 +36,7 @@ public sealed class GetProfitTrajectory
 
             if (trades is null || trades.Count == 0)
             {
-                return Result<IReadOnlyCollection<ProfitTrajectoryViewModel>>.Failure(Error.NotFound);
+                return Result<IReadOnlyCollection<ProfitTrajectoryViewModel>>.Success([]);
             }
 
             DateTime currentDate = new DateTimeProvider().Now;

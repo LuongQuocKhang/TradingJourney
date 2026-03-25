@@ -21,11 +21,11 @@ public sealed class GetWinLossRatio
 
             if (trades is null || trades.Count == 0)
             {
-                return Result<IReadOnlyCollection<WinLossRatioViewModel>>.Failure(Error.NotFound);
+                return Result<IReadOnlyCollection<WinLossRatioViewModel>>.Success([]);
             }
 
-            int wins = trades.Count(t => t.Pnl.Value > 0);
-            int losses = trades.Count(t => t.Pnl.Value < 0);
+            int wins = trades.Count(t => t.Pnl.HasValue && t.Pnl.Value > 0);
+            int losses = trades.Count(t => t.Pnl.HasValue && t.Pnl.Value < 0);
 
             IReadOnlyCollection<WinLossRatioViewModel> winLossRatios = [
                 new WinLossRatioViewModel("Wins", wins),

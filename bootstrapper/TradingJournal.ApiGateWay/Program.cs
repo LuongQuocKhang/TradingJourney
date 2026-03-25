@@ -1,4 +1,5 @@
 using Carter;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using TradingJournal.ApiGateWay.Extensions;
 using TradingJournal.Shared;
@@ -29,6 +30,7 @@ builder.Services.ConfigureHttpJsonOptions(options =>
 {
     options.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
     options.SerializerOptions.PropertyNameCaseInsensitive = true;
+    options.SerializerOptions.NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals;
 });
 
 bool isDevelopment = builder.Environment.IsDevelopment();
@@ -69,13 +71,13 @@ if (app.Environment.IsDevelopment())
     await app.MigrateTradingDatabase();
 }
 
+app.UseStaticFiles();
+
 app.MapCarter();
 
 app.UseAntiforgery();
 
 app.UseSwaggerDoc();
-
-app.UseStaticFiles();
 
 // app.UseAuthentication();
 // app.UseAuthorization();

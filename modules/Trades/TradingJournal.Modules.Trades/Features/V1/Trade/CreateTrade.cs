@@ -1,6 +1,5 @@
 ﻿using Mapster;
 using Microsoft.AspNetCore.Hosting;
-using TradingJournal.Modules.Trades.Dto;
 
 namespace TradingJournal.Modules.Trades.Features.V1.Trade;
 
@@ -34,57 +33,57 @@ public sealed class CreateTrade
         {
             RuleFor(x => x.Asset)
                 .Cascade(CascadeMode.Stop)
-                .NotNull().WithErrorCode(HttpStatusCode.BadRequest.ToString())
+                .NotNull().WithErrorCode(nameof(HttpStatusCode.BadRequest))
                 .WithMessage("Asset cannot be null.");
 
             RuleFor(x => x.Position)
                 .Cascade(CascadeMode.Stop)
-                .Must(pos => Enum.IsDefined(pos))
-                .WithErrorCode(HttpStatusCode.BadRequest.ToString())
+                .Must(Enum.IsDefined)
+                .WithErrorCode(nameof(HttpStatusCode.BadRequest))
                 .WithMessage("Position must be a valid TradeEnum value.");
 
             RuleFor(x => x.EntryPrice)
                 .Cascade(CascadeMode.Stop)
-                .GreaterThan(0).WithErrorCode(HttpStatusCode.BadRequest.ToString())
+                .GreaterThan(0).WithErrorCode(nameof(HttpStatusCode.BadRequest))
                 .WithMessage("EntryPrice must be greater than 0.");
 
             RuleFor(x => x.TargetTier1)
                 .Cascade(CascadeMode.Stop)
-                .GreaterThan(0).WithErrorCode(HttpStatusCode.BadRequest.ToString())
+                .GreaterThan(0).WithErrorCode(nameof(HttpStatusCode.BadRequest))
                 .WithMessage("First Target Tier must be greater than 0.");
 
             RuleFor(x => x.StopLoss)
                 .Cascade(CascadeMode.Stop)
-                .GreaterThan(0).WithErrorCode(HttpStatusCode.BadRequest.ToString())
+                .GreaterThan(0).WithErrorCode(nameof(HttpStatusCode.BadRequest))
                 .WithMessage("Stop Loss must be entered and greater than 0.");
 
             RuleFor(x => x.Notes)
                 .Cascade(CascadeMode.Stop)
-                .NotNull().WithErrorCode(HttpStatusCode.BadRequest.ToString())
+                .NotNull().WithErrorCode(nameof(HttpStatusCode.BadRequest))
                 .WithMessage("Must enter notes ( analysis of the trade ).");
 
             RuleFor(x => x.Date)
                 .Cascade(CascadeMode.Stop)
-                .NotNull().WithErrorCode(HttpStatusCode.BadRequest.ToString())
+                .NotNull().WithErrorCode(nameof(HttpStatusCode.BadRequest))
                 .WithMessage("Date of the trade must be entered.");
 
             RuleFor(x => x.Status)
                 .Cascade(CascadeMode.Stop)
-                .Must(status => Enum.IsDefined(status))
-                .WithErrorCode(HttpStatusCode.BadRequest.ToString())
+                .Must(Enum.IsDefined)
+                .WithErrorCode(nameof(HttpStatusCode.BadRequest))
                 .WithMessage("Status must be a valid TradeStatus value.");
 
             RuleFor(x => x.TradeHistoryChecklists)
                 .Cascade(CascadeMode.Stop)
-                .NotNull().WithErrorCode(HttpStatusCode.BadRequest.ToString())
+                .NotNull().WithErrorCode(nameof(HttpStatusCode.BadRequest))
                 .WithMessage("Pretrade checklists must be entered.")
-                .Must(checklistIds => checklistIds != null && checklistIds.Count > 0)
-                .WithErrorCode(HttpStatusCode.BadRequest.ToString())
+                .Must(checklistIds => checklistIds is { Count: > 0 })
+                .WithErrorCode(nameof(HttpStatusCode.BadRequest))
                 .WithMessage("At least one pretrade checklist must be provided.");
 
             RuleFor(x => x.TradingZoneId)
                 .Cascade(CascadeMode.Stop)
-                .GreaterThan(0).WithErrorCode(HttpStatusCode.BadRequest.ToString())
+                .GreaterThan(0).WithErrorCode(nameof(HttpStatusCode.BadRequest))
                 .WithMessage("Trading Zone must be entered and greater than 0.");
         }
     }
@@ -135,6 +134,7 @@ public sealed class CreateTrade
                         TradeHistory = tradeHistory
                     });
                 }
+                
                 await context.TradeScreenShots.AddRangeAsync(screenshotEntities, cancellationToken);
 
                 await context.TradeTechnicalAnalysisTags.AddRangeAsync(request.TradeTechnicalAnalysisTags?.Select(tagId => new TradeTechnicalAnalysisTag

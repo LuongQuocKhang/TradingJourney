@@ -22,12 +22,12 @@ public sealed class GetTradingStatistic
 
             if (trades is null || trades.Count == 0)
             {
-                return Result<TradingStatisticViewModel>.Failure(Error.NotFound);
+                return Result<TradingStatisticViewModel>.Success(new TradingStatisticViewModel());
             }
 
-            List<TradeHistory> closedTrades = trades.Where(t => t.Status == TradeStatus.Closed).ToList();
+            List<TradeHistory> closedTrades = [.. trades.Where(t => t.Status == TradeStatus.Closed)];
 
-            double totalPnL = closedTrades.Where(t => t.Pnl.HasValue).Sum(t => t.Pnl.Value);
+            double totalPnL = closedTrades.Where(t => t.Pnl.HasValue).Sum(t => t.Pnl != null ? t.Pnl.Value : 0);
 
             double winRate = closedTrades.Count(t => t.Pnl.HasValue && t.Pnl.Value > 0) / (double)closedTrades.Count(t => t.Pnl.HasValue) * 100;
             
