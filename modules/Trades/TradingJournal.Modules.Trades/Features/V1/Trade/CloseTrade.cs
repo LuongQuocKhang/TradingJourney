@@ -2,7 +2,7 @@ namespace TradingJournal.Modules.Trades.Features.V1.Trade;
 
 public sealed class CloseTrade
 {
-    internal sealed record Request(int TradeId, double ExitPrice, double PnL) : ICommand<Result<bool>>;
+    internal sealed record Request(int TradeId, double ExitPrice, double PnL, string? TradingResult, bool? HitStopLoss) : ICommand<Result<bool>>;
     
     internal sealed class Validator : AbstractValidator<Request>
     {
@@ -33,6 +33,10 @@ public sealed class CloseTrade
             tradeHistory.ExitPrice = request.ExitPrice;
 
             tradeHistory.Pnl = request.PnL;
+
+            tradeHistory.TradingResult = request.TradingResult;
+
+            tradeHistory.HitStopLoss = request.HitStopLoss;
 
             tradeHistory.ClosedDate = DateTime.UtcNow;
             tradeHistory.Status = TradeStatus.Closed;

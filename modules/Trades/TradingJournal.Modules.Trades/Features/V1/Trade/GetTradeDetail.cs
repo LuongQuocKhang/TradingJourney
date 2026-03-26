@@ -35,7 +35,7 @@ public class GetTradeDetail
                 return Result<TradeHistoryDetailViewModel>.Failure(Error.NotFound);
             }
 
-            TradeHistoryDetailViewModel TradeHistoryDetailViewModel = new()
+            TradeHistoryDetailViewModel tradeHistoryDetailViewModel = new()
             {
                 Asset = trade.Asset,
                 Position = trade.Position,
@@ -45,6 +45,8 @@ public class GetTradeDetail
                 ExitPrice = trade.ExitPrice,
                 Pnl = trade.Pnl,
                 ClosedDate = trade.ClosedDate,
+                TradingResult = trade.TradingResult,
+                HitStopLoss = trade.HitStopLoss,
                 Notes = trade.Notes,
                 TradingSessionId = trade.TradingSessionId,
                 TradingZoneId = trade.TradingZoneId,
@@ -53,14 +55,13 @@ public class GetTradeDetail
                 TargetTier3 = trade.TargetTier3,
                 StopLoss = trade.StopLoss,
                 ConfidenceLevel = trade.ConfidenceLevel,
-                PsychologyNotes = trade.PsychologyNotes,
                 EmotionTags = trade.TradeEmotionTags?.Select(x => x.EmotionTagId).ToList(),
                 ScreenShots = [.. trade.TradeScreenShots.Select(x => x.Url)],
                 SelectedChecklists = [.. trade.TradeChecklists.Select(x => x.PretradeChecklistId)],
                 TechnicalAnalysisTags = [.. trade.TradeTechnicalAnalysisTags.Select(x => x.TechnicalAnalysisId)]
             };
 
-            return Result<TradeHistoryDetailViewModel>.Success(TradeHistoryDetailViewModel);
+            return Result<TradeHistoryDetailViewModel>.Success(tradeHistoryDetailViewModel);
         }
     }
 

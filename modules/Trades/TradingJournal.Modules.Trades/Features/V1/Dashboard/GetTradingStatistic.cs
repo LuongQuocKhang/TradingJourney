@@ -15,21 +15,24 @@ public sealed class GetTradingStatistic
 
             DateTime fromDate = DashboardFilterHelper.GetFromDate(request.Filter);
 
-            List<TradeHistory>? trades = await context.TradeHistories
+            List<TradeHistory> trades = await context.TradeHistories
                 .AsNoTracking()
                 .Where(t => t.CreatedBy == userId && t.Date >= fromDate)
                 .ToListAsync(cancellationToken);
 
-            if (trades is null || trades.Count == 0)
+            if (trades.Count == 0)
             {
                 return Result<TradingStatisticViewModel>.Success(new TradingStatisticViewModel());
             }
 
             List<TradeHistory> closedTrades = [.. trades.Where(t => t.Status == TradeStatus.Closed)];
 
-            double totalPnL = closedTrades.Where(t => t.Pnl.HasValue).Sum(t => t.Pnl != null ? t.Pnl.Value : 0);
+            double totalPnL = closedTrades.Where(t => t.Pnl.HasValue).Sum(t => t.Pnl ?? 0);
 
-            double winRate = closedTrades.Count(t => t.Pnl.HasValue && t.Pnl.Value > 0) / (double)closedTrades.Count(t => t.Pnl.HasValue) * 100;
+            int totalWin = closedTrades.Count(t => t.Pnl is > 0);
+            int totalLoss = closedTrades.Count(t => t.Pnl is < 0);
+            
+            double winRate = closedTrades.Count == 0 ? 0 : (double)totalWin / (totalWin + totalLoss) * 100;
             
             int totalTrades = trades.Count;
 

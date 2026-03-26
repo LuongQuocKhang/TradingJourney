@@ -36,57 +36,57 @@ public sealed class UpdateTrade
         {
             RuleFor(x => x.Asset)
                 .Cascade(CascadeMode.Stop)
-                .NotNull().WithErrorCode(HttpStatusCode.BadRequest.ToString())
+                .NotNull().WithErrorCode(nameof(HttpStatusCode.BadRequest))
                 .WithMessage("Asset cannot be null.");
 
             RuleFor(x => x.Position)
                 .Cascade(CascadeMode.Stop)
-                .Must(pos => Enum.IsDefined(pos))
-                .WithErrorCode(HttpStatusCode.BadRequest.ToString())
+                .Must(Enum.IsDefined)
+                .WithErrorCode(nameof(HttpStatusCode.BadRequest))
                 .WithMessage("Position must be a valid TradeEnum value.");
 
             RuleFor(x => x.EntryPrice)
                 .Cascade(CascadeMode.Stop)
-                .GreaterThan(0).WithErrorCode(HttpStatusCode.BadRequest.ToString())
+                .GreaterThan(0).WithErrorCode(nameof(HttpStatusCode.BadRequest))
                 .WithMessage("EntryPrice must be greater than 0.");
 
             RuleFor(x => x.TargetTier1)
                 .Cascade(CascadeMode.Stop)
-                .GreaterThan(0).WithErrorCode(HttpStatusCode.BadRequest.ToString())
+                .GreaterThan(0).WithErrorCode(nameof(HttpStatusCode.BadRequest))
                 .WithMessage("First Target Tier must be greater than 0.");
 
             RuleFor(x => x.StopLoss)
                 .Cascade(CascadeMode.Stop)
-                .GreaterThan(0).WithErrorCode(HttpStatusCode.BadRequest.ToString())
+                .GreaterThan(0).WithErrorCode(nameof(HttpStatusCode.BadRequest))
                 .WithMessage("Stop Loss must be entered and greater than 0.");
 
             RuleFor(x => x.Notes)
                 .Cascade(CascadeMode.Stop)
-                .NotNull().WithErrorCode(HttpStatusCode.BadRequest.ToString())
+                .NotNull().WithErrorCode(nameof(HttpStatusCode.BadRequest))
                 .WithMessage("Must enter notes ( analysis of the trade ).");
 
             RuleFor(x => x.Date)
                 .Cascade(CascadeMode.Stop)
-                .NotNull().WithErrorCode(HttpStatusCode.BadRequest.ToString())
+                .NotNull().WithErrorCode(nameof(HttpStatusCode.BadRequest))
                 .WithMessage("Date of the trade must be entered.");
 
             RuleFor(x => x.Status)
                 .Cascade(CascadeMode.Stop)
-                .Must(status => Enum.IsDefined(status))
-                .WithErrorCode(HttpStatusCode.BadRequest.ToString())
+                .Must(Enum.IsDefined)
+                .WithErrorCode(nameof(HttpStatusCode.BadRequest))
                 .WithMessage("Status must be a valid TradeStatus value.");
 
             RuleFor(x => x.TradeHistoryChecklists)
                 .Cascade(CascadeMode.Stop)
-                .NotNull().WithErrorCode(HttpStatusCode.BadRequest.ToString())
+                .NotNull().WithErrorCode(nameof(HttpStatusCode.BadRequest))
                 .WithMessage("Pretrade checklists must be entered.")
                 .Must(checklistIds => checklistIds != null && checklistIds.Count > 0)
-                .WithErrorCode(HttpStatusCode.BadRequest.ToString())
+                .WithErrorCode(nameof(HttpStatusCode.BadRequest))
                 .WithMessage("At least one pretrade checklist must be provided.");
 
             RuleFor(x => x.TradingZoneId)
                 .Cascade(CascadeMode.Stop)
-                .GreaterThan(0).WithErrorCode(HttpStatusCode.BadRequest.ToString())
+                .GreaterThan(0).WithErrorCode(nameof(HttpStatusCode.BadRequest))
                 .WithMessage("Trading Zone must be entered and greater than 0.");
         }
     }
@@ -124,14 +124,13 @@ public sealed class UpdateTrade
                 tradeHistory.Pnl = request.Pnl;
                 tradeHistory.ClosedDate = request.ClosedDate;
                 tradeHistory.ConfidenceLevel = request.ConfidenceLevel;
-                tradeHistory.PsychologyNotes = request.PsychologyNotes;
                 tradeHistory.TradingZoneId = request.TradingZoneId;
                 tradeHistory.TradingSessionId = request.TradingSessionId;
 
                 #region remove all existing emotion tags, pretrade checklists, and technical analysis tags
                 context.TradeEmotionTags.RemoveRange(tradeHistory.TradeEmotionTags ?? []);
                 context.TradeHistoryChecklist.RemoveRange(tradeHistory.TradeChecklists);
-                context.TradeTechnicalAnalysisTags.RemoveRange(tradeHistory.TradeTechnicalAnalysisTags ?? []);
+                context.TradeTechnicalAnalysisTags.RemoveRange(tradeHistory.TradeTechnicalAnalysisTags);
 
                 await context.TradeHistoryChecklist.AddRangeAsync(request.TradeHistoryChecklists.Select(checklistId => new TradeHistoryChecklist
                 {
@@ -160,12 +159,10 @@ public sealed class UpdateTrade
 
                 // Separate incoming into existing URLs (kept) vs new base64 (to save)
                 List<string> incomingUrls = incomingScreenshots.Where(s => !IsBase64Image(s)).ToList();
-                List<string> newBase64Screenshots = incomingScreenshots.Where(s => IsBase64Image(s)).ToList();
+                List<string> newBase64Screenshots = incomingScreenshots.Where(IsBase64Image).ToList();
 
                 // Find screenshots to delete (old URLs not in the incoming list)
-                List<TradeScreenShot> screenshotsToDelete = tradeHistory.TradeScreenShots
-                    .Where(existing => !incomingUrls.Contains(existing.Url))
-                    .ToList();
+                List<TradeScreenShot> screenshotsToDelete = [.. tradeHistory.TradeScreenShots.Where(existing => !incomingUrls.Contains(existing.Url))];
 
                 // Delete physical files for removed screenshots
                 foreach (var screenshot in screenshotsToDelete)

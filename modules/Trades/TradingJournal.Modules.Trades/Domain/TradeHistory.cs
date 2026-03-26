@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace TradingJournal.Modules.Trades.Domain;
 
@@ -22,6 +22,10 @@ public sealed class TradeHistory : EntityBase<int>
     public double? Pnl { get; set; }
 
     public DateTime? ClosedDate { get; set; }
+
+    public string? TradingResult { get; set; }
+
+    public bool? HitStopLoss { get; set; }
 
     public string? Notes { get; set; } = string.Empty;
 
@@ -47,8 +51,6 @@ public sealed class TradeHistory : EntityBase<int>
     #region Psychology & Emotions
 
     public ConfidenceLevel ConfidenceLevel { get; set; }
-
-    public string? PsychologyNotes { get; set; }
 
     #endregion
 
