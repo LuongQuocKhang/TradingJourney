@@ -1,12 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using TradingJournal.Modules.Psychology.Common.Enum;
-using TradingJournal.Modules.Psychology.Constants;
-using TradingJournal.Modules.Psychology.Domain;
-using TradingJournal.Modules.Psychology.Infrastructure.Persistance;
-using TradingJournal.Modules.Psychology.ViewModel;
+﻿using TradingJournal.Modules.Psychology.ViewModel;
 using TradingJournal.Shared.Common;
 using TradingJournal.Shared.Extensions;
-using TradingJournal.Shared.Interfaces;
 
 namespace TradingJournal.Modules.Psychology.Features.V1.Psychology;
 

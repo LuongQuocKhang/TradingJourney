@@ -1,10 +1,4 @@
-﻿using TradingJournal.Modules.Psychology.Constants;
-using TradingJournal.Modules.Psychology.Domain;
-using TradingJournal.Modules.Psychology.Infrastructure.Persistance;
-using TradingJournal.Shared.Contracts;
-using TradingJournal.Shared.Interfaces;
-
-namespace TradingJournal.Modules.Psychology.Features.V1.Emotion;
+﻿namespace TradingJournal.Modules.Psychology.Features.V1.Emotion;
 
 public sealed class DeleteEmotion
 {

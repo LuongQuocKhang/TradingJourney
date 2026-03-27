@@ -1,5 +1,4 @@
 using Carter;
-using System.Text.Json;
 using System.Text.Json.Serialization;
 using TradingJournal.ApiGateWay.Extensions;
 using TradingJournal.Shared;
@@ -9,7 +8,6 @@ using TradingJournal.Modules.Psychology;
 using TradingJournal.Modules.Strategies;
 using Scalar.AspNetCore;
 using TradingJournal.Shared.Middlewares;
-using MassTransit;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 // Add services to the container.

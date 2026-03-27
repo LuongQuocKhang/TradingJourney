@@ -1,8 +1,4 @@
-﻿using TradingJournal.Modules.Psychology.Constants;
-using TradingJournal.Modules.Psychology.Domain;
-using TradingJournal.Modules.Psychology.Infrastructure.Persistance;
-using TradingJournal.Shared.Dtos;
-using TradingJournal.Shared.Interfaces;
+﻿using TradingJournal.Shared.Dtos;
 
 namespace TradingJournal.Modules.Psychology.Features.V1.Emotion;
 

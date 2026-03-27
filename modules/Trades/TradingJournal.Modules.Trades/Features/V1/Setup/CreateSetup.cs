@@ -1,5 +1,3 @@
-using Mapster;
-
 namespace TradingJournal.Modules.Trades.Features.V1.Setup;
 
 public sealed class CreateSetup

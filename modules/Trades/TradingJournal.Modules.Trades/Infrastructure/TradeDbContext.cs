@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Storage;
-using TradingJournal.Shared.Common;
 
 namespace TradingJournal.Modules.Trades.Infrastructure;
 

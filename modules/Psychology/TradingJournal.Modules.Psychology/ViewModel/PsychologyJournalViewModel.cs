@@ -1,6 +1,3 @@
-using TradingJournal.Modules.Psychology.Common.Enum;
-using TradingJournal.Modules.Psychology.Domain;
-
 namespace TradingJournal.Modules.Psychology.ViewModel;
 
 public class PsychologyJournalViewModel

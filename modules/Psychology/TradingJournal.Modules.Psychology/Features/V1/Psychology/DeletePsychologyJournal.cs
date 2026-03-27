@@ -1,8 +1,4 @@
-﻿using TradingJournal.Modules.Psychology.Constants;
-using TradingJournal.Modules.Psychology.Domain;
-using TradingJournal.Modules.Psychology.Infrastructure.Persistance;
-
-namespace TradingJournal.Modules.Psychology.Features.V1.Psychology;
+﻿namespace TradingJournal.Modules.Psychology.Features.V1.Psychology;
 
 public sealed class DeletePsychologyJournal
 {

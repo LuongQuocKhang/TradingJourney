@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.OpenApi;
 using Microsoft.OpenApi;
-using Microsoft.OpenApi.Models;
 
 namespace TradingJournal.ApiGateWay.Extensions;
 
@@ -18,17 +17,7 @@ public static class OpenApiExtensions
     /// <returns></returns>
     public static OpenApiOptions UseJwtBearerAuthentication(this OpenApiOptions options)
     {
-        OpenApiSecurityScheme schema = new()
-        {
-            Type = SecuritySchemeType.Http,
-            Name = JwtBearerDefaults.AuthenticationScheme,
-            Scheme = JwtBearerDefaults.AuthenticationScheme,
-            Reference = new OpenApiReference()
-            {
-                Type = ReferenceType.SecurityScheme,
-                Id = JwtBearerDefaults.AuthenticationScheme
-            }
-        };
+        OpenApiSecuritySchemeReference schema = new OpenApiSecuritySchemeReference(JwtBearerDefaults.AuthenticationScheme);
 
         options.AddDocumentTransformer((document, context, ct) =>
         {

@@ -1,10 +1,6 @@
-using FluentValidation;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
-using TradingJournal.Modules.Strategies.Infrastructure;
 using TradingJournal.Modules.Strategies.Services;
 using TradingJournal.Shared.Behaviors;
 

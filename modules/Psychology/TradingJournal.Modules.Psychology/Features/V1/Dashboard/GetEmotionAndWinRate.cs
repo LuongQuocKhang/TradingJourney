@@ -1,7 +1,5 @@
 using TradingJournal.Modules.Psychology.ViewModel;
-using TradingJournal.Shared.Contracts;
 using TradingJournal.Shared.Dtos;
-using TradingJournal.Shared.Interfaces;
 
 namespace TradingJournal.Modules.Psychology.Features.V1.Dashboard;
 

@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
-using TradingJournal.Modules.Psychology.Common.Enum;
 
 namespace TradingJournal.Modules.Psychology.Domain;
 

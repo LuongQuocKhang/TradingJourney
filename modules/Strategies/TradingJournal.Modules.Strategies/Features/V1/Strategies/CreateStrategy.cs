@@ -1,5 +1,4 @@
 ﻿using System.Text.Json;
-using Mapster;
 
 namespace TradingJournal.Modules.Strategies.Features.V1.Strategies;
 

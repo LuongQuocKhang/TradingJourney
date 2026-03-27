@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Storage;
-using TradingJournal.Modules.Psychology.Domain;
 
 namespace TradingJournal.Modules.Psychology.Infrastructure.Persistance;
 

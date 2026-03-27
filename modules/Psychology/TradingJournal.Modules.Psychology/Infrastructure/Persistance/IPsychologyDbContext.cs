@@ -1,6 +1,4 @@
-﻿using TradingJournal.Modules.Psychology.Domain;
-
-namespace TradingJournal.Modules.Psychology.Infrastructure.Persistance;
+﻿namespace TradingJournal.Modules.Psychology.Infrastructure.Persistance;
 
 public interface IPsychologyDbContext
 {

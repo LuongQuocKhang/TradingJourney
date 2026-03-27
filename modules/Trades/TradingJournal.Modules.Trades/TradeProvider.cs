@@ -1,8 +1,5 @@
-using Microsoft.EntityFrameworkCore;
-using TradingJournal.Modules.Trades.Infrastructure;
 using TradingJournal.Shared.Contracts;
 using TradingJournal.Shared.Dtos;
-using TradingJournal.Shared.Interfaces;
 
 namespace TradingJournal.Modules.Trades;
 

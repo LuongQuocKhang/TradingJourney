@@ -1,5 +1,4 @@
 using Mapster;
-using TradingJournal.Modules.Trades.Dto;
 
 namespace TradingJournal.Modules.Trades.Features.V1.Trade;
 

@@ -1,5 +1,4 @@
 using TradingJournal.Modules.Psychology.ViewModel;
-using TradingJournal.Shared.Contracts;
 using TradingJournal.Shared.Extensions;
 
 namespace TradingJournal.Modules.Psychology.Features.V1.Dashboard;

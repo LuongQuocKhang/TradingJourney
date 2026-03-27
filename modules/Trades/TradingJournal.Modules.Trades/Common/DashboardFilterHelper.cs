@@ -1,5 +1,3 @@
-using TradingJournal.Modules.Trades.Common.Enum;
-
 namespace TradingJournal.Modules.Trades.Common;
 
 public static class DashboardFilterHelper

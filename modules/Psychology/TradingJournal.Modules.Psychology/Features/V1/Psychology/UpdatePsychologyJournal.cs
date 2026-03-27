@@ -1,10 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using TradingJournal.Modules.Psychology.Common.Enum;
-using TradingJournal.Modules.Psychology.Constants;
-using TradingJournal.Modules.Psychology.Domain;
-using TradingJournal.Modules.Psychology.Infrastructure.Persistance;
-
-namespace TradingJournal.Modules.Psychology.Features.V1.Psychology;
+﻿namespace TradingJournal.Modules.Psychology.Features.V1.Psychology;
 
 public sealed class UpdatePsychologyJournal
 {

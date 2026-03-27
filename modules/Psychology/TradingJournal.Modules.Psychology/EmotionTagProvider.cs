@@ -1,9 +1,4 @@
-using TradingJournal.Modules.Psychology.Domain;
-using TradingJournal.Modules.Psychology.Infrastructure.Persistance;
-using TradingJournal.Shared.Contracts;
 using TradingJournal.Shared.Dtos;
-using TradingJournal.Shared.Interfaces;
-using Microsoft.EntityFrameworkCore;
 
 namespace TradingJournal.Modules.Psychology;
 

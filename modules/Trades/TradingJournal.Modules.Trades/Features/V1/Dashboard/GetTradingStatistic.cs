@@ -1,6 +1,3 @@
-using TradingJournal.Shared.Common;
-
-
 namespace TradingJournal.Modules.Trades.Features.V1.Dashboard;
 
 public sealed class GetTradingStatistic
