@@ -1,4 +1,5 @@
 ﻿using TradingJournal.Modules.Psychology.ViewModel;
+using TradingJournal.Shared.Common.Enum;
 using TradingJournal.Shared.Extensions;
 
 namespace TradingJournal.Modules.Psychology.Features.V1.Dashboard;
@@ -46,7 +47,7 @@ public sealed class GetPsychologyStatistic
 
             int positiveCount = psychologyJournals
                 .SelectMany(x => x.PsychologyJournalEmotions)
-                .Count(x => x.EmotionTag.EmotionType == Shared.Common.EmotionType.Positive);
+                .Count(x => x.EmotionTag.EmotionType == EmotionType.Positive);
 
             PsychologyStatisticViewModel statistic = new()
             {

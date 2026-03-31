@@ -1,4 +1,4 @@
-using TradingJournal.Shared.Common;
+using TradingJournal.Shared.Common.Enum;
 
 namespace TradingJournal.Shared.Dtos;
 

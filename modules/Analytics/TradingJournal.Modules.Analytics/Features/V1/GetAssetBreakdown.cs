@@ -1,3 +1,5 @@
+using TradingJournal.Shared.Common.Enum;
+
 namespace TradingJournal.Modules.Analytics.Features.V1;
 
 public sealed class GetAssetBreakdown
@@ -24,10 +26,9 @@ public sealed class GetAssetBreakdown
             List<TradeCacheDto> allTrades = await tradeProvider.GetTradesAsync(cancellationToken);
             DateTime fromDate = AnalyticsFilterHelper.GetFromDate(request.Filter);
 
-            List<TradeCacheDto> closed = allTrades
-                .Where(t => t.Status == 1 && t.Pnl.HasValue)
-                .Where(t => fromDate == DateTime.MinValue || (t.ClosedDate.HasValue && t.ClosedDate.Value >= fromDate))
-                .ToList();
+            List<TradeCacheDto> closed = [.. allTrades
+                .Where(t => t.Status == TradeStatus.Closed && t.Pnl.HasValue)
+                .Where(t => fromDate == DateTime.MinValue || (t.ClosedDate.HasValue && t.ClosedDate.Value >= fromDate))];
 
             var assetGroups = closed
                 .GroupBy(t => t.Asset)

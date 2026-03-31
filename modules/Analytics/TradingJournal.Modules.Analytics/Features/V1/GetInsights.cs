@@ -1,3 +1,5 @@
+using TradingJournal.Shared.Common.Enum;
+
 namespace TradingJournal.Modules.Analytics.Features.V1;
 
 public sealed class GetInsights
@@ -24,10 +26,9 @@ public sealed class GetInsights
             List<TradeCacheDto> allTrades = await tradeProvider.GetTradesAsync(cancellationToken);
             DateTime fromDate = AnalyticsFilterHelper.GetFromDate(request.Filter);
 
-            List<TradeCacheDto> closed = allTrades
-                .Where(t => t.Status == 1 && t.Pnl.HasValue)
-                .Where(t => fromDate == DateTime.MinValue || (t.ClosedDate.HasValue && t.ClosedDate.Value >= fromDate))
-                .ToList();
+            List<TradeCacheDto> closed = [.. allTrades
+                .Where(t => t.Status == TradeStatus.Closed && t.Pnl.HasValue)
+                .Where(t => fromDate == DateTime.MinValue || (t.ClosedDate.HasValue && t.ClosedDate.Value >= fromDate))];
 
             if (closed.Count == 0)
             {
@@ -36,8 +37,8 @@ public sealed class GetInsights
             }
 
             // Compute metrics inline for insight generation
-            List<TradeCacheDto> wins = closed.Where(t => t.Pnl > 0).ToList();
-            List<TradeCacheDto> losses = closed.Where(t => t.Pnl <= 0).ToList();
+            List<TradeCacheDto> wins = [.. closed.Where(t => t.Pnl > 0)];
+            List<TradeCacheDto> losses = [.. closed.Where(t => t.Pnl <= 0)];
 
             double winRate = (double)wins.Count / closed.Count * 100;
             double avgWin = wins.Count > 0 ? wins.Average(t => (double)t.Pnl!.Value) : 0;
@@ -48,10 +49,9 @@ public sealed class GetInsights
             double profitFactor = grossLoss > 0 ? grossProfit / grossLoss : (grossProfit > 0 ? double.MaxValue : 0);
 
             // Max drawdown
-            List<TradeCacheDto> sorted = closed
+            List<TradeCacheDto> sorted = [.. closed
                 .Where(t => t.ClosedDate.HasValue)
-                .OrderBy(t => t.ClosedDate!.Value)
-                .ToList();
+                .OrderBy(t => t.ClosedDate!.Value)];
 
             double peak = 0, equity = 0, maxDDPct = 0;
             foreach (TradeCacheDto t in sorted)
@@ -75,20 +75,19 @@ public sealed class GetInsights
             }
 
             // Long vs Short
-            List<TradeCacheDto> longs = closed.Where(t => t.Position == 0).ToList();
-            List<TradeCacheDto> shorts = closed.Where(t => t.Position == 1).ToList();
+            List<TradeCacheDto> longs = [.. closed.Where(t => t.Position == PositionType.Long)];
+            List<TradeCacheDto> shorts = [.. closed.Where(t => t.Position == PositionType.Short)];
             double longsWinRate = longs.Count > 0 ? (double)longs.Count(t => t.Pnl > 0) / longs.Count * 100 : 0;
             double shortsWinRate = shorts.Count > 0 ? (double)shorts.Count(t => t.Pnl > 0) / shorts.Count * 100 : 0;
 
             // Avg holding days
-            double[] holdingDays = closed
+            double[] holdingDays = [.. closed
                 .Where(t => t.ClosedDate.HasValue)
-                .Select(t => (t.ClosedDate!.Value - t.Date).TotalDays)
-                .ToArray();
+                .Select(t => (t.ClosedDate!.Value - t.Date).TotalDays)];
             double avgHoldingDays = holdingDays.Length > 0 ? holdingDays.Average() : 0;
 
             // Avg risk-reward
-            double[] rrValues = closed
+            double[] rrValues = [.. closed
                 .Where(t => t.StopLoss > 0 && t.TargetTier1 > 0 && t.EntryPrice > 0)
                 .Select(t =>
                 {
@@ -96,12 +95,11 @@ public sealed class GetInsights
                     double reward = Math.Abs(t.TargetTier1 - t.EntryPrice);
                     return risk > 0 ? reward / risk : 0;
                 })
-                .Where(r => r > 0)
-                .ToArray();
+                .Where(r => r > 0)];
             double avgRiskReward = rrValues.Length > 0 ? rrValues.Average() : 0;
 
             // Sharpe
-            double[] returns = sorted.Select(t => (double)t.Pnl!.Value).ToArray();
+            double[] returns = [.. sorted.Select(t => (double)t.Pnl!.Value)];
             double meanReturn = returns.Length > 0 ? returns.Average() : 0;
             double stdDev = returns.Length > 1
                 ? Math.Sqrt(returns.Sum(r => Math.Pow(r - meanReturn, 2)) / (returns.Length - 1))

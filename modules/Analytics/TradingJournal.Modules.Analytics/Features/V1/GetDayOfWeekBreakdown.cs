@@ -1,3 +1,5 @@
+using TradingJournal.Shared.Common.Enum;
+
 namespace TradingJournal.Modules.Analytics.Features.V1;
 
 public sealed class GetDayOfWeekBreakdown
@@ -24,10 +26,9 @@ public sealed class GetDayOfWeekBreakdown
             List<TradeCacheDto> allTrades = await tradeProvider.GetTradesAsync(cancellationToken);
             DateTime fromDate = AnalyticsFilterHelper.GetFromDate(request.Filter);
 
-            List<TradeCacheDto> closed = allTrades
-                .Where(t => t.Status == 1 && t.Pnl.HasValue && t.ClosedDate.HasValue)
-                .Where(t => fromDate == DateTime.MinValue || t.ClosedDate!.Value >= fromDate)
-                .ToList();
+            List<TradeCacheDto> closed = [.. allTrades
+                .Where(t => t.Status == TradeStatus.Closed && t.Pnl.HasValue && t.ClosedDate.HasValue)
+                .Where(t => fromDate == DateTime.MinValue || t.ClosedDate!.Value >= fromDate)];
 
             string[] dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
@@ -35,7 +36,7 @@ public sealed class GetDayOfWeekBreakdown
                 .GroupBy(t => t.ClosedDate!.Value.DayOfWeek)
                 .ToDictionary(g => g.Key, g => g.ToList());
 
-            List<DayOfWeekViewModel> result = Enum.GetValues<DayOfWeek>()
+            List<DayOfWeekViewModel> result = [.. Enum.GetValues<DayOfWeek>()
                 .Select(day =>
                 {
                     if (!dayGroups.TryGetValue(day, out List<TradeCacheDto>? trades) || trades.Count == 0)
@@ -48,8 +49,7 @@ public sealed class GetDayOfWeekBreakdown
                         Math.Round(trades.Sum(t => (double)t.Pnl!.Value), 2),
                         trades.Count,
                         Math.Round((double)trades.Count(t => t.Pnl > 0) / trades.Count * 100, 1));
-                })
-                .ToList();
+                })];
 
             return Result<IReadOnlyCollection<DayOfWeekViewModel>>.Success(result);
         }

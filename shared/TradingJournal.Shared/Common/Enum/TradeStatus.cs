@@ -1,4 +1,4 @@
-﻿namespace TradingJournal.Modules.Trades.Common.Enum;
+﻿namespace TradingJournal.Shared.Common.Enum;
 
 public enum TradeStatus
 {

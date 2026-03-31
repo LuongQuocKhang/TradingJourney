@@ -1,3 +1,5 @@
+using TradingJournal.Shared.Common.Enum;
+
 namespace TradingJournal.Modules.Analytics.Features.V1;
 
 public sealed class GetMonthlyReturns
@@ -24,10 +26,9 @@ public sealed class GetMonthlyReturns
             List<TradeCacheDto> allTrades = await tradeProvider.GetTradesAsync(cancellationToken);
             DateTime fromDate = AnalyticsFilterHelper.GetFromDate(request.Filter);
 
-            List<TradeCacheDto> closed = allTrades
-                .Where(t => t.Status == 1 && t.Pnl.HasValue && t.ClosedDate.HasValue)
-                .Where(t => fromDate == DateTime.MinValue || t.ClosedDate!.Value >= fromDate)
-                .ToList();
+            List<TradeCacheDto> closed = [.. allTrades
+                .Where(t => t.Status == TradeStatus.Closed && t.Pnl.HasValue && t.ClosedDate.HasValue)
+                .Where(t => fromDate == DateTime.MinValue || t.ClosedDate!.Value >= fromDate)];
 
             Dictionary<string, double> monthly = [];
             foreach (TradeCacheDto t in closed)

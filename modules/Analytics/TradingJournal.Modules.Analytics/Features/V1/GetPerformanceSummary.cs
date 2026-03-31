@@ -1,3 +1,5 @@
+using TradingJournal.Shared.Common.Enum;
+
 namespace TradingJournal.Modules.Analytics.Features.V1;
 
 public sealed class GetPerformanceSummary
@@ -45,11 +47,9 @@ public sealed class GetPerformanceSummary
 
             DateTime fromDate = AnalyticsFilterHelper.GetFromDate(request.Filter);
 
-            // Filter to closed trades with PnL within the date range
-            List<TradeCacheDto> closed = allTrades
-                .Where(t => t.Status == 1 && t.Pnl.HasValue) // Status 1 = Closed
-                .Where(t => fromDate == DateTime.MinValue || (t.ClosedDate.HasValue && t.ClosedDate.Value >= fromDate))
-                .ToList();
+            List<TradeCacheDto> closed = [.. allTrades
+                .Where(t => t.Status == TradeStatus.Closed && t.Pnl.HasValue)
+                .Where(t => fromDate == DateTime.MinValue || (t.ClosedDate.HasValue && t.ClosedDate.Value >= fromDate))];
 
             if (closed.Count == 0)
             {
@@ -110,8 +110,8 @@ public sealed class GetPerformanceSummary
             double avgHoldingDays = holdingDays.Length > 0 ? holdingDays.Average() : 0;
 
             // Long vs Short win rates (Position: 0 = Long, 1 = Short)
-            List<TradeCacheDto> longs = closed.Where(t => t.Position == 0).ToList();
-            List<TradeCacheDto> shorts = closed.Where(t => t.Position == 1).ToList();
+            List<TradeCacheDto> longs = [.. closed.Where(t => t.Position == PositionType.Long)];
+            List<TradeCacheDto> shorts = [.. closed.Where(t => t.Position == PositionType.Short)];
             double longsWinRate = longs.Count > 0 ? (double)longs.Count(t => t.Pnl > 0) / longs.Count * 100 : 0;
             double shortsWinRate = shorts.Count > 0 ? (double)shorts.Count(t => t.Pnl > 0) / shorts.Count * 100 : 0;
 

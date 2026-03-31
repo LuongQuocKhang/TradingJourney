@@ -16,3 +16,4 @@ global using TradingJournal.Modules.Trades.Infrastructure;
 global using TradingJournal.Modules.Trades.ViewModel;
 global using Carter;
 global using TradingJournal.Shared.Interfaces;
+global using TradingJournal.Shared.Common.Enum;

@@ -1,3 +1,5 @@
+using TradingJournal.Shared.Common.Enum;
+
 namespace TradingJournal.Modules.Analytics.Features.V1;
 
 public sealed class GetEquityCurve
@@ -24,20 +26,18 @@ public sealed class GetEquityCurve
             List<TradeCacheDto> allTrades = await tradeProvider.GetTradesAsync(cancellationToken);
             DateTime fromDate = AnalyticsFilterHelper.GetFromDate(request.Filter);
 
-            List<TradeCacheDto> closed = allTrades
-                .Where(t => t.Status == 1 && t.Pnl.HasValue && t.ClosedDate.HasValue)
+            List<TradeCacheDto> closed = [.. allTrades
+                .Where(t => t.Status == TradeStatus.Closed && t.Pnl.HasValue && t.ClosedDate.HasValue)
                 .Where(t => fromDate == DateTime.MinValue || t.ClosedDate!.Value >= fromDate)
-                .OrderBy(t => t.ClosedDate!.Value)
-                .ToList();
+                .OrderBy(t => t.ClosedDate!.Value)];
 
             double cumulativeProfit = 0;
-            List<EquityPointViewModel> result = closed
+            List<EquityPointViewModel> result = [.. closed
                 .Select(t =>
                 {
                     cumulativeProfit += (double)t.Pnl!.Value;
                     return new EquityPointViewModel(t.ClosedDate!.Value, Math.Round(cumulativeProfit, 2));
-                })
-                .ToList();
+                })];
 
             return Result<IReadOnlyCollection<EquityPointViewModel>>.Success(result);
         }
