@@ -5,7 +5,7 @@ using TradingJournal.Shared;
 using TradingJournal.Modules.Analytics;
 using TradingJournal.Modules.Trades;
 using TradingJournal.Modules.Psychology;
-using TradingJournal.Modules.Strategies;
+
 using Scalar.AspNetCore;
 using TradingJournal.Shared.Middlewares;
 
@@ -39,7 +39,6 @@ builder.Services
     .AddSharedModule()
     .AddTradeModule(configuration, isDevelopment)
     .AddPsychologyModule(configuration, isDevelopment)
-    .AddStrategyModule(configuration, isDevelopment)
     .AddAnalyticsModule(isDevelopment)
     ;
 
