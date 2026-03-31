@@ -39,7 +39,6 @@ internal sealed class TradeDbContext(DbContextOptions<TradeDbContext> options)
         {
             builder.ToTable("TradingSummaries", "Trades");
 
-            // Quan hệ 1-1 với TradeHistory
             builder.HasOne(ta => ta.TradeHistory)
                    .WithOne(th => th.TradingSummary)
                    .HasForeignKey<TradingSummary>(ta => ta.TradeId)

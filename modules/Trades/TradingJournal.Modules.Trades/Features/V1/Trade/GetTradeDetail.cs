@@ -27,6 +27,7 @@ public class GetTradeDetail
                 .Include(x => x.TradeEmotionTags)
                 .Include(x => x.TradeChecklists)
                 .Include(x => x.TradeTechnicalAnalysisTags)
+                .Include(x => x.TradingSummary)
                 .FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken: cancellationToken);
 
             if (trade == null)
@@ -57,7 +58,8 @@ public class GetTradeDetail
                 EmotionTags = trade.TradeEmotionTags?.Select(x => x.EmotionTagId).ToList(),
                 ScreenShots = [.. trade.TradeScreenShots.Select(x => x.Url)],
                 SelectedChecklists = [.. trade.TradeChecklists.Select(x => x.PretradeChecklistId)],
-                TechnicalAnalysisTags = [.. trade.TradeTechnicalAnalysisTags.Select(x => x.TechnicalAnalysisId)]
+                TechnicalAnalysisTags = [.. trade.TradeTechnicalAnalysisTags.Select(x => x.TechnicalAnalysisId)],
+                TradeSumamry = trade.TradingSummary.Adapt<TradeSumamryViewModel>()
             };
 
             return Result<TradeHistoryDetailViewModel>.Success(tradeHistoryDetailViewModel);

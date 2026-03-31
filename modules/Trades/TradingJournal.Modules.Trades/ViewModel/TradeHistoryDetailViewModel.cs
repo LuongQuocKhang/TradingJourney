@@ -1,3 +1,5 @@
+using TradingJournal.Modules.Trades.Dto;
+
 namespace TradingJournal.Modules.Trades.ViewModel;
 
 public sealed class TradeHistoryDetailViewModel
@@ -46,4 +48,6 @@ public sealed class TradeHistoryDetailViewModel
     public List<int> SelectedChecklists { get; set; } = [];
 
     public List<int> TechnicalAnalysisTags { get; set; } = [];
+
+    public TradeSumamryViewModel? TradeSumamry { get; set; } = new();
 }
