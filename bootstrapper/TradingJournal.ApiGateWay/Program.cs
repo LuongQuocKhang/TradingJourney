@@ -4,13 +4,12 @@ using TradingJournal.ApiGateWay.Extensions;
 using TradingJournal.Shared;
 using TradingJournal.Modules.Analytics;
 using TradingJournal.Modules.Trades;
-using TradingJournal.Modules.Psychology;
-
 using Scalar.AspNetCore;
 using TradingJournal.Shared.Middlewares;
+using TradingJournal.Modules.Psychology;
+using TradingJournal.Messaging.Shared;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
-// Add services to the container.
 
 builder.Services.AddEndpointsApiExplorer();
 
@@ -33,26 +32,13 @@ builder.Services.ConfigureHttpJsonOptions(options =>
 
 bool isDevelopment = builder.Environment.IsDevelopment();
 
-//builder.ConfigureAspireDatabase();
 
 builder.Services
     .AddSharedModule()
     .AddTradeModule(configuration, isDevelopment)
     .AddPsychologyModule(configuration, isDevelopment)
     .AddAnalyticsModule(isDevelopment)
-    ;
-
-//builder.Services.AddMassTransit(x =>
-//{
-//    x.UsingRabbitMq((context, cfg) =>
-//    {
-//        cfg.Host("localhost", "/", h =>
-//        {
-//            h.Username("guest");
-//            h.Password("guest");
-//        });
-//    });
-//});
+    .AddInMemoryMessageQueue();
 
 builder.Services.AddOpenApi(options =>
 {

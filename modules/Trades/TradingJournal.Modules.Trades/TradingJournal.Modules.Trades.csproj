@@ -14,6 +14,7 @@
 
   <ItemGroup>
     <PackageReference Include="Carter" Version="10.0.0" />
+    <PackageReference Include="Google.GenAI" Version="1.6.0" />
     <PackageReference Include="Mapster" Version="10.0.6" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.5" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.5" />
@@ -21,7 +22,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\shared\TradingJournal.Messaging.Shared\TradingJournal.Messaging.Shared.csproj" />
     <ProjectReference Include="..\..\..\shared\TradingJournal.Shared\TradingJournal.Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Prompts\TradingOrderSummary.md" />
   </ItemGroup>
   
 </Project>

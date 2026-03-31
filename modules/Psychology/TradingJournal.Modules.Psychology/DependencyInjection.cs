@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
+using TradingJournal.Modules.Psychology.Helpers;
 using TradingJournal.Shared.Behaviors;
 namespace TradingJournal.Modules.Psychology;
 
@@ -25,6 +26,7 @@ public static class DependencyInjection
 
         services.AddScoped<IPsychologyDbContext, PsychologyDbContext>();
         services.AddScoped<IEmotionTagProvider, EmotionTagProvider>();
+        services.AddScoped<IPsychologyProvider, PsychologyProvider>();
 
         services.AddDbContext<PsychologyDbContext>(options =>
         {

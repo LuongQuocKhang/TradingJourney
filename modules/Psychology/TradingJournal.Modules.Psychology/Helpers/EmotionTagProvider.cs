@@ -1,6 +1,6 @@
 using TradingJournal.Shared.Dtos;
 
-namespace TradingJournal.Modules.Psychology;
+namespace TradingJournal.Modules.Psychology.Helpers;
 
 /// <summary>
 /// Psychology module's implementation of <see cref="IEmotionTagProvider"/>.

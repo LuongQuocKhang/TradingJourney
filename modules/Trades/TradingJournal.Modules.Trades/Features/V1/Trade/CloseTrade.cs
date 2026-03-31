@@ -1,3 +1,7 @@
+using TradingJournal.Messaging.Shared.Abstractions;
+using TradingJournal.Modules.Trades.Events;
+using TradingJournal.Modules.Trades.Services;
+
 namespace TradingJournal.Modules.Trades.Features.V1.Trade;
 
 public sealed class CloseTrade
@@ -18,7 +22,8 @@ public sealed class CloseTrade
         }
     }
 
-    internal sealed class Handler(ITradeDbContext tradeDbContext) : ICommandHandler<Request, Result<bool>>
+    internal sealed class Handler(ITradeDbContext tradeDbContext,
+        IEventBus eventBus) : ICommandHandler<Request, Result<bool>>
     {
         public async Task<Result<bool>> Handle(Request request, CancellationToken cancellationToken)
         {
@@ -42,6 +47,9 @@ public sealed class CloseTrade
             tradeHistory.Status = TradeStatus.Closed;
 
             await tradeDbContext.SaveChangesAsync(cancellationToken);
+
+            // AI Generate Insights
+            await eventBus.PublishAsync(new SummarizeTradingOrderEvent(Guid.NewGuid(), DateTime.UtcNow, tradeHistory.Id), cancellationToken);
 
             return Result<bool>.Success(true);
         }

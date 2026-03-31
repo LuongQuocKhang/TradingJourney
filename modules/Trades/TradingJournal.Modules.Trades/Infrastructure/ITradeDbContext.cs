@@ -23,6 +23,8 @@ public interface ITradeDbContext
 
     DbSet<TradingSession> TradingSessions { get; set; }
 
+    DbSet<TradingSummary> TradingSummaries { get; set; }
+
     Task BeginTransaction();
 
     Task CommitTransaction();

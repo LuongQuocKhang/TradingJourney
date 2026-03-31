@@ -31,6 +31,8 @@ public sealed class TradeHistory : EntityBase<int>
 
     public int? TradingSessionId { get; set; }
 
+    public int? TradingSummaryId { get; set; }
+
     // London / NY / Sydney / Tokyo
     public int? TradingZoneId { get; set; }
 
@@ -64,4 +66,10 @@ public sealed class TradeHistory : EntityBase<int>
 
     [ForeignKey(nameof(TradingSessionId))]
     public TradingSession? TradingSession { get; set; }
+
+    [ForeignKey(nameof(TradingSummaryId))]
+    public TradingSummary? TradingSummary { get; set; }
+
+    [ForeignKey(nameof(TradingZoneId))]
+    public TradingZone TradingZone { get; set; }
 }

@@ -27,11 +27,29 @@ internal sealed class TradeDbContext(DbContextOptions<TradeDbContext> options)
     public DbSet<TechnicalAnalysis> TechnicalAnalyses { get; set; }
 
     public DbSet<TradeTechnicalAnalysisTag> TradeTechnicalAnalysisTags { get; set; }
+    
+    public DbSet<TradingSummary> TradingSummaries { get; set; }
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<TradingSummary>(builder =>
+        {
+            builder.ToTable("TradingSummaries", "Trades");
+
+            // Quan hệ 1-1 với TradeHistory
+            builder.HasOne(ta => ta.TradeHistory)
+                   .WithOne(th => th.TradingSummary)
+                   .HasForeignKey<TradingSummary>(ta => ta.TradeId)
+                   .OnDelete(DeleteBehavior.Cascade);
+
+            builder.OwnsOne(ta => ta.CriticalMistakes, cm =>
+            {
+                cm.ToJson("CriticalMistakes"); 
+            });
+        });
     }
 
     public async Task BeginTransaction()

@@ -17,12 +17,15 @@ public static class OpenApiExtensions
     /// <returns></returns>
     public static OpenApiOptions UseJwtBearerAuthentication(this OpenApiOptions options)
     {
-        OpenApiSecuritySchemeReference schema = new OpenApiSecuritySchemeReference(JwtBearerDefaults.AuthenticationScheme);
+        OpenApiSecuritySchemeReference schema = new(JwtBearerDefaults.AuthenticationScheme);
 
         options.AddDocumentTransformer((document, context, ct) =>
         {
             document.Components ??= new OpenApiComponents();
-            document.Components.SecuritySchemes.Add(JwtBearerDefaults.AuthenticationScheme, schema);
+            document.Components.SecuritySchemes = new Dictionary<string, IOpenApiSecurityScheme>
+            {
+                { JwtBearerDefaults.AuthenticationScheme, schema }
+            };
             return Task.CompletedTask;
         });
 
