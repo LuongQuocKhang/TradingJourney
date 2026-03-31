@@ -29,8 +29,7 @@ public sealed class SummerizeTradeHistory
                 return Result<bool>.Failure(Error.NotFound);
             }
 
-            // Store to DB
-            await context.TradingSummaries.AddAsync(new TradingSummary
+            var tradingSummary = new TradingSummary
             {
                 Id = 0,
                 TradeId = request.TradeId,
@@ -42,9 +41,21 @@ public sealed class SummerizeTradeHistory
                     Technical = result.CriticalMistakes.Technical,
                     Psychological = result.CriticalMistakes.Psychological
                 }
-            });
+            };
+
+            // Store to DB
+            await context.TradingSummaries.AddAsync(tradingSummary, cancellationToken);
 
             await context.SaveChangesAsync(cancellationToken);
+
+            TradeHistory? tradeHistory = await context.TradeHistories.FindAsync([request.TradeId], cancellationToken);
+
+            if (tradeHistory is not null)
+            {
+                tradeHistory.TradingSummaryId = tradingSummary.Id;
+                context.TradeHistories.Update(tradeHistory);
+                await context.SaveChangesAsync(cancellationToken);
+            }
 
             return Result<bool>.Success(true);
         }

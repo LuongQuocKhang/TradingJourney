@@ -17,7 +17,7 @@ internal sealed class SummarizeTradingOrderEventHandler(IServiceScopeFactory ser
 
         // Store to DB
 
-        await context.TradingSummaries.AddAsync(new TradingSummary()
+        TradingSummary tradingSummary = new()
         {
             Id = 0,
             TradeId = notification.TradeHistoryId,
@@ -29,10 +29,19 @@ internal sealed class SummarizeTradingOrderEventHandler(IServiceScopeFactory ser
                 Psychological = result?.CriticalMistakes?.Psychological ?? [],
                 Technical = result?.CriticalMistakes?.Technical ?? [],
             },
-        }, cancellationToken: cancellationToken);
+        };
+
+        await context.TradingSummaries.AddAsync(tradingSummary, cancellationToken: cancellationToken);
 
         await context.SaveChangesAsync(cancellationToken);
 
-        await Task.CompletedTask;
+        TradeHistory? tradeHistory = await context.TradeHistories.FindAsync([notification.TradeHistoryId], cancellationToken);
+
+        if (tradeHistory is not null)
+        {
+            tradeHistory.TradingSummaryId = tradingSummary.Id;
+            context.TradeHistories.Update(tradeHistory);
+            await context.SaveChangesAsync(cancellationToken);
+        }
     }
 }
