@@ -240,7 +240,7 @@ public sealed class UpdateTrade
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            RouteGroupBuilder group = app.MapGroup("api/v1/trade-histories");
+            RouteGroupBuilder group = app.MapGroup(ApiGroup.V1.TradeHistory);
 
             group.MapPut("/", async ([FromBody] Request request, ISender sender) => {
                 Result<bool> result = await sender.Send(request);

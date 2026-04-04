@@ -42,7 +42,7 @@ public sealed class GetWinLossRatio
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            RouteGroupBuilder group = app.MapGroup("api/v1/dashboard");
+            RouteGroupBuilder group = app.MapGroup(ApiGroup.V1.Dashboard);
 
             group.MapGet("/win-loss-ratio", async (DashboardFilter filter, IMediator sender) =>
             {

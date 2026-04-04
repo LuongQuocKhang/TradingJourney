@@ -10,29 +10,29 @@ public sealed class UpdateTradingZone
         {
             RuleFor(x => x.Id)
                 .Cascade(CascadeMode.Stop)
-                .GreaterThan(0).WithErrorCode(HttpStatusCode.BadRequest.ToString())
+                .GreaterThan(0).WithErrorCode(nameof(HttpStatusCode.BadRequest))
                 .WithMessage("Trading Zone Id must be greater than 0.");
 
             RuleFor(x => x.Name)
                 .Cascade(CascadeMode.Stop)
-                .NotEmpty().WithErrorCode(HttpStatusCode.BadRequest.ToString())
+                .NotEmpty().WithErrorCode(nameof(HttpStatusCode.BadRequest))
                 .WithMessage("Trading Zone Name is required.");
 
             RuleFor(x => x.FromTime)
                 .Cascade(CascadeMode.Stop)
-                .NotNull().WithErrorCode(HttpStatusCode.BadRequest.ToString())
+                .NotNull().WithErrorCode(nameof(HttpStatusCode.BadRequest))
                 .WithMessage("FromTime cannot be null.")
-                .NotEmpty().WithErrorCode(HttpStatusCode.BadRequest.ToString())
+                .NotEmpty().WithErrorCode(nameof(HttpStatusCode.BadRequest))
                 .WithMessage("FromTime cannot be empty.")
-                .Must(BeAValidTime).WithErrorCode(HttpStatusCode.BadRequest.ToString())
+                .Must(BeAValidTime).WithErrorCode(nameof(HttpStatusCode.BadRequest))
                 .WithMessage("FromTime must be in a valid time format (e.g., HH:mm).");
             RuleFor(x => x.ToTime)
                 .Cascade(CascadeMode.Stop)
-                .NotNull().WithErrorCode(HttpStatusCode.BadRequest.ToString())
+                .NotNull().WithErrorCode(nameof(HttpStatusCode.BadRequest))
                 .WithMessage("ToTime cannot be null.")
-                .NotEmpty().WithErrorCode(HttpStatusCode.BadRequest.ToString())
+                .NotEmpty().WithErrorCode(nameof(HttpStatusCode.BadRequest))
                 .WithMessage("ToTime cannot be empty.")
-                .Must(BeAValidTime).WithErrorCode(HttpStatusCode.BadRequest.ToString())
+                .Must(BeAValidTime).WithErrorCode(nameof(HttpStatusCode.BadRequest))
                 .WithMessage("ToTime must be in a valid time format (e.g., HH:mm).");
         }
 
@@ -68,7 +68,7 @@ public sealed class UpdateTradingZone
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            RouteGroupBuilder group = app.MapGroup("api/v1/trading-zones");
+            RouteGroupBuilder group = app.MapGroup(ApiGroup.V1.TradingZones);
 
             group.MapPut("/", async ([FromBody] Request request, ISender sender) =>
             {

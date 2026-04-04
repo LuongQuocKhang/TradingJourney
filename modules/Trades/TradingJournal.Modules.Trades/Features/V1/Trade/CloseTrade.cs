@@ -36,13 +36,9 @@ public sealed class CloseTrade
             }
 
             tradeHistory.ExitPrice = request.ExitPrice;
-
             tradeHistory.Pnl = request.PnL;
-
             tradeHistory.TradingResult = request.TradingResult;
-
             tradeHistory.HitStopLoss = request.HitStopLoss;
-
             tradeHistory.ClosedDate = DateTime.UtcNow;
             tradeHistory.Status = TradeStatus.Closed;
 
@@ -59,7 +55,7 @@ public sealed class CloseTrade
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            RouteGroupBuilder group = app.MapGroup("api/v1/trade-histories");
+            RouteGroupBuilder group = app.MapGroup(ApiGroup.V1.TradeHistory);
 
             group.MapPost("/close", async (Request request, IMediator mediator) =>
             {

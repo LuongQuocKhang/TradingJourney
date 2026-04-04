@@ -25,7 +25,7 @@ public sealed class GetTradingZoneDetail
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            RouteGroupBuilder group = app.MapGroup("api/v1/trading-zones");
+            RouteGroupBuilder group = app.MapGroup(ApiGroup.V1.TradingZones);
 
             group.MapGet("/{id:int}", async (int id, ISender sender) =>
             {

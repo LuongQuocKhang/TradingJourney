@@ -36,7 +36,7 @@ public sealed class DeletePretradeChecklist
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            RouteGroupBuilder group = app.MapGroup("api/v1/pretrade-checklists");
+            RouteGroupBuilder group = app.MapGroup(ApiGroup.V1.PretradeChecklists);
 
             group.MapDelete("/{id:int}", async (int id, ISender sender) => {
                 Result result = await sender.Send(new Request(id));

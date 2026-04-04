@@ -23,7 +23,7 @@ public sealed class GetTradeSessions
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            RouteGroupBuilder group = app.MapGroup("api/v1/trade-sessions");
+            RouteGroupBuilder group = app.MapGroup(ApiGroup.V1.TradingSessions);
 
             group.MapGet("/", async ([FromQuery] int pageNumber, [FromQuery] int pageSize, [FromQuery] string? search, ISender sender) =>
             {

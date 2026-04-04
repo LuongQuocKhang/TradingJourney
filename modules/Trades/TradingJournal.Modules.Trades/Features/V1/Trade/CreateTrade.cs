@@ -98,8 +98,6 @@ public sealed class CreateTrade
 
                 TradeHistory tradeHistory = request.Adapt<TradeHistory>();
 
-                // Clear navigation properties to prevent Mapster from creating invalid child entities.
-                // These are manually added below with correct FK references.
                 tradeHistory.TradeTechnicalAnalysisTags = [];
                 tradeHistory.TradeScreenShots = [];
                 tradeHistory.TradeEmotionTags = [];
@@ -194,12 +192,12 @@ public sealed class CreateTrade
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            RouteGroupBuilder group = app.MapGroup("api/v1/trade-histories");
+            RouteGroupBuilder group = app.MapGroup(ApiGroup.V1.TradeHistory);
 
             group.MapPost("/", async ([FromBody] Request request, ISender sender) => {
                 Result<int> result = await sender.Send(request);
 
-                return result.IsSuccess ? Results.Created($"/api/v1/trade-histories/{result.Value}", result) 
+                return result.IsSuccess ? Results.Created($"{ApiGroup.V1.TradeHistory}/{result.Value}", result) 
                     : Results.BadRequest(result);
             })
             .Produces<Result<int>>(StatusCodes.Status201Created)

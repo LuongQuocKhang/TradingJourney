@@ -139,9 +139,9 @@ public class GetTrades
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            RouteGroupBuilder group = app.MapGroup("api/v1/trade-histories");
+            RouteGroupBuilder group = app.MapGroup(ApiGroup.V1.TradeHistory);
 
-            group.MapPost("/search", async (ISender sender, [FromBody] GetTrades.Request request) =>
+            group.MapPost("/search", async (ISender sender, [FromBody] Request request) =>
             {
                 Result<PaginationViewModel<TradeHistoryViewModel>> result = await sender.Send(request);
 

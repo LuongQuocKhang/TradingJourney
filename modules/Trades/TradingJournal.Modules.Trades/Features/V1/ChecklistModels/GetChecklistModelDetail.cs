@@ -31,7 +31,7 @@ public sealed class GetChecklistModelDetail
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            RouteGroupBuilder group = app.MapGroup("api/v1/checklist-models");
+            RouteGroupBuilder group = app.MapGroup(ApiGroup.V1.ChecklistModels);
 
             group.MapGet("/{id:int}", async (int id, ISender sender) =>
             {

@@ -46,7 +46,7 @@ public sealed class CreatePretradeChecklist
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            RouteGroupBuilder group = app.MapGroup("api/v1/pretrade-checklists");
+            RouteGroupBuilder group = app.MapGroup(ApiGroup.V1.PretradeChecklists);
 
             group.MapPost("/", async ([FromBody] Request request, ISender sender) => {
                 Result<int> result = await sender.Send(request);

@@ -61,7 +61,7 @@ public sealed class GetProfitTrajectory
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            RouteGroupBuilder group = app.MapGroup("api/v1/dashboard");
+            RouteGroupBuilder group = app.MapGroup(ApiGroup.V1.Dashboard);
 
             group.MapGet("/profit-trajectory", async (DashboardFilter filter, IMediator sender) =>
             {

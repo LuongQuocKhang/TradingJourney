@@ -41,7 +41,7 @@ public class DeleteTradeSession
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            RouteGroupBuilder group = app.MapGroup("api/v1/trade-sessions");
+            RouteGroupBuilder group = app.MapGroup(ApiGroup.V1.TradingSessions);
 
             group.MapDelete("/{id}", async (int id, ISender sender) =>
             {

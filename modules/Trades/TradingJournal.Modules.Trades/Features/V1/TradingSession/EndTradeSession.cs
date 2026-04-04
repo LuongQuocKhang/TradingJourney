@@ -66,7 +66,7 @@ public sealed class EndTradeSession
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            RouteGroupBuilder group = app.MapGroup("api/v1/trade-sessions");
+            RouteGroupBuilder group = app.MapGroup(ApiGroup.V1.TradingSessions);
 
             group.MapPost("/end", async ([FromBody] Request request, ISender sender) =>
             {

@@ -22,3 +22,25 @@ public static class Tags
 
     public const string ChecklistModels = "Checklist Models";
 }
+
+public static class ApiGroup
+{
+    public static class V1
+    {
+        internal const string TradeHistory = "api/v1/trade-histories";
+
+        internal const string ChecklistModels = "api/v1/checklist-models";
+
+        internal const string Dashboard = "api/v1/dashboard";
+
+        internal const string PretradeChecklists = "api/v1/pretrade-checklists";
+
+        internal const string Screenshots = "api/v1/screenshots";
+
+        internal const string TechnicalAnalysis = "api/v1/technical-analysis";
+
+        internal const string TradingSessions = "api/v1/trading-sessions";
+
+        internal const string TradingZones = "api/v1/trading-zones";
+    }
+}

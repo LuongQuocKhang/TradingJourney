@@ -39,11 +39,6 @@ internal sealed class TradeDbContext(DbContextOptions<TradeDbContext> options)
         {
             builder.ToTable("TradingSummaries", "Trades");
 
-            builder.HasOne(ta => ta.TradeHistory)
-                   .WithOne(th => th.TradingSummary)
-                   .HasForeignKey<TradingSummary>(ta => ta.TradeId)
-                   .OnDelete(DeleteBehavior.Cascade);
-
             builder.OwnsOne(ta => ta.CriticalMistakes, cm =>
             {
                 cm.ToJson("CriticalMistakes"); 

@@ -40,12 +40,12 @@ public sealed class CreateChecklistModel
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            RouteGroupBuilder group = app.MapGroup("api/v1/checklist-models");
+            RouteGroupBuilder group = app.MapGroup(ApiGroup.V1.ChecklistModels);
 
             group.MapPost("/", async ([FromBody] Request request, ISender sender) =>
             {
                 Result<int> result = await sender.Send(request);
-                return result.IsSuccess ? Results.Created($"/api/v1/checklist-models/{result.Value}", result)
+                return result.IsSuccess ? Results.Created($"{ApiGroup.V1.ChecklistModels}/{result.Value}", result)
                     : Results.BadRequest(result);
             })
             .Produces<Result<int>>(StatusCodes.Status201Created)

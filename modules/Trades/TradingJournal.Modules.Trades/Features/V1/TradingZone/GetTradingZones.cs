@@ -22,7 +22,7 @@ public sealed class GetTradingZones
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            RouteGroupBuilder group = app.MapGroup("api/v1/trading-zones");
+            RouteGroupBuilder group = app.MapGroup(ApiGroup.V1.TradingZones);
 
             group.MapGet("/", async (ISender sender) =>
             {

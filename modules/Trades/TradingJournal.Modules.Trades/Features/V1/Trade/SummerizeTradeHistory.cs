@@ -65,7 +65,7 @@ public sealed class SummerizeTradeHistory
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            RouteGroupBuilder group = app.MapGroup("api/v1/trade-histories");
+            RouteGroupBuilder group = app.MapGroup(ApiGroup.V1.TradeHistory);
 
             group.MapPost("/summarize/{tradeId:int}", async (int tradeId, ISender sender) => {
                 Result<bool> result = await sender.Send(new SummerizeTradeHistory.Request(tradeId));

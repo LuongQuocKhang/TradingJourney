@@ -81,7 +81,7 @@ public sealed class GetTradingCalendar
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            RouteGroupBuilder group = app.MapGroup("api/v1/dashboard");
+            RouteGroupBuilder group = app.MapGroup(ApiGroup.V1.Dashboard);
 
             group.MapGet("/calendar", async (int month, int year, DateTime? date, DashboardFilter filter, IMediator sender) =>
             {

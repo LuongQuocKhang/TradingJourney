@@ -41,7 +41,7 @@ public sealed class CreateTechnicalAnalysis
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            RouteGroupBuilder group = app.MapGroup("api/v1/technical-analysis");
+            RouteGroupBuilder group = app.MapGroup(ApiGroup.V1.TechnicalAnalysis);
 
             group.MapPost("/", async ([FromBody] Request request, ISender sender) =>
             {

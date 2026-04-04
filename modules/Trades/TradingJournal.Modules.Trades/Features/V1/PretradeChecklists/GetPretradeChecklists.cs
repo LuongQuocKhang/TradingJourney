@@ -24,7 +24,7 @@ public sealed class GetPretradeChecklists
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            RouteGroupBuilder group = app.MapGroup("api/v1/pretrade-checklists");
+            RouteGroupBuilder group = app.MapGroup(ApiGroup.V1.PretradeChecklists);
 
             group.MapGet("/", async (ISender sender) => {
                 Result<IReadOnlyCollection<PretradeChecklistViewModel>> result = await sender.Send(new Request());

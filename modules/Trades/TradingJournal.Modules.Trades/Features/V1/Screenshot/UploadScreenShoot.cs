@@ -39,8 +39,12 @@ public sealed class UploadScreenShoot
 
             HttpContext? httpContext = httpContextAccessor.HttpContext;
 
-            string imageUrl = $"{httpContext.Request.Scheme}://{httpContext.Request.Host}/screenshots/{fileName}";
+            string imageUrl = string.Empty;
 
+            if (httpContext != null)
+            {
+                imageUrl = $"{httpContext.Request.Scheme}://{httpContext.Request.Host}/screenshots/{fileName}";
+            }
             return Result<string>.Success(imageUrl);
         }
     }
@@ -49,7 +53,7 @@ public sealed class UploadScreenShoot
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            RouteGroupBuilder group = app.MapGroup("api/v1/screenshots");
+            RouteGroupBuilder group = app.MapGroup(ApiGroup.V1.Screenshots);
 
             group.MapPost("/upload", async (Request request, ISender sender) =>
             {

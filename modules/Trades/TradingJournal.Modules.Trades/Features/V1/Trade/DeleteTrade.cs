@@ -54,7 +54,19 @@ public class DeleteTrade
             if (string.IsNullOrEmpty(url) || !url.StartsWith("/screenshots/"))
                 return;
 
-            var filePath = Path.Combine(env.ContentRootPath, "wwwroot", url.TrimStart('/').Replace('/', Path.DirectorySeparatorChar));
+            // https://{host}/screenshots/c5cb241a-d470-4d5e-8ec9-14d47e23e0e8.png
+
+            List<string> parts = [.. url.Split("/screenshots/")];
+
+            if (parts.Count < 2)
+            {
+                return;
+            }
+
+            string fileName = parts[1];
+
+            var filePath = Path.Combine(env.ContentRootPath, "wwwroot", "screenshots", fileName);
+
             if (File.Exists(filePath))
             {
                 File.Delete(filePath);
@@ -66,7 +78,7 @@ public class DeleteTrade
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            RouteGroupBuilder group = app.MapGroup("api/v1/trade-histories");
+            RouteGroupBuilder group = app.MapGroup(ApiGroup.V1.TradeHistory);
 
             group.MapDelete("/{id}", async ([FromRoute] int id, ISender sender) => {
                 Result<int> result = await sender.Send(new Request { Id = id });

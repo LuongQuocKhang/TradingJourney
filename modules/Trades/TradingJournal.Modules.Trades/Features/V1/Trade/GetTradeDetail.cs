@@ -22,7 +22,8 @@ public class GetTradeDetail
     {
         public async Task<Result<TradeHistoryDetailViewModel>> Handle(Request request, CancellationToken cancellationToken)
         {
-            Domain.TradeHistory? trade = await tradeDbContext.TradeHistories
+            TradeHistory? trade = await tradeDbContext.TradeHistories
+                .AsNoTracking()
                 .Include(x => x.TradeScreenShots)
                 .Include(x => x.TradeEmotionTags)
                 .Include(x => x.TradeChecklists)
@@ -70,7 +71,7 @@ public class GetTradeDetail
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            RouteGroupBuilder group = app.MapGroup("api/v1/trade-histories");
+            RouteGroupBuilder group = app.MapGroup(ApiGroup.V1.TradeHistory);
 
             group.MapGet("/{id}", async ([FromRoute] int id, ISender sender) => {
                 Result<TradeHistoryDetailViewModel> result = await sender.Send(new Request(id));

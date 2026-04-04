@@ -57,12 +57,12 @@ public sealed class AddCriteriaToModel
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            RouteGroupBuilder group = app.MapGroup("api/v1/checklist-models");
+            RouteGroupBuilder group = app.MapGroup(ApiGroup.V1.ChecklistModels);
 
             group.MapPost("/{modelId:int}/criteria", async (int modelId, [FromBody] AddCriteriaRequest body, ISender sender) =>
             {
                 Result<int> result = await sender.Send(new Request(modelId, body.Name, body.Type));
-                return result.IsSuccess ? Results.Created($"/api/v1/checklist-models/{modelId}/criteria/{result.Value}", result)
+                return result.IsSuccess ? Results.Created($"{ApiGroup.V1.ChecklistModels}/{modelId}/criteria/{result.Value}", result)
                     : Results.BadRequest(result);
             })
             .Produces<Result<int>>(StatusCodes.Status201Created)
