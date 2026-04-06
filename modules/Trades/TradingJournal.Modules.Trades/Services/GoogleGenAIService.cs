@@ -1,6 +1,7 @@
-using Google.GenAI;
-using Google.GenAI.Types;
 using Microsoft.Extensions.Options;
+using System.Buffers.Text;
+using System.Net.Http.Headers;
+using System.Text;
 using System.Text.Json;
 using TradingJournal.Modules.Trades.Dto;
 using TradingJournal.Modules.Trades.Extensions;
@@ -14,9 +15,10 @@ internal sealed class GoogleGenAIService(
     ITradeDbContext context,
     IEmotionTagProvider emotionTagProvider,
     IPsychologyProvider psychologyProvider,
-    Client googleGenAiClient,
+    HttpClient httpClient,
     IImageHelper imageHelper,
-    IOptions<GoogleGenAIOptions> options) : IGoogleGenAIService
+    IOptions<OpenRouterOptions> options,
+    IHttpContextAccessor httpContextAccessor) : IGoogleGenAIService
 {
     public async Task<TradeAnalysisResultDto?> GenerateTradingOrderSummary(int tradeHistoryId, CancellationToken cancellationToken)
     {
@@ -37,20 +39,22 @@ internal sealed class GoogleGenAIService(
             tradeHistory.TradeScreenShots.Select(tss => tss.Url).ToList(),
             cancellationToken);
 
-        GenerateContentResponse response = await SendGeminiRequest(finalPrompt, imageContents, cancellationToken);
+        string responseText = await SendOpenRouterRequest(finalPrompt, imageContents, cancellationToken);
 
-        return ParseAiResponse(response);
+        return ParseAiResponse(responseText);
     }
 
     private async Task<TradeHistory> LoadTradeHistory(int tradeHistoryId, CancellationToken cancellationToken)
     {
         return await context.TradeHistories
+            .AsNoTracking()
             .Include(th => th.TradeScreenShots)
             .Include(th => th.TradeEmotionTags)
             .Include(th => th.TradeChecklists)
                 .ThenInclude(th => th.PretradeChecklist)
             .Include(th => th.TradeTechnicalAnalysisTags)
                 .ThenInclude(th => th.TechnicalAnalysis)
+            .AsSplitQuery()
             .FirstOrDefaultAsync(th => th.Id == tradeHistoryId, cancellationToken)
             ?? throw new InvalidOperationException("Trade history not found.");
     }
@@ -136,72 +140,114 @@ internal sealed class GoogleGenAIService(
             .Replace("{{PsychologyNotes}}", string.Join(", ", psychologyNotes ?? []));
     }
 
-    private async Task<GenerateContentResponse> SendGeminiRequest(
+    private async Task<string> SendOpenRouterRequest(
         string prompt,
         List<byte[]> imageContents,
         CancellationToken cancellationToken)
     {
-        List<Part> imageParts = [.. imageContents.Select(content => new Part
-        {
-            InlineData = new Blob
-            {
-                Data = content,
-                MimeType = "image/jpeg"
-            }
-        })];
-
-        List<Part> allPromptParts = [new Part { Text = prompt }];
-        allPromptParts.AddRange(imageParts);
-
-        List<Content> contents =
+        List<object> allPromptParts =
         [
-            new()
-            {
-                Role = "user",
-                Parts = allPromptParts
-            },
+            new { type = "text", text = prompt }
         ];
 
-        List<Tool> tools =
-        [
-            new Tool { UrlContext = new UrlContext() },
-        ];
-
-        GenerateContentConfig config = new()
+        foreach (byte[] content in imageContents)
         {
-            ThinkingConfig = new ThinkingConfig
+            allPromptParts.Add(new
             {
-                ThinkingLevel = ThinkingLevel.FromString(options.Value.ThinkingLevel),
-            },
-            MediaResolution = options.Value.MediaResolution,
-            Tools = tools,
-            ResponseMimeType = options.Value.ResponseMimeType,
-        };
-
-        GenerateContentResponse response = await googleGenAiClient.Models.GenerateContentAsync(
-            model: options.Value.Model ?? "gemini-2.5-pro",
-            contents: contents,
-            config: config,
-            cancellationToken: cancellationToken);
-
-        if (string.IsNullOrEmpty(response.Text))
-        {
-            throw new InvalidOperationException("Gemini returned an empty response.");
+                type = "image_url",
+                image_url = new
+                {
+                    url = $"data:image/jpeg;base64,{Convert.ToBase64String(content)}"
+                }
+            });
         }
 
-        return response;
+        var requestBody = new
+        {
+            model = options.Value.Model,
+            messages = new[]
+            {
+                new
+                {
+                    role = "user",
+                    content = allPromptParts
+                }
+            }
+        };
+
+        using HttpRequestMessage request = new(HttpMethod.Post, $"{options.Value.BaseUrl}/chat/completions");
+        
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", options.Value.ApiKey);
+
+        HttpContext? httpContext = httpContextAccessor.HttpContext;
+
+        if (httpContext != null)
+        {
+            request.Headers.Add("HTTP-Referer", $"{httpContext.Request.Scheme}://{httpContext.Request.Host}");
+        }
+        else
+        {
+            request.Headers.Add("HTTP-Referer", "http://localhost:3000");
+        }
+        request.Headers.Add("X-Title", "TradingJournal");
+
+        string jsonBody = JsonSerializer.Serialize(requestBody);
+        request.Content = new StringContent(jsonBody, Encoding.UTF8, "application/json");
+
+        using HttpResponseMessage response = await httpClient.SendAsync(request, cancellationToken);
+        
+        if (!response.IsSuccessStatusCode)
+        {
+            string errorContent = await response.Content.ReadAsStringAsync(cancellationToken);
+            throw new InvalidOperationException($"OpenRouter API failed with status {response.StatusCode}: {errorContent}");
+        }
+
+        string responseContent = await response.Content.ReadAsStringAsync(cancellationToken);
+        
+        using JsonDocument doc = JsonDocument.Parse(responseContent);
+        JsonElement root = doc.RootElement;
+        
+        if (root.TryGetProperty("choices", out JsonElement choices) && choices.GetArrayLength() > 0)
+        {
+            JsonElement message = choices[0].GetProperty("message");
+            if (message.TryGetProperty("content", out JsonElement textContent))
+            {
+                return textContent.GetString() ?? string.Empty;
+            }
+        }
+
+        throw new InvalidOperationException("OpenRouter returned an empty or invalid response.");
     }
 
-    private static TradeAnalysisResultDto? ParseAiResponse(GenerateContentResponse response)
+    private static TradeAnalysisResultDto? ParseAiResponse(string responseText)
     {
         try
         {
-            return JsonSerializer.Deserialize<TradeAnalysisResultDto>(response.Text!);
+            string cleanText = responseText.Trim();
+            if (cleanText.StartsWith("```json"))
+            {
+                cleanText = cleanText.Substring(7);
+            }
+            if (cleanText.StartsWith("```"))
+            {
+                cleanText = cleanText.Substring(3);
+            }
+            if (cleanText.EndsWith("```"))
+            {
+                cleanText = cleanText.Substring(0, cleanText.Length - 3);
+            }
+
+            JsonSerializerOptions serializeOptions = new()
+            {
+                PropertyNameCaseInsensitive = true
+            };
+
+            return JsonSerializer.Deserialize<TradeAnalysisResultDto>(cleanText.Trim(), serializeOptions);
         }
         catch (JsonException ex)
         {
             throw new InvalidOperationException(
-                $"Failed to parse AI response into TradeAnalysisResult. Raw response: {response.Text}", ex);
+                $"Failed to parse AI response into TradeAnalysisResult. Raw response: {responseText}", ex);
         }
     }
 }

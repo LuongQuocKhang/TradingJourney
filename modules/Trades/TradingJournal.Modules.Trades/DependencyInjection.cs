@@ -1,4 +1,3 @@
-using Google.GenAI;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -69,18 +68,10 @@ public static class DependencyInjection
 
     private static IServiceCollection AddGoogleGenAI(this IServiceCollection services, IConfiguration configuration)
     {
-        string apiKey = configuration["GoogleGenAI:ApiKey"] ?? throw new InvalidOperationException("Google Gen AI API key is not configured.");
-
-        Client googleGenAiClient = new(
-            apiKey: apiKey
-        );
-
-        services.AddSingleton(googleGenAiClient);
-
-        services.AddTransient<IGoogleGenAIService, GoogleGenAIService>();
+        services.AddHttpClient<IGoogleGenAIService, GoogleGenAIService>();
         services.AddTransient<IPromptService, PromptService>();
 
-        services.Configure<GoogleGenAIOptions>(configuration.GetSection("GoogleGenAI"));
+        services.Configure<OpenRouterOptions>(configuration.GetSection("GoogleGenAI"));
 
         return services;
     }
