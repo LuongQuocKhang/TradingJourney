@@ -60,7 +60,8 @@ public sealed class GetAssetBreakdown
             .Produces(StatusCodes.Status400BadRequest)
             .WithSummary("Get asset breakdown.")
             .WithDescription("Retrieves performance breakdown by trading asset.")
-            .WithTags(Tags.Analytics);
+            .WithTags(Tags.Analytics)
+            .RequireAuthorization();
         }
     }
 }

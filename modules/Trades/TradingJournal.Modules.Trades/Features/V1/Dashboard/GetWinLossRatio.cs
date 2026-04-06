@@ -42,9 +42,9 @@ public sealed class GetWinLossRatio
         {
             RouteGroupBuilder group = app.MapGroup(ApiGroup.V1.Dashboard);
 
-            group.MapGet("/win-loss-ratio", async (DashboardFilter filter, int userId, IMediator sender) =>
+            group.MapGet("/win-loss-ratio", async (DashboardFilter filter, IMediator sender) =>
             {
-                Result<IReadOnlyCollection<WinLossRatioViewModel>> result = await sender.Send(new Request(filter, userId));
+                Result<IReadOnlyCollection<WinLossRatioViewModel>> result = await sender.Send(new Request(filter));
 
                 return result.IsSuccess ? Results.Ok(result) : Results.Problem(result.Errors[0].Description);
             })

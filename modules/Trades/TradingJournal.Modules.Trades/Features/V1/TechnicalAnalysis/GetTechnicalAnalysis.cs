@@ -4,7 +4,7 @@ namespace TradingJournal.Modules.Trades.Features.V1.TechnicalAnalysis;
 
 public sealed class GetTechnicalAnalysis
 {
-    internal sealed record Request(int UserId = 0) : IQuery<Result<IReadOnlyCollection<TechnicalAnalysisViewModel>>>;
+    internal sealed record Request() : IQuery<Result<IReadOnlyCollection<TechnicalAnalysisViewModel>>>;
 
     internal sealed class Handler(ITradeDbContext context) : IQueryHandler<Request, Result<IReadOnlyCollection<TechnicalAnalysisViewModel>>>
     {
@@ -12,7 +12,6 @@ public sealed class GetTechnicalAnalysis
         {
             IReadOnlyCollection<Domain.TechnicalAnalysis> technicalAnalyses = await context.TechnicalAnalyses
                 .AsNoTracking()
-                .Where(x => x.CreatedBy == request.UserId)
                 .ToListAsync(cancellationToken);
 
             IReadOnlyCollection<TechnicalAnalysisViewModel> technicalAnalysisViewModels = technicalAnalyses.Adapt<IReadOnlyCollection<TechnicalAnalysisViewModel>>();
@@ -27,9 +26,9 @@ public sealed class GetTechnicalAnalysis
         {
             RouteGroupBuilder group = app.MapGroup(ApiGroup.V1.TechnicalAnalysis);
 
-            group.MapGet("/", async ([FromQuery] int userId, ISender sender) =>
+            group.MapGet("/", async (ISender sender) =>
             {
-                Result<IReadOnlyCollection<TechnicalAnalysisViewModel>> result = await sender.Send(new Request(userId));
+                Result<IReadOnlyCollection<TechnicalAnalysisViewModel>> result = await sender.Send(new Request());
 
                 return result.IsSuccess ? Results.Ok(result)
                     : Results.BadRequest(result);
@@ -39,7 +38,8 @@ public sealed class GetTechnicalAnalysis
             .Produces(StatusCodes.Status500InternalServerError)
             .WithSummary("Get all technical analyses.")
             .WithDescription("Gets all technical analyses.")
-            .WithTags(Tags.TechnicalAnalysis);
+            .WithTags(Tags.TechnicalAnalysis)
+            .RequireAuthorization();
         }
     }
 }

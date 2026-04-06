@@ -44,9 +44,9 @@ public class DeleteTradeSession
         {
             RouteGroupBuilder group = app.MapGroup(ApiGroup.V1.TradingSessions);
 
-            group.MapDelete("/{id}", async ([FromQuery] int userId, int id, ISender sender) =>
+            group.MapDelete("/{id}", async (int id, ISender sender) =>
             {
-                Result<bool> result = await sender.Send(new Request(id, userId));
+                Result<bool> result = await sender.Send(new Request(id));
 
                 return result.IsSuccess ? Results.Ok(result)
                     : Results.BadRequest(result.Errors);
@@ -56,7 +56,8 @@ public class DeleteTradeSession
             .Produces(StatusCodes.Status500InternalServerError)
             .WithSummary("Delete a trade session.")
             .WithDescription("Deletes a trade session with the given ID.")
-            .WithTags(Tags.TradingSessions);
+            .WithTags(Tags.TradingSessions)
+            .RequireAuthorization();
         }
     }
 }

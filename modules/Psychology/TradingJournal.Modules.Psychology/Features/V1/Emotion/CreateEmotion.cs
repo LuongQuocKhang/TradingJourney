@@ -69,7 +69,8 @@ public sealed class CreateEmotion
             .Produces(StatusCodes.Status500InternalServerError)
             .WithSummary("Create a new emotion tag.")
             .WithDescription("Creates a new emotion tag/")
-            .WithTags(Tags.Emotions);
+            .WithTags(Tags.Emotions)
+            .RequireAuthorization();
         }
     }
 }

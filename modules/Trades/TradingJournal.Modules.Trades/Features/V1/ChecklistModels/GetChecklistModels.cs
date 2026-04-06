@@ -36,7 +36,8 @@ public sealed class GetChecklistModels
             .Produces<Result<IReadOnlyCollection<ChecklistModelViewModel>>>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status400BadRequest)
             .WithSummary("Get all checklist models.")
-            .WithTags(Tags.ChecklistModels);
+            .WithTags(Tags.ChecklistModels)
+            .RequireAuthorization();
         }
     }
 }

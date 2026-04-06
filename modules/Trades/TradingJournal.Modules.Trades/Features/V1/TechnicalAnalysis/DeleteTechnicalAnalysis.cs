@@ -53,7 +53,8 @@ public sealed class DeleteTechnicalAnalysis
             .Produces(StatusCodes.Status500InternalServerError)
             .WithSummary("Delete a technical analysis by ID.")
             .WithDescription("Deletes a technical analysis by its ID.")
-            .WithTags(Tags.TechnicalAnalysis);
+            .WithTags(Tags.TechnicalAnalysis)
+            .RequireAuthorization();
         }
     }
 }

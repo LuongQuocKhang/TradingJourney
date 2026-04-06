@@ -69,7 +69,8 @@ public sealed class AddCriteriaToModel
             .Produces(StatusCodes.Status400BadRequest)
             .WithSummary("Add a new criteria to a checklist model.")
             .WithDescription("Adds a new pretrade checklist criteria to the specified model.")
-            .WithTags(Tags.ChecklistModels);
+            .WithTags(Tags.ChecklistModels)
+            .RequireAuthorization();
         }
     }
 

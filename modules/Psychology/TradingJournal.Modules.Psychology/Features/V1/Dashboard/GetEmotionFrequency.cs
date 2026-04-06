@@ -62,7 +62,8 @@ public sealed class GetEmotionFrequency
             .Produces(StatusCodes.Status500InternalServerError)
             .WithSummary("Get emotion frequency.")
             .WithDescription("Calculates how often each emotion appears across all trades.")
-            .WithTags(Tags.Dashboard);
+            .WithTags(Tags.Dashboard)
+            .RequireAuthorization();
         }
     }
 }

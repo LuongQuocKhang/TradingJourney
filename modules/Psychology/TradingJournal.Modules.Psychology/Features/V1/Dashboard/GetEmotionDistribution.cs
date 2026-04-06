@@ -68,7 +68,8 @@ public sealed class GetEmotionDistribution
             .Produces(StatusCodes.Status500InternalServerError)
             .WithSummary("Get emotion distribution.")
             .WithDescription("Groups emotion tags into positive, negative, and neutral categories.")
-            .WithTags(Tags.Dashboard);
+            .WithTags(Tags.Dashboard)
+            .RequireAuthorization();
         }
     }
 }

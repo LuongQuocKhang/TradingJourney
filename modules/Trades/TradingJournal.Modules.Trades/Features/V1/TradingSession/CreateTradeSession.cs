@@ -56,7 +56,8 @@ public sealed class CreateTradeSession
             .Produces(StatusCodes.Status500InternalServerError)
             .WithSummary("Create a new trade session.")
             .WithDescription("Creates a new trade session with the given details.")
-            .WithTags(Tags.TradingSessions);
+            .WithTags(Tags.TradingSessions)
+            .RequireAuthorization();
         }
     }
 }

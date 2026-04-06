@@ -77,7 +77,8 @@ public sealed class CreateTradingZone
             .Produces(StatusCodes.Status500InternalServerError)
             .WithSummary("Create a new trading zone.")
             .WithDescription("Creates a new trading zone with the given details.")
-            .WithTags(Tags.TradingZones);
+            .WithTags(Tags.TradingZones)
+            .RequireAuthorization();
         }
     }
 }

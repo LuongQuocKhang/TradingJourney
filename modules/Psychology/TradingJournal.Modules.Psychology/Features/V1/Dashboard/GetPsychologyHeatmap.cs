@@ -97,7 +97,8 @@ public sealed class GetPsychologyHeatmap
             .Produces(StatusCodes.Status500InternalServerError)
             .WithSummary("Get psychology heatmap.")
             .WithDescription("Calculates PnL and win statistics per emotion tag.")
-            .WithTags(Tags.Dashboard);
+            .WithTags(Tags.Dashboard)
+            .RequireAuthorization();
         }
     }
 }

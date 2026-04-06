@@ -55,7 +55,8 @@ public sealed class GetMoodAndConfidenceTrend
             .Produces(StatusCodes.Status500InternalServerError)
             .WithSummary("Get mood and confidence trend.")
             .WithDescription("Gets the trend of overall mood and confidence level over time.")
-            .WithTags(Tags.Dashboard);
+            .WithTags(Tags.Dashboard)
+            .RequireAuthorization();
         }
     }
 }

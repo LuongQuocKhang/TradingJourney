@@ -188,7 +188,8 @@ public sealed class GetInsights
             .Produces(StatusCodes.Status400BadRequest)
             .WithSummary("Get trading insights.")
             .WithDescription("Generates actionable insights and recommendations based on trading data.")
-            .WithTags(Tags.Analytics);
+            .WithTags(Tags.Analytics)
+            .RequireAuthorization();
         }
     }
 }

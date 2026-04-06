@@ -55,7 +55,8 @@ public sealed class DeletePsychologyJournal
             .Produces(StatusCodes.Status500InternalServerError)
             .WithSummary("Delete a psychology journal.")
             .WithDescription("Deletes a psychology journal")
-            .WithTags(Tags.PsychologyJournal);
+            .WithTags(Tags.PsychologyJournal)
+            .RequireAuthorization();
         }
     }
 }

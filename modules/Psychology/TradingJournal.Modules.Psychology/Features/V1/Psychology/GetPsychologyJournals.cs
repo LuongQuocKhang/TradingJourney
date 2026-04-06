@@ -113,7 +113,8 @@ public sealed class GetPsychologyJournals
             .Produces(StatusCodes.Status500InternalServerError)
             .WithSummary("Search psychology journals.")
             .WithDescription("Searches psychology journals.")
-            .WithTags(Tags.PsychologyJournal);
+            .WithTags(Tags.PsychologyJournal)
+            .RequireAuthorization();
         }
     }
 }

@@ -82,9 +82,9 @@ public sealed class GetTradingCalendar
         {
             RouteGroupBuilder group = app.MapGroup(ApiGroup.V1.Dashboard);
 
-            group.MapGet("/calendar", async (int month, int year, DateTime? date, DashboardFilter filter, int userId, IMediator sender) =>
+            group.MapGet("/calendar", async (int month, int year, DateTime? date, DashboardFilter filter, IMediator sender) =>
             {
-                Result<TradingCalendarResponse> result = await sender.Send(new Request(month, year, date, filter, userId));
+                Result<TradingCalendarResponse> result = await sender.Send(new Request(month, year, date, filter));
 
                 return result.IsSuccess ? Results.Ok(result) : Results.Problem(result.Errors[0].Description);
             })

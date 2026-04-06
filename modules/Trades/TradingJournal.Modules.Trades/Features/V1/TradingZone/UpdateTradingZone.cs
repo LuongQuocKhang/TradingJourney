@@ -82,7 +82,8 @@ public sealed class UpdateTradingZone
             .Produces(StatusCodes.Status500InternalServerError)
             .WithSummary("Update a trading zone by ID.")
             .WithDescription("Updates a trading zone by its ID.")
-            .WithTags(Tags.TradingZones);
+            .WithTags(Tags.TradingZones)
+            .RequireAuthorization();
         }
     }
 }

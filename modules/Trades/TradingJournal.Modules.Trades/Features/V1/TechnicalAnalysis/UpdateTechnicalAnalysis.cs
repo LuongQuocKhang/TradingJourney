@@ -60,7 +60,8 @@ public sealed class UpdateTechnicalAnalysis
             .Produces(StatusCodes.Status500InternalServerError)
             .WithSummary("Update a technical analysis.")
             .WithDescription("Updates a technical analysis.")
-            .WithTags(Tags.TechnicalAnalysis);
+            .WithTags(Tags.TechnicalAnalysis)
+            .RequireAuthorization();
         }
     }
 }

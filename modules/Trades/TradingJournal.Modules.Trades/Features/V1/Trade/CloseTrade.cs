@@ -67,7 +67,8 @@ public sealed class CloseTrade
             .Produces(StatusCodes.Status500InternalServerError)
             .WithSummary("Close a trade.")
             .WithDescription("Closes a trade by setting its exit price, calculating PnL, and updating status to Closed.")
-            .WithTags(Tags.TradeHistory);
+            .WithTags(Tags.TradeHistory)
+            .RequireAuthorization();
         }
     }
 }

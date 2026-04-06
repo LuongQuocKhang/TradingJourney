@@ -71,7 +71,8 @@ public sealed class GetDayOfWeekBreakdown
             .Produces(StatusCodes.Status400BadRequest)
             .WithSummary("Get day of week breakdown.")
             .WithDescription("Retrieves performance breakdown by day of the week.")
-            .WithTags(Tags.Analytics);
+            .WithTags(Tags.Analytics)
+            .RequireAuthorization();
         }
     }
 }

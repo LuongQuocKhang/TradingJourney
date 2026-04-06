@@ -36,7 +36,8 @@ public sealed class GetPretradeChecklists
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status500InternalServerError)
             .WithSummary("Get all pretrade checklists.")
-            .WithTags(Tags.PretradeChecklists);
+            .WithTags(Tags.PretradeChecklists)
+            .RequireAuthorization();
         }
     }
 }

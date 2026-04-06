@@ -49,7 +49,8 @@ public sealed class DeletePretradeChecklist
             .Produces(StatusCodes.Status404NotFound)
             .Produces(StatusCodes.Status500InternalServerError)
             .WithSummary("Delete a pretrade checklist by its Id.")
-            .WithTags(Tags.PretradeChecklists);
+            .WithTags(Tags.PretradeChecklists)
+            .RequireAuthorization();
         }
     }
 }

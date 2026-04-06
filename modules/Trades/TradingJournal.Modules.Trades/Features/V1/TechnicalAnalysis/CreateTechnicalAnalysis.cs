@@ -61,7 +61,8 @@ public sealed class CreateTechnicalAnalysis
             .Produces(StatusCodes.Status500InternalServerError)
             .WithSummary("Create a new technical analysis.")
             .WithDescription("Creates a new technical analysis.")
-            .WithTags(Tags.TechnicalAnalysis);
+            .WithTags(Tags.TechnicalAnalysis)
+            .RequireAuthorization();
         }
     }
 }

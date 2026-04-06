@@ -80,7 +80,8 @@ public sealed class EndTradeSession
             .Produces(StatusCodes.Status500InternalServerError)
             .WithSummary("End a trade session.")
             .WithDescription("Ends a trade session with the given ID.")
-            .WithTags(Tags.TradingSessions);
+            .WithTags(Tags.TradingSessions)
+            .RequireAuthorization();
         }
     }
 }

@@ -40,9 +40,9 @@ public sealed class DeleteTradingZone
         {
             RouteGroupBuilder group = app.MapGroup(ApiGroup.V1.TradingZones);
 
-            group.MapDelete("/{id:int}", async ([FromQuery] int userId, int id, ISender sender) =>
+            group.MapDelete("/{id:int}", async (int id, ISender sender) =>
             {
-                Result<bool> result = await sender.Send(new Request(id, userId));
+                Result<bool> result = await sender.Send(new Request(id));
 
                 return result.IsSuccess ? Results.Ok(result)
                     : Results.BadRequest(result);
@@ -52,7 +52,8 @@ public sealed class DeleteTradingZone
             .Produces(StatusCodes.Status500InternalServerError)
             .WithSummary("Delete a trading zone by ID.")
             .WithDescription("Deletes a trading zone by its ID.")
-            .WithTags(Tags.TradingZones);
+            .WithTags(Tags.TradingZones)
+            .RequireAuthorization();
         }
     }
 }

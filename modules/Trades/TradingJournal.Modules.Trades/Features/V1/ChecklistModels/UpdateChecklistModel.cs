@@ -56,7 +56,8 @@ public sealed class UpdateChecklistModel
             .Produces<Result<bool>>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status400BadRequest)
             .WithSummary("Update an existing checklist model.")
-            .WithTags(Tags.ChecklistModels);
+            .WithTags(Tags.ChecklistModels)
+            .RequireAuthorization();
         }
     }
 }

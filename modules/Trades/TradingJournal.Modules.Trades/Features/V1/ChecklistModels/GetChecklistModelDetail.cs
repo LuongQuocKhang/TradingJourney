@@ -2,7 +2,7 @@ namespace TradingJournal.Modules.Trades.Features.V1.ChecklistModels;
 
 public sealed class GetChecklistModelDetail
 {
-    internal record Request(int Id) : ICommand<Result<ChecklistModelDetailViewModel>>;
+    internal record Request(int Id, int UserId = 0) : ICommand<Result<ChecklistModelDetailViewModel>>;
 
     internal sealed class Handler(ITradeDbContext context) : ICommandHandler<Request, Result<ChecklistModelDetailViewModel>>
     {
@@ -11,7 +11,7 @@ public sealed class GetChecklistModelDetail
             ChecklistModel? model = await context.ChecklistModels
                 .AsNoTracking()
                 .Include(m => m.Criteria)
-                .FirstOrDefaultAsync(m => m.Id == request.Id && m.CreatedBy == request.UserId, cancellationToken);
+            .FirstOrDefaultAsync(m => m.Id == request.Id, cancellationToken);
 
             if (model is null)
                 return Result<ChecklistModelDetailViewModel>.Failure(
@@ -42,7 +42,8 @@ public sealed class GetChecklistModelDetail
             .Produces<Result<ChecklistModelDetailViewModel>>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status404NotFound)
             .WithSummary("Get checklist model detail with all criteria.")
-            .WithTags(Tags.ChecklistModels);
+            .WithTags(Tags.ChecklistModels)
+            .RequireAuthorization();
         }
     }
 }

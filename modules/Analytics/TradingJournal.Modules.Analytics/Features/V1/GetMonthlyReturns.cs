@@ -63,7 +63,8 @@ public sealed class GetMonthlyReturns
             .Produces(StatusCodes.Status400BadRequest)
             .WithSummary("Get monthly returns.")
             .WithDescription("Retrieves PnL aggregated by month.")
-            .WithTags(Tags.Analytics);
+            .WithTags(Tags.Analytics)
+            .RequireAuthorization();
         }
     }
 }

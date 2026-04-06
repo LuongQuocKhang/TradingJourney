@@ -65,7 +65,8 @@ public sealed class CreatePretradeChecklist
             .Produces(StatusCodes.Status500InternalServerError)
             .WithSummary("Create a new pretrade checklist.")
             .WithDescription("Creates a new pretrade checklist with the given details.")
-            .WithTags(Tags.PretradeChecklists);
+            .WithTags(Tags.PretradeChecklists)
+            .RequireAuthorization();
         }
     }
 }

@@ -67,7 +67,8 @@ public sealed class UploadScreenShoot
             .Produces(StatusCodes.Status500InternalServerError)
             .WithSummary("Upload a screenshot.")
             .WithDescription("Uploads a screenshot.")
-            .WithTags(Tags.TradingScreenshoots);
+            .WithTags(Tags.TradingScreenshoots)
+            .RequireAuthorization();
         }
     }
 }

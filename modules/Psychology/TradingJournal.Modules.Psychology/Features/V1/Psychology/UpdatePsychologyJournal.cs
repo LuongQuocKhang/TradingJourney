@@ -54,7 +54,8 @@ public sealed class UpdatePsychologyJournal
             .Produces(StatusCodes.Status500InternalServerError)
             .WithSummary("Update a psychology journal entry.")
             .WithDescription("Updates a psychology journal entry for today.")
-            .WithTags(Tags.PsychologyJournal);
+            .WithTags(Tags.PsychologyJournal)
+            .RequireAuthorization();
         }
     }
 }

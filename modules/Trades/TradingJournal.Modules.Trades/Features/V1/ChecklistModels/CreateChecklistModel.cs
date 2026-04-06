@@ -58,7 +58,8 @@ public sealed class CreateChecklistModel
             .Produces(StatusCodes.Status400BadRequest)
             .WithSummary("Create a new checklist model.")
             .WithDescription("Creates a new checklist model with the given name and description.")
-            .WithTags(Tags.ChecklistModels);
+            .WithTags(Tags.ChecklistModels)
+            .RequireAuthorization();
         }
     }
 }

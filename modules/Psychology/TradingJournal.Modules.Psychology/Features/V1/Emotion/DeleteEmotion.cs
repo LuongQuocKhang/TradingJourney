@@ -56,7 +56,8 @@ public sealed class DeleteEmotion
             .Produces(StatusCodes.Status500InternalServerError)
             .WithSummary("Delete an emotion tag.")
             .WithDescription("Deletes an emotion tag/")
-            .WithTags(Tags.Emotions);
+            .WithTags(Tags.Emotions)
+            .RequireAuthorization();
         }
     }
 }

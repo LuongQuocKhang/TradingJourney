@@ -76,7 +76,8 @@ public sealed class GetEmotionAndWinRate
             .Produces(StatusCodes.Status500InternalServerError)
             .WithSummary("Get emotion win rate.")
             .WithDescription("Calculates win rate percentage per emotion tag for closed trades.")
-            .WithTags(Tags.Dashboard);
+            .WithTags(Tags.Dashboard)
+            .RequireAuthorization();
         }
     }
 }

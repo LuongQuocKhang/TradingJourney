@@ -51,9 +51,9 @@ public sealed class GetTradingStatistic
         {
             RouteGroupBuilder group = app.MapGroup(ApiGroup.V1.Dashboard);
 
-            group.MapGet("/statistics", async (DashboardFilter filter, int userId, IMediator sender) =>
+            group.MapGet("/statistics", async (DashboardFilter filter, IMediator sender) =>
             {
-                Result<TradingStatisticViewModel> result = await sender.Send(new Request(filter, userId));
+                Result<TradingStatisticViewModel> result = await sender.Send(new Request(filter));
 
                 return result.IsSuccess ? Results.Ok(result.Value) : Results.Problem(result.Errors[0].Description);
             })

@@ -59,7 +59,8 @@ public sealed class GetEquityCurve
             .Produces(StatusCodes.Status400BadRequest)
             .WithSummary("Get equity curve.")
             .WithDescription("Retrieves cumulative profit trajectory over time.")
-            .WithTags(Tags.Analytics);
+            .WithTags(Tags.Analytics)
+            .RequireAuthorization();
         }
     }
 }

@@ -178,7 +178,8 @@ public sealed class GetPerformanceSummary
             .Produces(StatusCodes.Status400BadRequest)
             .WithSummary("Get performance summary.")
             .WithDescription("Retrieves comprehensive trading performance metrics.")
-            .WithTags(Tags.Analytics);
+            .WithTags(Tags.Analytics)
+            .RequireAuthorization();
         }
     }
 }

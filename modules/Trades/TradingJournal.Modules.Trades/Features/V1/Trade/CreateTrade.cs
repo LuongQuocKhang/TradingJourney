@@ -205,7 +205,8 @@ public sealed class CreateTrade
             .Produces(StatusCodes.Status500InternalServerError)
             .WithSummary("Create a new trade history.")
             .WithDescription("Creates a new trade history with the given details.") 
-            .WithTags(Tags.TradeHistory);
+            .WithTags(Tags.TradeHistory)
+            .RequireAuthorization();
         }
     }
 }
