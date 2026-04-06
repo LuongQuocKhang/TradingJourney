@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TradingJournal.Modules.Trades.Infrastructure;
 
@@ -11,9 +12,11 @@ using TradingJournal.Modules.Trades.Infrastructure;
 namespace TradingJournal.Modules.Trades.Migrations
 {
     [DbContext(typeof(TradeDbContext))]
-    partial class TradeDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260406214323_add trading review")]
+    partial class addtradingreview
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -388,31 +391,13 @@ namespace TradingJournal.Modules.Trades.Migrations
                     b.Property<string>("AiActionItems")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("AiCriticalMistakesPsychological")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("AiCriticalMistakesTechnical")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("AiPsychologyAnalysis")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("AiStrengths")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("AiSummary")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("AiSummaryGenerating")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("AiTechnicalInsights")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("AiWeaknesses")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("AiWhatToImprove")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("CreatedBy")

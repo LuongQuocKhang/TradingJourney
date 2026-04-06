@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Storage;
 using TradingJournal.Shared.Extensions;
@@ -32,6 +31,7 @@ internal sealed class TradeDbContext(DbContextOptions<TradeDbContext> options, I
     
     public DbSet<TradingSummary> TradingSummaries { get; set; } = null!;
 
+    public DbSet<TradingReview> TradingReviews { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

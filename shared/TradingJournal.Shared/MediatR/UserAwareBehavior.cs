@@ -1,6 +1,5 @@
 using System.Reflection;
 using MediatR;
-using Microsoft.AspNetCore.Http;
 using TradingJournal.Shared.Security;
 
 namespace TradingJournal.Shared.MediatR;

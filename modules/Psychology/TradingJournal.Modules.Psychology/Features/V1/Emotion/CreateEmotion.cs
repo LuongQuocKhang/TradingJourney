@@ -1,5 +1,4 @@
-﻿using TradingJournal.Shared.Common;
-using TradingJournal.Shared.Common.Enum;
+﻿using TradingJournal.Shared.Common.Enum;
 
 namespace TradingJournal.Modules.Psychology.Features.V1.Emotion;
 

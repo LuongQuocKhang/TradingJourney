@@ -1,10 +1,12 @@
-﻿using System.Reflection;
+using System.Reflection;
 
 namespace TradingJournal.Modules.Trades.Services
 {
     public sealed class PromptService(ICacheRepository cacheRepository) : IPromptService
     {
         public Task<string> GetTradingOrderSummary() => GetPrompt("TradingOrderSummary");
+
+        public Task<string> GetReviewSummary() => GetPrompt("ReviewSummary");
 
         private async Task<string> GetPrompt(string promptName)
         {

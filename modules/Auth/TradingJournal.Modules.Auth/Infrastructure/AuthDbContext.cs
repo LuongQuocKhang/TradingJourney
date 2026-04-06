@@ -1,6 +1,3 @@
-using Microsoft.EntityFrameworkCore;
-using TradingJournal.Shared.Abstractions;
-
 namespace TradingJournal.Modules.Auth.Infrastructure;
 
 internal sealed class AuthDbContext : DbContext, IAuthDbContext

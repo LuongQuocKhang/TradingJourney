@@ -4,7 +4,6 @@ using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using TradingJournal.ApiGateWay.Extensions;
-using TradingJournal.Shared.Security;
 using TradingJournal.Shared;
 using TradingJournal.Modules.Analytics;
 using TradingJournal.Modules.Trades;

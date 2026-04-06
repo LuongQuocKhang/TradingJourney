@@ -18,7 +18,7 @@ public sealed class SummerizeTradeHistory
         }
     }
 
-    internal sealed class Handler(ITradeDbContext context, IGoogleGenAIService googleGenAIService) : IRequestHandler<Request, Result<bool>>
+    internal sealed class Handler(ITradeDbContext context, IOpenRouterAIService googleGenAIService) : IRequestHandler<Request, Result<bool>>
     {
         public async Task<Result<bool>> Handle(Request request, CancellationToken cancellationToken)
         {

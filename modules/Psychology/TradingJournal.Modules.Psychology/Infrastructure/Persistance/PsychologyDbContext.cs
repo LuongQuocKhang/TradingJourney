@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Storage;
 using TradingJournal.Shared.Extensions;

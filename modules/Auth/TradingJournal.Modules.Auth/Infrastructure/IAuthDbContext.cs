@@ -1,6 +1,3 @@
-using Microsoft.EntityFrameworkCore;
-using TradingJournal.Modules.Auth;
-
 namespace TradingJournal.Modules.Auth.Infrastructure;
 
 public interface IAuthDbContext

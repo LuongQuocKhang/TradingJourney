@@ -40,7 +40,7 @@ public static class DependencyInjection
 
         services.AddScoped<ITradeProvider, TradeProvider>();
 
-        services.AddGoogleGenAI(configuration);
+        services.AddOpenRouterAI(configuration);
 
         services.AddEventHandlers();
 
@@ -66,12 +66,12 @@ public static class DependencyInjection
         return app;
     }
 
-    private static IServiceCollection AddGoogleGenAI(this IServiceCollection services, IConfiguration configuration)
+    private static IServiceCollection AddOpenRouterAI(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddHttpClient<IGoogleGenAIService, GoogleGenAIService>();
+        services.AddHttpClient<IOpenRouterAIService, OpenRouterAIService>();
         services.AddTransient<IPromptService, PromptService>();
 
-        services.Configure<OpenRouterOptions>(configuration.GetSection("GoogleGenAI"));
+        services.Configure<OpenRouterOptions>(configuration.GetSection(OpenRouterOptions.BindLocator));
 
         return services;
     }
@@ -80,6 +80,9 @@ public static class DependencyInjection
     {
         services.AddTransient<INotificationHandler<SummarizeTradingOrderEvent>,
             SummarizeTradingOrderEventHandler>();
+
+        services.AddTransient<INotificationHandler<GenerateReviewSummaryEvent>,
+            GenerateReviewSummaryEventHandler>();
 
         return services;
     }

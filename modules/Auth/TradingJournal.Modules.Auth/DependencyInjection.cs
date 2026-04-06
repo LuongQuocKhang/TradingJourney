@@ -1,8 +1,6 @@
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
-using TradingJournal.Modules.Auth.Infrastructure;
 using TradingJournal.Shared.Behaviors;
 
 namespace TradingJournal.Modules.Auth;

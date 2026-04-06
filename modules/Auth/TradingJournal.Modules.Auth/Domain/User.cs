@@ -1,6 +1,4 @@
 using System.ComponentModel.DataAnnotations.Schema;
-using TradingJournal.Shared.Abstractions;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace TradingJournal.Modules.Auth;
 

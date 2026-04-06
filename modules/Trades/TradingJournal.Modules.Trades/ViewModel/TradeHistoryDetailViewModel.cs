@@ -1,5 +1,3 @@
-using TradingJournal.Modules.Trades.Dto;
-
 namespace TradingJournal.Modules.Trades.ViewModel;
 
 public sealed class TradeHistoryDetailViewModel

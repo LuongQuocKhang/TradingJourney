@@ -11,7 +11,7 @@ internal sealed class SummarizeTradingOrderEventHandler(IServiceScopeFactory ser
     {
         using AsyncServiceScope scope = serviceScopeFactory.CreateAsyncScope();
 
-        IGoogleGenAIService googleGenAiService = scope.ServiceProvider.GetRequiredService<IGoogleGenAIService>();
+        IOpenRouterAIService googleGenAiService = scope.ServiceProvider.GetRequiredService<IOpenRouterAIService>();
 
         TradeAnalysisResultDto? result = await googleGenAiService.GenerateTradingOrderSummary(notification.TradeHistoryId, cancellationToken) ?? throw new AggregateException($"Failed to generate trading order summary for TradeHistoryId: {notification.TradeHistoryId}");
 

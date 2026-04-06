@@ -2,8 +2,6 @@ using TradingJournal.Shared.Security;
 using TradingJournal.Shared.Common;
 using TradingJournal.Shared.Interfaces;
 using TradingJournal.Shared.Repositories;
-using TradingJournal.Shared.MediatR;
-using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace TradingJournal.Shared;

@@ -21,6 +21,8 @@ public static class Tags
     public const string TradingSetups = "Trading Setups";
 
     public const string ChecklistModels = "Checklist Models";
+
+    public const string Reviews = "Reviews";
 }
 
 public static class ApiGroup
@@ -42,5 +44,7 @@ public static class ApiGroup
         internal const string TradingSessions = "api/v1/trading-sessions";
 
         internal const string TradingZones = "api/v1/trading-zones";
+
+        internal const string Reviews = "api/v1/reviews";
     }
 }
