@@ -2,19 +2,17 @@ namespace TradingJournal.Modules.Trades.Features.V1.Dashboard;
 
 public sealed class GetTradingStatistic
 {
-    internal sealed record Request(DashboardFilter Filter) : IQuery<Result<TradingStatisticViewModel>>;
+    internal sealed record Request(DashboardFilter Filter, int UserId = 0) : IQuery<Result<TradingStatisticViewModel>>;
 
     internal sealed class Handler(ITradeDbContext context) : IQueryHandler<Request, Result<TradingStatisticViewModel>>
     {
         public async Task<Result<TradingStatisticViewModel>> Handle(Request request, CancellationToken cancellationToken)
         {
-            int userId = 0; // TODO: Get user ID from context
-
             DateTime fromDate = DashboardFilterHelper.GetFromDate(request.Filter);
 
             List<TradeHistory> trades = await context.TradeHistories
                 .AsNoTracking()
-                .Where(t => t.CreatedBy == userId && t.Date >= fromDate)
+                .Where(t => t.CreatedBy == request.UserId && t.Date >= fromDate)
                 .ToListAsync(cancellationToken);
 
             if (trades.Count == 0)
@@ -28,9 +26,9 @@ public sealed class GetTradingStatistic
 
             int totalWin = closedTrades.Count(t => t.Pnl is > 0);
             int totalLoss = closedTrades.Count(t => t.Pnl is < 0);
-            
+
             double winRate = closedTrades.Count == 0 ? 0 : (double)totalWin / (totalWin + totalLoss) * 100;
-            
+
             int totalTrades = trades.Count;
 
             int openPositions = trades.Where(x => x.Status == TradeStatus.Open).Count(t => !t.Pnl.HasValue);
@@ -53,9 +51,9 @@ public sealed class GetTradingStatistic
         {
             RouteGroupBuilder group = app.MapGroup(ApiGroup.V1.Dashboard);
 
-            group.MapGet("/statistics", async (DashboardFilter filter, IMediator sender) =>
+            group.MapGet("/statistics", async (DashboardFilter filter, int userId, IMediator sender) =>
             {
-                Result<TradingStatisticViewModel> result = await sender.Send(new Request(filter));
+                Result<TradingStatisticViewModel> result = await sender.Send(new Request(filter, userId));
 
                 return result.IsSuccess ? Results.Ok(result.Value) : Results.Problem(result.Errors[0].Description);
             })

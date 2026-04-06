@@ -4,7 +4,7 @@ namespace TradingJournal.Modules.Trades.Features.V1.TradingSession;
 
 public sealed class CreateTradeSession
 {
-    public record Request(DateTime FromTime) : ICommand<Result<int>>;
+    public record Request(DateTime FromTime, int UserId = 0) : ICommand<Result<int>>;
 
     internal sealed class Validator : AbstractValidator<Request>
     {
@@ -21,7 +21,13 @@ public sealed class CreateTradeSession
     {
         public async Task<Result<int>> Handle(Request request, CancellationToken cancellationToken)
         {
+            if (request.UserId == 0)
+            {
+                return Result<int>.Failure(Error.Create("Unauthorized."));
+            }
+
             var tradeSession = request.Adapt<Domain.TradingSession>();
+            tradeSession.CreatedBy = request.UserId;
 
             await context.TradingSessions.AddAsync(tradeSession, cancellationToken);
 

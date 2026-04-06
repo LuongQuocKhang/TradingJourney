@@ -2,7 +2,7 @@ namespace TradingJournal.Modules.Trades.Features.V1.ChecklistModels;
 
 public sealed class CreateChecklistModel
 {
-    internal record Request(string Name, string? Description) : ICommand<Result<int>>;
+    internal record Request(string Name, string? Description, int UserId = 0) : ICommand<Result<int>>;
 
     internal sealed class Validator : AbstractValidator<Request>
     {
@@ -21,11 +21,17 @@ public sealed class CreateChecklistModel
     {
         public async Task<Result<int>> Handle(Request request, CancellationToken cancellationToken)
         {
+            if (request.UserId == 0)
+            {
+                return Result<int>.Failure(Error.Create("Unauthorized."));
+            }
+
             ChecklistModel model = new()
             {
                 Id = 0,
                 Name = request.Name,
-                Description = request.Description
+                Description = request.Description,
+                CreatedBy = request.UserId,
             };
 
             await context.ChecklistModels.AddAsync(model, cancellationToken);

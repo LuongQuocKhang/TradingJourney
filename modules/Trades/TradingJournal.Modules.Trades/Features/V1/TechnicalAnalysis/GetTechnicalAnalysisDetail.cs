@@ -4,7 +4,7 @@ namespace TradingJournal.Modules.Trades.Features.V1.TechnicalAnalysis;
 
 public sealed class GetTechnicalAnalysisDetail
 {
-    internal sealed record Request(int Id) : IQuery<Result<TechnicalAnalysisViewModel>>;
+    internal sealed record Request(int Id, int UserId = 0) : IQuery<Result<TechnicalAnalysisViewModel>>;
 
     internal sealed class Validator : AbstractValidator<Request>
     {
@@ -23,7 +23,7 @@ public sealed class GetTechnicalAnalysisDetail
         {
             Domain.TechnicalAnalysis? technicalAnalysis = await context.TechnicalAnalyses
                 .AsNoTracking()
-                .FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken);
+                .FirstOrDefaultAsync(x => x.Id == request.Id && x.CreatedBy == request.UserId, cancellationToken);
 
             if (technicalAnalysis is null)
             {
@@ -42,9 +42,9 @@ public sealed class GetTechnicalAnalysisDetail
         {
             RouteGroupBuilder group = app.MapGroup(ApiGroup.V1.TechnicalAnalysis);
 
-            group.MapGet("/{id:int}", async (int id, ISender sender) =>
+            group.MapGet("/{id:int}", async ([FromQuery] int userId, int id, ISender sender) =>
             {
-                Result<TechnicalAnalysisViewModel> result = await sender.Send(new Request(id));
+                Result<TechnicalAnalysisViewModel> result = await sender.Send(new Request(id, userId));
 
                 return result.IsSuccess ? Results.Ok(result)
                     : Results.BadRequest(result);

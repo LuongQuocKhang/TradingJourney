@@ -2,8 +2,8 @@
 
 public sealed class CreateTodayPsychology
 {
-    public record Request(DateTime Date, string TodayTradingReview, List<int> EmotionTags, 
-        OverallMood OverallMood = OverallMood.Neutral, 
+    public record Request(DateTime Date, string TodayTradingReview, List<int> EmotionTags, int UserId = 0,
+        OverallMood OverallMood = OverallMood.Neutral,
         ConfidentLevel ConfidentLevel = ConfidentLevel.None) : ICommand<Result<int>>;
 
     internal sealed class Handler(IPsychologyDbContext context) : ICommandHandler<Request, Result<int>>
@@ -17,6 +17,7 @@ public sealed class CreateTodayPsychology
                 TodayTradingReview = request.TodayTradingReview,
                 OverallMood = request.OverallMood,
                 ConfidentLevel = request.ConfidentLevel,
+                CreatedBy = request.UserId,
                 PsychologyJournalEmotions = [.. request.EmotionTags.Select(e => new PsychologyJournalEmotion
                 { 
                     Id = 0,
@@ -48,7 +49,8 @@ public sealed class CreateTodayPsychology
             .Produces(StatusCodes.Status500InternalServerError)
             .WithSummary("Create a new psychology journal entry.")
             .WithDescription("Creates a new psychology journal entry for today.")
-            .WithTags(Tags.PsychologyJournal);
+            .WithTags(Tags.PsychologyJournal)
+            .RequireAuthorization();
         }
     }
 }

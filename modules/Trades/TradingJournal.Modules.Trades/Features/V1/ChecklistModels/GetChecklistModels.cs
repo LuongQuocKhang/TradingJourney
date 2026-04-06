@@ -2,7 +2,7 @@ namespace TradingJournal.Modules.Trades.Features.V1.ChecklistModels;
 
 public sealed class GetChecklistModels
 {
-    internal record Request() : ICommand<Result<IReadOnlyCollection<ChecklistModelViewModel>>>;
+    internal record Request(int UserId = 0) : ICommand<Result<IReadOnlyCollection<ChecklistModelViewModel>>>;
 
     internal sealed class Handler(ITradeDbContext context) : ICommandHandler<Request, Result<IReadOnlyCollection<ChecklistModelViewModel>>>
     {

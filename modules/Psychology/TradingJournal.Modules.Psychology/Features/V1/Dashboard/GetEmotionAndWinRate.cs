@@ -5,7 +5,7 @@ namespace TradingJournal.Modules.Psychology.Features.V1.Dashboard;
 
 public sealed class GetEmotionAndWinRate
 {
-    internal record Request() : IQuery<Result<List<EmotionWinRateViewModel>>>;
+    internal record Request(int UserId = 0) : IQuery<Result<List<EmotionWinRateViewModel>>>;
 
     internal sealed class Handler(ITradeProvider tradeProvider, IEmotionTagProvider emotionTagProvider)
         : IQueryHandler<Request, Result<List<EmotionWinRateViewModel>>>
@@ -13,6 +13,7 @@ public sealed class GetEmotionAndWinRate
         public async Task<Result<List<EmotionWinRateViewModel>>> Handle(Request request, CancellationToken cancellationToken)
         {
             List<TradeCacheDto> allTrades = await tradeProvider.GetTradesAsync(cancellationToken);
+            List<TradeCacheDto> trades = [.. allTrades.Where(t => t.CreatedBy == request.UserId)];
             List<EmotionTagCacheDto> tags = await emotionTagProvider.GetEmotionTagsAsync(cancellationToken);
 
             var closedTrades = allTrades.Where(t => t.ClosedDate.HasValue && t.Pnl.HasValue).ToList();

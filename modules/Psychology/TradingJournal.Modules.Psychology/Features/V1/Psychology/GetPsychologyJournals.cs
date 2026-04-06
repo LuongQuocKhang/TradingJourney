@@ -11,7 +11,8 @@ public sealed class GetPsychologyJournals
         DateTime? EndDate = null,
         OverallMood? OverallMood = null,
         ConfidentLevel? ConfidentLevel = null,
-        List<int>? EmotionTags = null) : IQuery<Result<PaginationViewModel<PsychologyJournalViewModel>>>;
+        List<int>? EmotionTags = null,
+        int UserId = 0) : IQuery<Result<PaginationViewModel<PsychologyJournalViewModel>>>;
 
     internal sealed class Handler(IPsychologyDbContext context, ICacheRepository cacheRepository) : IQueryHandler<Request, Result<PaginationViewModel<PsychologyJournalViewModel>>>
     {
@@ -36,6 +37,7 @@ public sealed class GetPsychologyJournals
         private async Task<PaginationViewModel<PsychologyJournalViewModel>> GetPsychologyJournalsAsync(Request request, CancellationToken cancellationToken)
         {
             IQueryable<PsychologyJournal> query = context.PsychologyJournals
+                .Where(x => x.CreatedBy == request.UserId)
                 .Include(x => x.PsychologyJournalEmotions)
                 .ThenInclude(x => x.EmotionTag)
                 .AsNoTracking();

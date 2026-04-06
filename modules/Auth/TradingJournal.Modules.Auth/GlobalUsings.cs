@@ -1,0 +1,15 @@
+global using Carter;
+global using FluentValidation;
+global using MediatR;
+global using Microsoft.AspNetCore.Builder;
+global using Microsoft.AspNetCore.Http;
+global using Microsoft.AspNetCore.Routing;
+global using Microsoft.AspNetCore.Mvc;
+global using System.Net;
+global using Microsoft.EntityFrameworkCore;
+global using TradingJournal.Modules.Auth;
+global using TradingJournal.Modules.Auth.Infrastructure;
+global using TradingJournal.Shared.CQRS;
+global using TradingJournal.Shared.Abstractions;
+global using TradingJournal.Shared.Security;
+global using System.Security.Claims;

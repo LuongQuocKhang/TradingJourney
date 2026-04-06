@@ -1,18 +1,20 @@
-﻿using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Storage;
+using TradingJournal.Shared.Extensions;
 
 namespace TradingJournal.Modules.Psychology.Infrastructure.Persistance;
 
-internal sealed class PsychologyDbContext(DbContextOptions<PsychologyDbContext> options)
+internal sealed class PsychologyDbContext(DbContextOptions<PsychologyDbContext> options, IHttpContextAccessor httpContextAccessor)
     : DbContext(options), IPsychologyDbContext
 {
     private IDbContextTransaction? _transaction;
 
-    public DbSet<EmotionTag> EmotionTags { get; set; }
+    public DbSet<EmotionTag> EmotionTags { get; set; } = null!;
 
-    public DbSet<PsychologyJournal> PsychologyJournals { get; set; }
+    public DbSet<PsychologyJournal> PsychologyJournals { get; set; } = null!;
 
-    public DbSet<PsychologyJournalEmotion> PsychologyJournalEmotions { get; set; }
+    public DbSet<PsychologyJournalEmotion> PsychologyJournalEmotions { get; set; } = null!;
 
     public async Task BeginTransaction()
     {
@@ -30,14 +32,14 @@ internal sealed class PsychologyDbContext(DbContextOptions<PsychologyDbContext> 
     public async Task RollbackTransaction()
     {
         if (_transaction == null) return;
-
         await _transaction.RollbackAsync();
         await _transaction.DisposeAsync();
         _transaction = null;
     }
 
-    public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
+        int userId = httpContextAccessor.HttpContext?.User.GetCurrentUserId() ?? 0;
 
         foreach (EntityEntry<EntityBase<int>> entry in ChangeTracker.Entries<EntityBase<int>>())
         {
@@ -45,19 +47,13 @@ internal sealed class PsychologyDbContext(DbContextOptions<PsychologyDbContext> 
             {
                 case EntityState.Added:
                     entry.Entity.CreatedDate = DateTime.UtcNow;
-                    entry.Entity.CreatedBy = 0;
+                    entry.Entity.CreatedBy = userId;
                     break;
                 case EntityState.Modified:
-                case EntityState.Detached:
-                case EntityState.Unchanged:
-                case EntityState.Deleted:
                     entry.Entity.UpdatedDate = DateTime.UtcNow;
-                    entry.Entity.UpdatedBy = 0;
+                    entry.Entity.UpdatedBy = userId;
                     break;
-                default:
-                    throw new ArgumentOutOfRangeException();
             }
-
         }
 
         return base.SaveChangesAsync(cancellationToken);

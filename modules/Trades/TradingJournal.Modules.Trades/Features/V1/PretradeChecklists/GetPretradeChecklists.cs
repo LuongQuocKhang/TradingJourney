@@ -2,13 +2,14 @@
 
 public sealed class GetPretradeChecklists
 {
-    internal record Request() : ICommand<Result<IReadOnlyCollection<PretradeChecklistViewModel>>>;
+    internal record Request(int UserId = 0) : ICommand<Result<IReadOnlyCollection<PretradeChecklistViewModel>>>;
 
     internal sealed class Handler(ITradeDbContext context) : ICommandHandler<Request, Result<IReadOnlyCollection<PretradeChecklistViewModel>>>
     {
         public async Task<Result<IReadOnlyCollection<PretradeChecklistViewModel>>> Handle(Request request, CancellationToken cancellationToken)
         {
             List<PretradeChecklist> checklists = await context.PretradeChecklists
+                .Where(c => c.CreatedBy == request.UserId)
                 .AsNoTracking()
                 .ToListAsync(cancellationToken);
 
@@ -26,8 +27,8 @@ public sealed class GetPretradeChecklists
         {
             RouteGroupBuilder group = app.MapGroup(ApiGroup.V1.PretradeChecklists);
 
-            group.MapGet("/", async (ISender sender) => {
-                Result<IReadOnlyCollection<PretradeChecklistViewModel>> result = await sender.Send(new Request());
+            group.MapGet("/", async (int userId, ISender sender) => {
+                Result<IReadOnlyCollection<PretradeChecklistViewModel>> result = await sender.Send(new Request(userId));
                 return result.IsSuccess ? Results.Ok(result)
                     : Results.BadRequest(result);
             })

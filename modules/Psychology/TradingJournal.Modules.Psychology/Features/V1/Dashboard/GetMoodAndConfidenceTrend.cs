@@ -5,7 +5,7 @@ namespace TradingJournal.Modules.Psychology.Features.V1.Dashboard;
 
 public sealed class GetMoodAndConfidenceTrend
 {
-    internal record Request() : IQuery<Result<List<MoodAndConfidenceTrendViewModel>>>;
+    internal record Request(int UserId = 0) : IQuery<Result<List<MoodAndConfidenceTrendViewModel>>>;
 
     internal sealed class Handler(IPsychologyDbContext context, ICacheRepository cacheRepository) 
         : IQueryHandler<Request, Result<List<MoodAndConfidenceTrendViewModel>>>
@@ -20,6 +20,7 @@ public sealed class GetMoodAndConfidenceTrend
                 {
                     var journals = await context.PsychologyJournals
                         .AsNoTracking()
+                        .Where(x => x.CreatedBy == request.UserId)
                         .OrderBy(x => x.Date)
                         .ToListAsync(ct);
 

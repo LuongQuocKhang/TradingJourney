@@ -2,7 +2,7 @@ namespace TradingJournal.Modules.Trades.Features.V1.ChecklistModels;
 
 public sealed class UpdateChecklistModel
 {
-    internal record Request(int Id, string Name, string? Description) : ICommand<Result<bool>>;
+    internal record Request(int Id, string Name, string? Description, int UserId = 0) : ICommand<Result<bool>>;
 
     internal sealed class Validator : AbstractValidator<Request>
     {
@@ -26,7 +26,7 @@ public sealed class UpdateChecklistModel
         public async Task<Result<bool>> Handle(Request request, CancellationToken cancellationToken)
         {
             ChecklistModel? model = await context.ChecklistModels
-                .FirstOrDefaultAsync(m => m.Id == request.Id, cancellationToken);
+                .FirstOrDefaultAsync(m => m.Id == request.Id && m.CreatedBy == request.UserId, cancellationToken);
 
             if (model is null)
                 return Result<bool>.Failure(Error.Create($"Checklist model with id {request.Id} not found."));

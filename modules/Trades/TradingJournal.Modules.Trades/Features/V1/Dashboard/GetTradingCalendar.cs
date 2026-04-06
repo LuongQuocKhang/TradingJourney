@@ -2,7 +2,7 @@ namespace TradingJournal.Modules.Trades.Features.V1.Dashboard;
 
 public sealed class GetTradingCalendar
 {
-    internal sealed record Request(int Month, int Year, DateTime? Date, DashboardFilter Filter) : IQuery<Result<TradingCalendarResponse>>;
+    internal sealed record Request(int Month, int Year, DateTime? Date, DashboardFilter Filter, int UserId = 0) : IQuery<Result<TradingCalendarResponse>>;
 
     internal sealed record TradingCalendarViewModel(DateTime Date, double? PnL = 0);
 
@@ -17,8 +17,6 @@ public sealed class GetTradingCalendar
     {
         public async Task<Result<TradingCalendarResponse>> Handle(Request request, CancellationToken cancellationToken)
         {
-            int userId = 0; // TODO: Get user ID from context
-
             DateTime filterFromDate = DashboardFilterHelper.GetFromDate(request.Filter);
 
             DateTime targetDate = request.Date ?? new DateTime(request.Year, request.Month, 1);
@@ -33,7 +31,7 @@ public sealed class GetTradingCalendar
 
             List<TradeHistory>? trades = await context.TradeHistories
                 .AsNoTracking()
-                .Where(t => t.CreatedBy == userId && t.Status == TradeStatus.Closed && t.ClosedDate != null && 
+                .Where(t => t.CreatedBy == request.UserId && t.Status == TradeStatus.Closed && t.ClosedDate != null &&
                     t.ClosedDate.Value.Month == request.Month && t.ClosedDate.Value.Year == request.Year &&
                     t.ClosedDate.Value >= filterFromDate)
                 .ToListAsync(cancellationToken);
@@ -54,17 +52,18 @@ public sealed class GetTradingCalendar
             }
 
             double monthlyPnL = await context.TradeHistories
-                .Where(t => t.CreatedBy == userId && t.Status == TradeStatus.Closed && t.ClosedDate != null && 
+                .Where(t => t.CreatedBy == request.UserId && t.Status == TradeStatus.Closed && t.ClosedDate != null &&
                             t.ClosedDate >= startOfMonth && t.ClosedDate <= endOfMonth && t.ClosedDate >= filterFromDate)
                 .SumAsync(t => t.Pnl ?? 0, cancellationToken);
 
             double weeklyPnL = await context.TradeHistories
-                .Where(t => t.CreatedBy == userId && t.Status == TradeStatus.Closed && t.ClosedDate != null && 
+                .Where(t => t.CreatedBy == request.UserId && t.Status == TradeStatus.Closed && t.ClosedDate != null &&
                             t.ClosedDate >= startOfWeek && t.ClosedDate <= endOfWeek && t.ClosedDate >= filterFromDate)
+
                 .SumAsync(t => t.Pnl ?? 0, cancellationToken);
                 
             double dailyPnL = await context.TradeHistories
-                .Where(t => t.CreatedBy == userId && t.Status == TradeStatus.Closed && t.ClosedDate != null && 
+                .Where(t => t.CreatedBy == request.UserId && t.Status == TradeStatus.Closed && t.ClosedDate != null && 
                             t.ClosedDate >= startOfDay && t.ClosedDate <= endOfDay && t.ClosedDate >= filterFromDate)
                 .SumAsync(t => t.Pnl ?? 0, cancellationToken);
 
@@ -83,9 +82,9 @@ public sealed class GetTradingCalendar
         {
             RouteGroupBuilder group = app.MapGroup(ApiGroup.V1.Dashboard);
 
-            group.MapGet("/calendar", async (int month, int year, DateTime? date, DashboardFilter filter, IMediator sender) =>
+            group.MapGet("/calendar", async (int month, int year, DateTime? date, DashboardFilter filter, int userId, IMediator sender) =>
             {
-                Result<TradingCalendarResponse> result = await sender.Send(new Request(month, year, date, filter));
+                Result<TradingCalendarResponse> result = await sender.Send(new Request(month, year, date, filter, userId));
 
                 return result.IsSuccess ? Results.Ok(result) : Results.Problem(result.Errors[0].Description);
             })

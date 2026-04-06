@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 using TradingJournal.Shared.Behaviors;
+using TradingJournal.Shared.MediatR;
 
 namespace TradingJournal.Modules.Analytics;
 
@@ -15,6 +16,7 @@ public static class DependencyInjection
         {
             config.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
 
+            config.AddOpenBehavior(typeof(UserAwareBehavior<,>));
             config.AddOpenBehavior(typeof(ValidationBehavior<,>));
 
             if (isDevelopment)

@@ -5,6 +5,7 @@ public sealed class DeletePsychologyJournal
     public sealed class Request : ICommand<Result<bool>>
     {
         public int Id { get; set; }
+        public int UserId { get; set; }
     }
 
     internal sealed class Validator : AbstractValidator<Request>
@@ -23,7 +24,7 @@ public sealed class DeletePsychologyJournal
     {
         public async Task<Result<bool>> Handle(Request request, CancellationToken cancellationToken)
         {
-            PsychologyJournal? psychologyJournal = await context.PsychologyJournals.FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken);
+            PsychologyJournal? psychologyJournal = await context.PsychologyJournals.FirstOrDefaultAsync(x => x.Id == request.Id && x.CreatedBy == request.UserId, cancellationToken);
             
             if (psychologyJournal is null)
             {

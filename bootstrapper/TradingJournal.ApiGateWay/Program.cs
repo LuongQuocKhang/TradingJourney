@@ -1,13 +1,19 @@
 using Carter;
 using System.Text.Json.Serialization;
+using System.Text;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using TradingJournal.ApiGateWay.Extensions;
+using TradingJournal.Shared.Security;
 using TradingJournal.Shared;
 using TradingJournal.Modules.Analytics;
 using TradingJournal.Modules.Trades;
 using Scalar.AspNetCore;
 using TradingJournal.Shared.Middlewares;
 using TradingJournal.Modules.Psychology;
+using TradingJournal.Modules.Auth;
 using TradingJournal.Messaging.Shared;
+using System.Security.Claims;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -32,9 +38,30 @@ builder.Services.ConfigureHttpJsonOptions(options =>
 
 bool isDevelopment = builder.Environment.IsDevelopment();
 
+// JWT Authentication
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.RequireHttpsMetadata = !isDevelopment;
+        options.SaveToken = true;
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = configuration["Jwt:Issuer"],
+            ValidAudience = configuration["Jwt:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Secret"]!)),
+            NameClaimType = ClaimTypes.Name,
+        };
+    });
+
+builder.Services.AddAuthorization();
 
 builder.Services
     .AddSharedModule()
+    .AddAuthModule(configuration, isDevelopment)
     .AddTradeModule(configuration, isDevelopment)
     .AddPsychologyModule(configuration, isDevelopment)
     .AddAnalyticsModule(isDevelopment)
@@ -56,18 +83,18 @@ if (app.Environment.IsDevelopment())
 
 app.UseStaticFiles();
 
-app.MapCarter();
-
-app.UseAntiforgery();
+app.UseCustomExceptionHandler();
 
 app.UseSwaggerDoc();
 
-// app.UseAuthentication();
-// app.UseAuthorization();
+app.UseHttpsRedirection();
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.MapCarter();
 
 app.MapOpenApi();
-
-app.UseCustomExceptionHandler();
 
 app.MapScalarApiReference(options =>
 {
@@ -77,7 +104,5 @@ app.UseCors(cors => cors
     .AllowAnyOrigin()
     .AllowAnyMethod()
     .AllowAnyHeader());
-
-app.UseHttpsRedirection();
 
 await app.RunAsync();

@@ -5,7 +5,7 @@ namespace TradingJournal.Modules.Psychology.Features.V1.Dashboard;
 
 public sealed class GetPsychologyHeatmap
 {
-    internal record Request() : IQuery<Result<List<PsychologyHeatmapViewModel>>>;
+    internal record Request(int UserId = 0) : IQuery<Result<List<PsychologyHeatmapViewModel>>>;
 
     internal sealed class Handler(ITradeProvider tradeProvider, IEmotionTagProvider emotionTagProvider)
         : IQueryHandler<Request, Result<List<PsychologyHeatmapViewModel>>>
@@ -13,6 +13,7 @@ public sealed class GetPsychologyHeatmap
         public async Task<Result<List<PsychologyHeatmapViewModel>>> Handle(Request request, CancellationToken cancellationToken)
         {
             List<TradeCacheDto> allTrades = await tradeProvider.GetTradesAsync(cancellationToken);
+            List<TradeCacheDto> trades = [.. allTrades.Where(t => t.CreatedBy == request.UserId)];
             List<EmotionTagCacheDto> tags = await emotionTagProvider.GetEmotionTagsAsync(cancellationToken);
 
             // Only consider closed trades that have a Pnl

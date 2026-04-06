@@ -6,7 +6,7 @@ namespace TradingJournal.Modules.Trades.Features.V1.Trade;
 
 public sealed class CloseTrade
 {
-    internal sealed record Request(int TradeId, double ExitPrice, double PnL, string? TradingResult, bool? HitStopLoss) : ICommand<Result<bool>>;
+    internal sealed record Request(int TradeId, double ExitPrice, double PnL, string? TradingResult, bool? HitStopLoss, int UserId = 0) : ICommand<Result<bool>>;
     
     internal sealed class Validator : AbstractValidator<Request>
     {
@@ -28,7 +28,7 @@ public sealed class CloseTrade
         public async Task<Result<bool>> Handle(Request request, CancellationToken cancellationToken)
         {
             TradeHistory? tradeHistory = await tradeDbContext.TradeHistories
-                .FirstOrDefaultAsync(th => th.Id == request.TradeId, cancellationToken);
+                .FirstOrDefaultAsync(th => th.Id == request.TradeId && th.CreatedBy == request.UserId, cancellationToken);
 
             if (tradeHistory == null)
             {
@@ -44,7 +44,6 @@ public sealed class CloseTrade
 
             await tradeDbContext.SaveChangesAsync(cancellationToken);
 
-            // AI Generate Insights
             await eventBus.PublishAsync(new SummarizeTradingOrderEvent(Guid.NewGuid(), DateTime.UtcNow, tradeHistory.Id), cancellationToken);
 
             return Result<bool>.Success(true);
@@ -57,7 +56,7 @@ public sealed class CloseTrade
         {
             RouteGroupBuilder group = app.MapGroup(ApiGroup.V1.TradeHistory);
 
-            group.MapPost("/close", async (Request request, IMediator mediator) =>
+            group.MapPost("/close", async ([FromBody] Request request, IMediator mediator) =>
             {
                 Result<bool> result = await mediator.Send(request);
                 return result;

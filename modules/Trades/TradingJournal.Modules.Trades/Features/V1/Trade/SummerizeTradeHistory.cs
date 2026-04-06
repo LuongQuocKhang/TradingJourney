@@ -5,7 +5,7 @@ namespace TradingJournal.Modules.Trades.Features.V1.Trade;
 
 public sealed class SummerizeTradeHistory
 {
-    public record Request(int TradeId) : IQuery<Result<bool>>;
+    public record Request(int TradeId, int UserId = 0) : IQuery<Result<bool>>;
 
     internal sealed class Validator : AbstractValidator<Request>
     {
@@ -48,7 +48,7 @@ public sealed class SummerizeTradeHistory
 
             await context.SaveChangesAsync(cancellationToken);
 
-            TradeHistory? tradeHistory = await context.TradeHistories.FindAsync([request.TradeId], cancellationToken);
+            TradeHistory? tradeHistory = await context.TradeHistories.FirstOrDefaultAsync(x => x.Id == request.TradeId && x.CreatedBy == request.UserId, cancellationToken);
 
             if (tradeHistory is not null)
             {
@@ -67,8 +67,8 @@ public sealed class SummerizeTradeHistory
         {
             RouteGroupBuilder group = app.MapGroup(ApiGroup.V1.TradeHistory);
 
-            group.MapPost("/summarize/{tradeId:int}", async (int tradeId, ISender sender) => {
-                Result<bool> result = await sender.Send(new SummerizeTradeHistory.Request(tradeId));
+            group.MapPost("/summarize/{tradeId:int}", async (int tradeId, int userId, ISender sender) => {
+                Result<bool> result = await sender.Send(new SummerizeTradeHistory.Request(tradeId, userId));
 
                 return result.IsSuccess ? Results.Ok(result) : Results.BadRequest(result);
             })

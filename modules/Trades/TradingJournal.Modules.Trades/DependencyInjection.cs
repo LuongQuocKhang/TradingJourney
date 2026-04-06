@@ -1,4 +1,4 @@
-﻿using Google.GenAI;
+using Google.GenAI;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -9,6 +9,7 @@ using TradingJournal.Modules.Trades.Extensions;
 using TradingJournal.Modules.Trades.Options;
 using TradingJournal.Modules.Trades.Services;
 using TradingJournal.Shared.Behaviors;
+using TradingJournal.Shared.MediatR;
 
 namespace TradingJournal.Modules.Trades;
 
@@ -22,8 +23,8 @@ public static class DependencyInjection
         services.AddMediatR(config =>
         {
             config.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
-
             config.AddOpenBehavior(typeof(ValidationBehavior<,>));
+            config.AddOpenBehavior(typeof(UserAwareBehavior<,>));
 
             if (isDevelopment)
             {
@@ -58,8 +59,9 @@ public static class DependencyInjection
             TradeDbContext dbContext = scope.ServiceProvider.GetRequiredService<TradeDbContext>();
             await dbContext.Database.MigrateAsync();
         }
-        catch
+        catch (Exception)
         {
+            // Log exception if needed
         }
 
         return app;

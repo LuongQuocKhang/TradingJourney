@@ -2,7 +2,7 @@
 
 public sealed class UpdateTradingZone
 {
-    internal sealed record Request(int Id, string Name, string FromTime, string ToTime, string? Description) : ICommand<Result<bool>>;
+    internal sealed record Request(int Id, string Name, string FromTime, string ToTime, string? Description, int UserId = 0) : ICommand<Result<bool>>;
 
     internal sealed class Validator : AbstractValidator<Request>
     {
@@ -46,7 +46,7 @@ public sealed class UpdateTradingZone
     {
         public async Task<Result<bool>> Handle(Request request, CancellationToken cancellationToken)
         {
-            var tradingZone = await context.TradingZones.FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken);
+            var tradingZone = await context.TradingZones.FirstOrDefaultAsync(x => x.Id == request.Id && x.CreatedBy == request.UserId, cancellationToken);
 
             if (tradingZone is null)
             {

@@ -2,7 +2,7 @@ namespace TradingJournal.Modules.Trades.Features.V1.TechnicalAnalysis;
 
 public sealed class DeleteTechnicalAnalysis
 {
-    internal sealed record Request(int Id) : ICommand<Result<bool>>;
+    internal sealed record Request(int Id, int UserId = 0) : ICommand<Result<bool>>;
 
     internal sealed class Validator : AbstractValidator<Request>
     {
@@ -20,7 +20,7 @@ public sealed class DeleteTechnicalAnalysis
         public async Task<Result<bool>> Handle(Request request, CancellationToken cancellationToken)
         {
             Domain.TechnicalAnalysis? technicalAnalysis = await context.TechnicalAnalyses
-                .FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken);
+                .FirstOrDefaultAsync(x => x.Id == request.Id && x.CreatedBy == request.UserId, cancellationToken);
 
             if (technicalAnalysis is null)
             {

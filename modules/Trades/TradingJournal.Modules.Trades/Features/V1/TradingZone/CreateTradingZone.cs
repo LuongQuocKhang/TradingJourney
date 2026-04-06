@@ -4,7 +4,7 @@ namespace TradingJournal.Modules.Trades.Features.V1.TradingZone;
 
 public sealed class CreateTradingZone
 {
-    internal record Request(string Name, string FromTime, string ToTime, string? Description) : ICommand<Result<int>>;
+    internal record Request(string Name, string FromTime, string ToTime, string? Description, int UserId = 0) : ICommand<Result<int>>;
 
     internal sealed class Validator : AbstractValidator<Request>
     {
@@ -43,7 +43,13 @@ public sealed class CreateTradingZone
     {
         public async Task<Result<int>> Handle(Request request, CancellationToken cancellationToken)
         {
+            if (request.UserId == 0)
+            {
+                return Result<int>.Failure(Error.Create("Unauthorized."));
+            }
+
             Domain.TradingZone tradingZone = request.Adapt<Domain.TradingZone>();
+            tradingZone.CreatedBy = request.UserId;
 
             await context.TradingZones.AddAsync(tradingZone, cancellationToken);
 

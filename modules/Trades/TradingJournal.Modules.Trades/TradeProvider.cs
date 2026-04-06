@@ -31,7 +31,8 @@ internal sealed class TradeProvider(ITradeDbContext context, ICacheRepository ca
                     ClosedDate = t.ClosedDate,
                     TradingSessionId = t.TradingSessionId,
                     TradingZoneId = t.TradingZoneId,
-                    EmotionTags = t.TradeEmotionTags?.Select(e => e.EmotionTagId).ToList() ?? []
+                    EmotionTags = t.TradeEmotionTags?.Select(e => e.EmotionTagId).ToList() ?? [],
+                    CreatedBy = t.CreatedBy ?? 0
                 })];
             },
             expiration: TimeSpan.FromMinutes(5),

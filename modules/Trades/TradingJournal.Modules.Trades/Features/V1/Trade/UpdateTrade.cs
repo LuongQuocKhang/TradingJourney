@@ -27,7 +27,8 @@ public sealed class UpdateTrade
         string? PsychologyNotes,
         List<int> TradeHistoryChecklists,
         int TradingZoneId,
-        int? TradingSessionId) : ICommand<Result<bool>>;
+        int? TradingSessionId,
+        int UserId = 0) : ICommand<Result<bool>>;
 
     internal sealed class Validator : AbstractValidator<Request>
     {
@@ -102,7 +103,7 @@ public sealed class UpdateTrade
                     .Include(th => th.TradeEmotionTags)
                     .Include(th => th.TradeChecklists)
                     .Include(x => x.TradeTechnicalAnalysisTags)
-                    .FirstOrDefaultAsync(th => th.Id == request.Id, cancellationToken: cancellationToken);
+                    .FirstOrDefaultAsync(th => th.Id == request.Id && th.CreatedBy == request.UserId, cancellationToken);
 
                 if (tradeHistory == null)
                 {

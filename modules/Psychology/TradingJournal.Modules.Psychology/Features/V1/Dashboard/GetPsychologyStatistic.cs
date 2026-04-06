@@ -6,7 +6,7 @@ namespace TradingJournal.Modules.Psychology.Features.V1.Dashboard;
 
 public sealed class GetPsychologyStatistic
 {
-    internal record Request() : IQuery<Result<PsychologyStatisticViewModel>>;
+    internal record Request(int UserId = 0) : IQuery<Result<PsychologyStatisticViewModel>>;
 
     internal sealed class Handler(IPsychologyDbContext context, ICacheRepository cacheRepository) : IQueryHandler<Request, Result<PsychologyStatisticViewModel>>
     {
@@ -31,7 +31,8 @@ public sealed class GetPsychologyStatistic
             IQueryable<PsychologyJournal> query = context.PsychologyJournals
                 .Include(x => x.PsychologyJournalEmotions)
                 .ThenInclude(x => x.EmotionTag)
-                .AsNoTracking();
+                .AsNoTracking()
+                .Where(x => x.CreatedBy == request.UserId);
 
             List<PsychologyJournal> psychologyJournals = await query.ToListAsync(cancellationToken);
 

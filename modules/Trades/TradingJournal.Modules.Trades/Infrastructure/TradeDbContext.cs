@@ -1,34 +1,36 @@
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Storage;
+using TradingJournal.Shared.Extensions;
 
 namespace TradingJournal.Modules.Trades.Infrastructure;
 
-internal sealed class TradeDbContext(DbContextOptions<TradeDbContext> options)
+internal sealed class TradeDbContext(DbContextOptions<TradeDbContext> options, IHttpContextAccessor httpContextAccessor)
     : DbContext(options), ITradeDbContext
 {
     private IDbContextTransaction? _transaction;
 
-    public DbSet<TradeHistory> TradeHistories { get; set; }
+    public DbSet<TradeHistory> TradeHistories { get; set; } = null!;
 
-    public DbSet<ChecklistModel> ChecklistModels { get; set; }
+    public DbSet<ChecklistModel> ChecklistModels { get; set; } = null!;
 
-    public DbSet<PretradeChecklist> PretradeChecklists { get; set; }
+    public DbSet<PretradeChecklist> PretradeChecklists { get; set; } = null!;
 
-    public DbSet<TradeScreenShot> TradeScreenShots { get; set; }
+    public DbSet<TradeScreenShot> TradeScreenShots { get; set; } = null!;
 
-    public DbSet<TradingZone> TradingZones { get; set; }
+    public DbSet<TradingZone> TradingZones { get; set; } = null!;
 
-    public DbSet<TradingSession> TradingSessions { get; set; }
+    public DbSet<TradingSession> TradingSessions { get; set; } = null!;
 
-    public DbSet<TradeHistoryChecklist> TradeHistoryChecklist { get; set; }
+    public DbSet<TradeHistoryChecklist> TradeHistoryChecklist { get; set; } = null!;
 
-    public DbSet<TradeEmotionTag> TradeEmotionTags { get; set; }
+    public DbSet<TradeEmotionTag> TradeEmotionTags { get; set; } = null!;
 
-    public DbSet<TechnicalAnalysis> TechnicalAnalyses { get; set; }
+    public DbSet<TechnicalAnalysis> TechnicalAnalyses { get; set; } = null!;
 
-    public DbSet<TradeTechnicalAnalysisTag> TradeTechnicalAnalysisTags { get; set; }
+    public DbSet<TradeTechnicalAnalysisTag> TradeTechnicalAnalysisTags { get; set; } = null!;
     
-    public DbSet<TradingSummary> TradingSummaries { get; set; }
+    public DbSet<TradingSummary> TradingSummaries { get; set; } = null!;
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -38,7 +40,6 @@ internal sealed class TradeDbContext(DbContextOptions<TradeDbContext> options)
         modelBuilder.Entity<TradingSummary>(builder =>
         {
             builder.ToTable("TradingSummaries", "Trades");
-
             builder.OwnsOne(ta => ta.CriticalMistakes, cm =>
             {
                 cm.ToJson("CriticalMistakes"); 
@@ -62,14 +63,14 @@ internal sealed class TradeDbContext(DbContextOptions<TradeDbContext> options)
     public async Task RollbackTransaction()
     {
         if (_transaction == null) return;
-
         await _transaction.RollbackAsync();
         await _transaction.DisposeAsync();
         _transaction = null;
     }
 
-    public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
+        int userId = httpContextAccessor.HttpContext?.User.GetCurrentUserId() ?? 0;
 
         foreach (EntityEntry<EntityBase<int>> entry in ChangeTracker.Entries<EntityBase<int>>())
         {
@@ -77,19 +78,13 @@ internal sealed class TradeDbContext(DbContextOptions<TradeDbContext> options)
             {
                 case EntityState.Added:
                     entry.Entity.CreatedDate = DateTime.UtcNow;
-                    entry.Entity.CreatedBy = 0;
+                    entry.Entity.CreatedBy = userId;
                     break;
                 case EntityState.Modified:
-                case EntityState.Detached:
-                case EntityState.Unchanged:
-                case EntityState.Deleted:
                     entry.Entity.UpdatedDate = DateTime.UtcNow;
-                    entry.Entity.UpdatedBy = 0;
+                    entry.Entity.UpdatedBy = userId;
                     break;
-                default:
-                    throw new ArgumentOutOfRangeException();
             }
-
         }
 
         return base.SaveChangesAsync(cancellationToken);

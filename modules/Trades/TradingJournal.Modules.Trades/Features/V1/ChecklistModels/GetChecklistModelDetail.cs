@@ -11,7 +11,7 @@ public sealed class GetChecklistModelDetail
             ChecklistModel? model = await context.ChecklistModels
                 .AsNoTracking()
                 .Include(m => m.Criteria)
-                .FirstOrDefaultAsync(m => m.Id == request.Id, cancellationToken);
+                .FirstOrDefaultAsync(m => m.Id == request.Id && m.CreatedBy == request.UserId, cancellationToken);
 
             if (model is null)
                 return Result<ChecklistModelDetailViewModel>.Failure(

@@ -4,7 +4,7 @@ namespace TradingJournal.Modules.Analytics.Features.V1;
 
 public sealed class GetMonthlyReturns
 {
-    internal sealed record Request(AnalyticsFilter Filter) : IQuery<Result<IReadOnlyCollection<MonthlyReturnViewModel>>>;
+    internal sealed record Request(AnalyticsFilter Filter, int UserId = 0) : IQuery<Result<IReadOnlyCollection<MonthlyReturnViewModel>>>;
 
     internal sealed record MonthlyReturnViewModel(string Month, double Pnl);
 
@@ -24,9 +24,10 @@ public sealed class GetMonthlyReturns
         public async Task<Result<IReadOnlyCollection<MonthlyReturnViewModel>>> Handle(Request request, CancellationToken cancellationToken)
         {
             List<TradeCacheDto> allTrades = await tradeProvider.GetTradesAsync(cancellationToken);
+            List<TradeCacheDto> trades = [.. allTrades.Where(t => t.CreatedBy == request.UserId)];
             DateTime fromDate = AnalyticsFilterHelper.GetFromDate(request.Filter);
 
-            List<TradeCacheDto> closed = [.. allTrades
+            List<TradeCacheDto> closed = [.. trades
                 .Where(t => t.Status == TradeStatus.Closed && t.Pnl.HasValue && t.ClosedDate.HasValue)
                 .Where(t => fromDate == DateTime.MinValue || t.ClosedDate!.Value >= fromDate)];
 

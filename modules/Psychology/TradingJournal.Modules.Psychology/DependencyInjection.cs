@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 using TradingJournal.Modules.Psychology.Helpers;
 using TradingJournal.Shared.Behaviors;
+using TradingJournal.Shared.MediatR;
 namespace TradingJournal.Modules.Psychology;
 
 public static class DependencyInjection
@@ -16,6 +17,7 @@ public static class DependencyInjection
         {
             config.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
 
+            config.AddOpenBehavior(typeof(UserAwareBehavior<,>));
             config.AddOpenBehavior(typeof(ValidationBehavior<,>));
 
             if (isDevelopment)

@@ -4,7 +4,7 @@ namespace TradingJournal.Modules.Trades.Features.V1.Trade;
 
 public class GetTradeDetail
 {
-    public record Request(int Id) : IQuery<Result<TradeHistoryDetailViewModel>>;
+    public record Request(int Id, int UserId = 0) : IQuery<Result<TradeHistoryDetailViewModel>>;
 
     public class Validator : AbstractValidator<Request>
     {

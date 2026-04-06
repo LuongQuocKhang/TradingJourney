@@ -7,14 +7,15 @@ namespace TradingJournal.Modules.Psychology.Features.V1.Dashboard;
 
 public sealed class GetEmotionDistribution
 {
-    internal record Request() : IQuery<Result<List<EmotionDistributionViewModel>>>;
+    internal record Request(int UserId = 0) : IQuery<Result<List<EmotionDistributionViewModel>>>;
 
     internal sealed class Handler(ITradeProvider tradeProvider, IEmotionTagProvider emotionTagProvider)
         : IQueryHandler<Request, Result<List<EmotionDistributionViewModel>>>
     {
         public async Task<Result<List<EmotionDistributionViewModel>>> Handle(Request request, CancellationToken cancellationToken)
         {
-            List<TradeCacheDto> trades = await tradeProvider.GetTradesAsync(cancellationToken);
+            List<TradeCacheDto> allTrades = await tradeProvider.GetTradesAsync(cancellationToken);
+            List<TradeCacheDto> trades = [.. allTrades.Where(t => t.CreatedBy == request.UserId)];
             List<EmotionTagCacheDto> tags = await emotionTagProvider.GetEmotionTagsAsync(cancellationToken);
 
             var tagDict = tags.ToDictionary(t => t.Id, t => t);

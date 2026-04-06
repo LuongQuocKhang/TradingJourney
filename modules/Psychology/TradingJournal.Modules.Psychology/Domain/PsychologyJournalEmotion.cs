@@ -11,8 +11,8 @@ public sealed class PsychologyJournalEmotion : EntityBase<int>
     public int EmotionTagId { get; set; }
 
     [ForeignKey(nameof(PsychologyJournalId))]
-    public PsychologyJournal PsychologyJournal { get; set; }
+    public PsychologyJournal PsychologyJournal { get; set; } = null!;
 
     [ForeignKey(nameof(EmotionTagId))]
-    public EmotionTag EmotionTag { get; set; }
+    public EmotionTag EmotionTag { get; set; } = null!;
 }

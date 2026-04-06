@@ -2,7 +2,7 @@ namespace TradingJournal.Modules.Trades.Features.V1.TradingSession;
 
 public class DeleteTradeSession
 {
-    public sealed record Request(int Id) : ICommand<Result<bool>>;
+    public sealed record Request(int Id, int UserId = 0) : ICommand<Result<bool>>;
 
     internal sealed class Validator : AbstractValidator<Request>
     {
@@ -21,7 +21,8 @@ public class DeleteTradeSession
     {
         public async Task<Result<bool>> Handle(Request request, CancellationToken cancellationToken)
         {
-            var tradeSession = await context.TradingSessions.FindAsync([request.Id], cancellationToken: cancellationToken);
+            var tradeSession = await context.TradingSessions
+                .FirstOrDefaultAsync(x => x.Id == request.Id && x.CreatedBy == request.UserId, cancellationToken: cancellationToken);
 
             if (tradeSession == null)
             {
@@ -43,9 +44,9 @@ public class DeleteTradeSession
         {
             RouteGroupBuilder group = app.MapGroup(ApiGroup.V1.TradingSessions);
 
-            group.MapDelete("/{id}", async (int id, ISender sender) =>
+            group.MapDelete("/{id}", async ([FromQuery] int userId, int id, ISender sender) =>
             {
-                Result<bool> result = await sender.Send(new Request(id));
+                Result<bool> result = await sender.Send(new Request(id, userId));
 
                 return result.IsSuccess ? Results.Ok(result)
                     : Results.BadRequest(result.Errors);

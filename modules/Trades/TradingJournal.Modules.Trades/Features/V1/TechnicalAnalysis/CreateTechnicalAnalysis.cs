@@ -2,7 +2,7 @@ namespace TradingJournal.Modules.Trades.Features.V1.TechnicalAnalysis;
 
 public sealed class CreateTechnicalAnalysis
 {
-    internal sealed record Request(string Name, string? ShortName, string? Description) : ICommand<Result<int>>;
+    internal sealed record Request(string Name, string? ShortName, string? Description, int UserId = 0) : ICommand<Result<int>>;
 
     internal class Validator : AbstractValidator<Request>
     {
@@ -21,12 +21,18 @@ public sealed class CreateTechnicalAnalysis
     {
         public async Task<Result<int>> Handle(Request request, CancellationToken cancellationToken)
         {
+            if (request.UserId == 0)
+            {
+                return Result<int>.Failure(Error.Create("Unauthorized."));
+            }
+
             Domain.TechnicalAnalysis technicalAnalysis = new()
             {
                 Id = 0,
                 Name = request.Name,
                 ShortName = request.ShortName ?? string.Empty,
-                Description = request.Description
+                Description = request.Description,
+                CreatedBy = request.UserId,
             };
 
             await context.TechnicalAnalyses.AddAsync(technicalAnalysis, cancellationToken);

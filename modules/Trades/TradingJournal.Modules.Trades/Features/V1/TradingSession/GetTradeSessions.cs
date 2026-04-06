@@ -2,13 +2,14 @@ namespace TradingJournal.Modules.Trades.Features.V1.TradingSession;
 
 public sealed class GetTradeSessions
 {
-    public sealed record Request(int PageNumber, int PageSize, string? Search) : IQuery<Result<List<Domain.TradingSession>>>;
+    public sealed record Request(int PageNumber, int PageSize, string? Search, int UserId = 0) : IQuery<Result<List<Domain.TradingSession>>>;
 
     internal sealed class Handler(ITradeDbContext context) : IQueryHandler<Request, Result<List<Domain.TradingSession>>>
     {
         public async Task<Result<List<Domain.TradingSession>>> Handle(Request request, CancellationToken cancellationToken)
         {
             var tradeSessions = await context.TradingSessions
+                .Where(x => x.CreatedBy == request.UserId)
                 .AsNoTracking()
                 .OrderByDescending(x => x.CreatedDate)
                 .Skip((request.PageNumber - 1) * request.PageSize)
@@ -25,9 +26,9 @@ public sealed class GetTradeSessions
         {
             RouteGroupBuilder group = app.MapGroup(ApiGroup.V1.TradingSessions);
 
-            group.MapGet("/", async ([FromQuery] int pageNumber, [FromQuery] int pageSize, [FromQuery] string? search, ISender sender) =>
+            group.MapGet("/", async ([FromQuery] int pageNumber, [FromQuery] int pageSize, [FromQuery] string? search, [FromQuery] int userId, ISender sender) =>
             {
-                Result<List<Domain.TradingSession>> result = await sender.Send(new Request(pageNumber, pageSize, search));
+                Result<List<Domain.TradingSession>> result = await sender.Send(new Request(pageNumber, pageSize, search, userId));
 
                 return result.IsSuccess ? Results.Ok(result)
                     : Results.BadRequest(result.Errors);

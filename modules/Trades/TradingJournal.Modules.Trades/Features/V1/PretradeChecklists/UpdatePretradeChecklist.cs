@@ -2,7 +2,7 @@
 
 public sealed class UpdatePretradeChecklist
 {
-    internal record Request(int Id, string Name, PretradeChecklistType Type) : ICommand<Result>;
+    internal record Request(int Id, string Name, PretradeChecklistType Type, int UserId = 0) : ICommand<Result>;
 
     internal sealed class Validator : AbstractValidator<Request>
     {
@@ -30,7 +30,8 @@ public sealed class UpdatePretradeChecklist
     {
         public async Task<Result> Handle(Request request, CancellationToken cancellationToken)
         {
-            PretradeChecklist? checklist = await context.PretradeChecklists.FindAsync([request.Id], cancellationToken);
+            PretradeChecklist? checklist = await context.PretradeChecklists
+                .FirstOrDefaultAsync(c => c.Id == request.Id && c.CreatedBy == request.UserId, cancellationToken);
 
             if (checklist is null)
             {

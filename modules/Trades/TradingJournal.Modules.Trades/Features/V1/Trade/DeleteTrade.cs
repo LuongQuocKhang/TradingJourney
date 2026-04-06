@@ -7,6 +7,7 @@ public class DeleteTrade
     public class Request : ICommand<Result<int>>
     {
         public int Id { get; set; }
+        public int UserId { get; set; }
     }
     
     public class Validator : AbstractValidator<Request>
@@ -29,7 +30,7 @@ public class DeleteTrade
                 .Include(x => x.TradeScreenShots)
                 .Include(x => x.TradeChecklists)
                 .Include(x => x.TradeTechnicalAnalysisTags)
-                .FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken: cancellationToken);
+                .FirstOrDefaultAsync(x => x.Id == request.Id && x.CreatedBy == request.UserId, cancellationToken);
 
             if (trade == null)
             {
@@ -80,8 +81,8 @@ public class DeleteTrade
         {
             RouteGroupBuilder group = app.MapGroup(ApiGroup.V1.TradeHistory);
 
-            group.MapDelete("/{id}", async ([FromRoute] int id, ISender sender) => {
-                Result<int> result = await sender.Send(new Request { Id = id });
+            group.MapDelete("/{id}", async ([FromRoute] int id, [FromQuery] int userId, ISender sender) => {
+                Result<int> result = await sender.Send(new Request { Id = id, UserId = userId });
 
                 return result.IsSuccess ? Results.Ok(result) 
                     : Results.BadRequest(result);

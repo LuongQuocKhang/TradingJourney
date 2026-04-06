@@ -22,6 +22,8 @@ public class GetTrades
         public int Page { get; set; } = 1;
 
         public int PageSize { get; set; } = 10;
+        
+        public int UserId { get; set; }
     }
 
     internal sealed class Validator : AbstractValidator<Request>
@@ -56,6 +58,7 @@ public class GetTrades
         private async Task<PaginationViewModel<TradeHistoryViewModel>> GetTradesFromDatabase(Request request, CancellationToken cancellationToken)
         {
             IQueryable<TradeHistory> query = tradeDbContext.TradeHistories
+                .Where(th => th.CreatedBy == request.UserId)
                 .AsNoTracking();
 
             if (!string.IsNullOrEmpty(request.Asset))

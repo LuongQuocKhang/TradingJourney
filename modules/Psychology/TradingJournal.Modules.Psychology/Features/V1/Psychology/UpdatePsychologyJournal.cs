@@ -2,15 +2,15 @@
 
 public sealed class UpdatePsychologyJournal
 {
-    public record Request(int Id, DateTime Date, string TodayTradingReview, List<int> EmotionTags, 
-        OverallMood OverallMood = OverallMood.Neutral, 
+    public record Request(int Id, DateTime Date, string TodayTradingReview, List<int> EmotionTags, int UserId = 0,
+        OverallMood OverallMood = OverallMood.Neutral,
         ConfidentLevel ConfidentLevel = ConfidentLevel.None) : ICommand<Result<bool>>;
 
     internal sealed class Handler(IPsychologyDbContext context) : ICommandHandler<Request, Result<bool>>
     {
         public async Task<Result<bool>> Handle(Request request, CancellationToken cancellationToken)
         {
-            PsychologyJournal? psychologyJournal = await context.PsychologyJournals.FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken);
+            PsychologyJournal? psychologyJournal = await context.PsychologyJournals.FirstOrDefaultAsync(x => x.Id == request.Id && x.CreatedBy == request.UserId, cancellationToken);
             
             if (psychologyJournal is null)
             {

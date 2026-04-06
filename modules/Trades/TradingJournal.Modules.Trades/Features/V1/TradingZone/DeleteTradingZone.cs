@@ -2,7 +2,7 @@
 
 public sealed class DeleteTradingZone
 {
-    internal sealed record Request(int Id) : ICommand<Result<bool>>;
+    internal sealed record Request(int Id, int UserId = 0) : ICommand<Result<bool>>;
 
     internal sealed class Validator : AbstractValidator<Request>
     {
@@ -19,7 +19,7 @@ public sealed class DeleteTradingZone
     {
         public async Task<Result<bool>> Handle(Request request, CancellationToken cancellationToken)
         {
-            var tradingZone = await context.TradingZones.FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken);
+            var tradingZone = await context.TradingZones.FirstOrDefaultAsync(x => x.Id == request.Id && x.CreatedBy == request.UserId, cancellationToken);
 
             if (tradingZone is null)
             {
@@ -40,9 +40,9 @@ public sealed class DeleteTradingZone
         {
             RouteGroupBuilder group = app.MapGroup(ApiGroup.V1.TradingZones);
 
-            group.MapDelete("/{id:int}", async (int id, ISender sender) =>
+            group.MapDelete("/{id:int}", async ([FromQuery] int userId, int id, ISender sender) =>
             {
-                Result<bool> result = await sender.Send(new Request(id));
+                Result<bool> result = await sender.Send(new Request(id, userId));
 
                 return result.IsSuccess ? Results.Ok(result)
                     : Results.BadRequest(result);
