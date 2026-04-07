@@ -156,7 +156,8 @@ public class GetTrades
             .Produces(StatusCodes.Status500InternalServerError)
             .WithSummary("Search trade histories.")
             .WithDescription("Retrieves a list of trade histories.")
-            .WithTags(Tags.TradeHistory);
+            .WithTags(Tags.TradeHistory)
+            .RequireAuthorization();
         }
     }
 }

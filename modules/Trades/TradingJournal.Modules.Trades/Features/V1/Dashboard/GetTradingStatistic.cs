@@ -62,7 +62,8 @@ public sealed class GetTradingStatistic
             .Produces(StatusCodes.Status500InternalServerError)
             .WithSummary("Get trading statistics.")
             .WithDescription("Retrieves the trading statistics including total PnL, win rate, total trades, and open positions.")
-            .WithTags(Tags.Dashboard);
+            .WithTags(Tags.Dashboard)
+            .RequireAuthorization();
         }
     }
 }

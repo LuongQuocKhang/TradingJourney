@@ -53,7 +53,8 @@ public sealed class GetWinLossRatio
             .Produces(StatusCodes.Status500InternalServerError)
             .WithSummary("Get win/loss ratio.")
             .WithDescription("Retrieves the count of winning and losing trades for the user.")
-            .WithTags(Tags.Dashboard);
+            .WithTags(Tags.Dashboard)
+            .RequireAuthorization();
         }
     }
 }

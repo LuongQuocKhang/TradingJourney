@@ -41,11 +41,14 @@ public sealed class GetReviewTrades
     {
         public async Task<Result<PaginationViewModel<ReviewTradeViewModel>>> Handle(Request request, CancellationToken cancellationToken)
         {
+            DateTime fromDate = request.FromDate.Date;
+            DateTime toDate = request.ToDate.Date.AddDays(1).AddTicks(-1); // Include the entire ToDate day
+
             IQueryable<TradeHistory> query = context.TradeHistories
                 .AsNoTracking()
                 .Where(th => th.CreatedBy == request.UserId)
                 .Where(th => th.Status == TradeStatus.Closed && th.Pnl.HasValue)
-                .Where(th => th.ClosedDate.HasValue && th.ClosedDate.Value >= request.FromDate && th.ClosedDate.Value <= request.ToDate);
+                .Where(th => th.ClosedDate.HasValue && th.ClosedDate.Value >= fromDate && th.ClosedDate.Value <= toDate);
 
             int totalItems = await query.CountAsync(cancellationToken);
 

@@ -93,7 +93,8 @@ public sealed class GetTradingCalendar
             .Produces(StatusCodes.Status500InternalServerError)
             .WithSummary("Get trading calendar for a specific month and year.")
             .WithDescription("Retrieves the trading calendar with PnL for each day in the specified month and year, along with daily, weekly, and monthly summaries.")
-            .WithTags(Tags.Dashboard);
+            .WithTags(Tags.Dashboard)
+            .RequireAuthorization();
         }
     }
 }

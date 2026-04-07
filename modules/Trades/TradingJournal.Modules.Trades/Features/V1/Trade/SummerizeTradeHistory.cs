@@ -77,7 +77,8 @@ public sealed class SummerizeTradeHistory
             .Produces(StatusCodes.Status500InternalServerError)
             .WithSummary("Summarize trade history.")
             .WithDescription("Uses AI to generate a summary for the specified trade history.")
-            .WithTags(Tags.TradeHistory);
+            .WithTags(Tags.TradeHistory)
+            .RequireAuthorization();
         }
     }
 }

@@ -253,7 +253,8 @@ public sealed class UpdateTrade
             .Produces(StatusCodes.Status500InternalServerError)
             .WithSummary("Update an existing trade history.")
             .WithDescription("Updates an existing trade history with the given details.")
-            .WithTags(Tags.TradeHistory);
+            .WithTags(Tags.TradeHistory)
+            .RequireAuthorization();
         }
     }
 }

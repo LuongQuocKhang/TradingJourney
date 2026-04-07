@@ -84,7 +84,8 @@ public class GetTradeDetail
             .Produces(StatusCodes.Status500InternalServerError)
             .WithSummary("Get a trade history by ID.")
             .WithDescription("Retrieves a trade history by its ID.") 
-            .WithTags(Tags.TradeHistory);
+            .WithTags(Tags.TradeHistory)
+            .RequireAuthorization();
         }
     }
 }
