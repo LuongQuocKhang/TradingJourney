@@ -3,33 +3,34 @@ using Moq;
 using TradingJournal.Modules.Psychology.Domain;
 using TradingJournal.Modules.Psychology.Features.V1.Emotion;
 using TradingJournal.Modules.Psychology.Infrastructure.Persistance;
+using TradingJournal.Shared.Interfaces;
 
 namespace TradingJournal.Tests.Psychology.Features.V1.Emotion;
 
 [TestFixture]
 public class GetEmotionsHandlerTests
 {
-    private Mock<IPsychologyDbContext> _contextMock = null!;
+    private Mock<IEmotionTagProvider> _providerMock = null!;
     private GetEmotions.Handler _handler = null!;
 
     [SetUp]
     public void SetUp()
     {
-        _contextMock = new Mock<IPsychologyDbContext>();
-        _handler = new GetEmotions.Handler(_contextMock.Object);
+        _providerMock = new Mock<IEmotionTagProvider>();
+        _handler = new GetEmotions.Handler(_providerMock.Object);
     }
 
     [Test]
-    public async Task Handle_Returns_Emotions_When_Request_Are_Present()
+    public async Task Handle_Returns_Emotions_When_Data_Exists()
     {
-        var emotions = new List<EmotionTag>
+        var emotions = new List<TradingJournal.Shared.Dtos.EmotionTagCacheDto>
         {
             new() { Id = 1, Name = "Happy" },
             new() { Id = 2, Name = "Sad" },
-        }.AsQueryable();
-        _contextMock.Setup(x => x.EmotionTags).Returns(emotions);
-        var request = new GetEmotions.Request(1, "");
-
+        };
+        _providerMock.Setup(x => x.GetEmotionTagsAsync(It.IsAny<CancellationToken>())).ReturnsAsync(emotions);
+        
+        var request = new GetEmotions.Request();
         var result = await _handler.Handle(request, CancellationToken.None);
 
         result.IsSuccess.Should().BeTrue();
@@ -37,20 +38,14 @@ public class GetEmotionsHandlerTests
     }
 
     [Test]
-    public async Task Handle_Filters_By_Name_When_Search_Provided()
+    public async Task Handle_Returns_NotFound_When_No_Data()
     {
-        var emotions = new List<EmotionTag>
-        {
-            new() { Id = 1, Name = "Happy" },
-            new() { Id = 2, Name = "Sad" },
-        }.AsQueryable();
-        _contextMock.Setup(x => x.EmotionTags).Returns(emotions);
-        var request = new GetEmotions.Request(1, "Happy");
-
+        _providerMock.Setup(x => x.GetEmotionTagsAsync(It.IsAny<CancellationToken>())).ReturnsAsync(new List<TradingJournal.Shared.Dtos.EmotionTagCacheDto>());
+        
+        var request = new GetEmotions.Request();
         var result = await _handler.Handle(request, CancellationToken.None);
 
-        result.IsSuccess.Should().BeTrue();
-        result.Value.Should().HaveCount(1);
-        result.Value[0].Name.Should().Be("Happy");
+        result.IsFailure.Should().BeTrue();
     }
 }
+

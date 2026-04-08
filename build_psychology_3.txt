@@ -1,0 +1,7 @@
+﻿c:\project\.NET\TradingJournal\tests\TradingJournal.Tests.Psychology\Features\V1\Dashboard\GetPsychologyHeatmapTests.cs(9,29): error CS0234: The type or namespace name 'Responses' does not exist in the namespace 'TradingJournal.Shared' (are you missing an assembly reference?) [c:\project\.NET\TradingJournal\tests\TradingJournal.Tests.Psychology\TradingJournal.Tests.Psychology.csproj]
+
+Build FAILED.
+    0 Warning(s)
+    1 Error(s)
+
+Time Elapsed 00:00:02.03

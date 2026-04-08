@@ -81,12 +81,11 @@ public class RegisterHandlerTests
     public async Task Handle_Returns_Success_When_Email_Is_New()
     {
         // Arrange
-        var userSet = new Mock<DbSet<User>>();
         // Arrange
         var user = new User { Id = 1, Email = "test@example.com", PasswordHash = BCrypt.Net.BCrypt.HashPassword("password123"), FullName = "Test User", IsActive = true };
-        userSet.Setup(x => x.Include(It.IsAny<string>())).Returns(userSet.Object);
+        var users = new System.Collections.Generic.List<User> { user };
+        var userSet = MockQueryable.Moq.MoqExtensions.BuildMockDbSet(users.AsQueryable());
         _contextMock.Setup(x => x.Users).Returns(userSet.Object);
-        userSet.Setup(x => x.FirstOrDefaultAsync(It.IsAny<System.Linq.Expressions.Expression<System.Func<User, bool>>>(), It.IsAny<CancellationToken>())).ReturnsAsync(user);
         _contextMock.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
 
         var request = new Register.Request("new@example.com", "password123", "New User");
@@ -104,12 +103,11 @@ public class RegisterHandlerTests
     public async Task Handle_Returns_Failure_When_Email_Already_Exists()
     {
         // Arrange
-        var userSet = new Mock<DbSet<User>>();
         // Arrange
         var user = new User { Id = 1, Email = "existing@example.com", PasswordHash = BCrypt.Net.BCrypt.HashPassword("password123"), FullName = "Test User", IsActive = true };
-        userSet.Setup(x => x.Include(It.IsAny<string>())).Returns(userSet.Object);
+        var users = new System.Collections.Generic.List<User> { user };
+        var userSet = MockQueryable.Moq.MoqExtensions.BuildMockDbSet(users.AsQueryable());
         _contextMock.Setup(x => x.Users).Returns(userSet.Object);
-        userSet.Setup(x => x.FirstOrDefaultAsync(It.IsAny<System.Linq.Expressions.Expression<System.Func<User, bool>>>(), It.IsAny<CancellationToken>())).ReturnsAsync(user);
         _contextMock.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
 
         var request = new Register.Request("existing@example.com", "password123", "Dup User");

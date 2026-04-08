@@ -5,6 +5,7 @@ using Moq;
 using TradingJournal.Modules.Psychology.Domain;
 using TradingJournal.Modules.Psychology.Features.V1.Emotion;
 using TradingJournal.Modules.Psychology.Infrastructure.Persistance;
+using TradingJournal.Shared.Interfaces;
 
 namespace TradingJournal.Tests.Psychology.Features.V1.Emotion;
 
@@ -16,10 +17,7 @@ public class DeleteEmotionValidatorTests
     [Test]
     public void Should_Have_Error_When_Id_Is_Zero()
     {
-        var request = new DeleteEmotion.Request()
-        {
-            Id = 1
-        };
+        var request = new DeleteEmotion.Request(1);
 
         var result = _validator.TestValidate(request);
         result.ShouldHaveValidationErrorFor(x => x.Id);
@@ -28,10 +26,7 @@ public class DeleteEmotionValidatorTests
     [Test]
     public void Should_Not_Have_Error_When_Id_Is_Valid()
     {
-        var request = new DeleteEmotion.Request()
-        {
-            Id = 1
-        };
+        var request = new DeleteEmotion.Request(1);
         var result = _validator.TestValidate(request);
         result.ShouldNotHaveValidationErrorFor(x => x.Id);
     }
@@ -41,13 +36,15 @@ public class DeleteEmotionValidatorTests
 public class DeleteEmotionHandlerTests
 {
     private Mock<IPsychologyDbContext> _contextMock = null!;
+    private Mock<ICacheRepository> _cacheMock = null!;
     private DeleteEmotion.Handler _handler = null!;
 
     [SetUp]
     public void SetUp()
     {
         _contextMock = new Mock<IPsychologyDbContext>();
-        _handler = new DeleteEmotion.Handler(_contextMock.Object);
+        _cacheMock = new Mock<ICacheRepository>();
+        _handler = new DeleteEmotion.Handler(_contextMock.Object, _cacheMock.Object);
     }
 
     [Test]

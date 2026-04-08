@@ -44,31 +44,32 @@ public class LoginValidatorTests
 public class LoginHandlerTests
 {
     private Mock<IAuthDbContext> _contextMock = null!;
-    private Mock<IConfiguration> _configMock = null!;
     private Login.Handler _handler = null!;
 
     [SetUp]
     public void SetUp()
     {
         _contextMock = new Mock<IAuthDbContext>();
-        _configMock = new Mock<IConfiguration>();
-        _configMock.Setup(x => x["Jwt:Secret"]).Returns("a-very-long-secret-key-that-is-at-least-32-chars!");
-        _configMock.Setup(x => x["Jwt:Issuer"]).Returns("TradingJournal");
-        _configMock.Setup(x => x["Jwt:Audience"]).Returns("TradingJournal");
-        _configMock.Setup(x => x["Jwt:ExpiryMinutes"]).Returns("60");
-        _configMock.Setup(x => x.GetValue<int>("Jwt:ExpiryMinutes", 60)).Returns(60);
-        _handler = new Login.Handler(_contextMock.Object, _configMock.Object);
+        var inMemorySettings = new System.Collections.Generic.Dictionary<string, string?> {
+            {"Jwt:Secret", "a-very-long-secret-key-that-is-at-least-32-chars!"},
+            {"Jwt:Issuer", "TradingJournal"},
+            {"Jwt:Audience", "TradingJournal"},
+            {"Jwt:ExpiryMinutes", "60"}
+        };
+        var configuration = new Microsoft.Extensions.Configuration.ConfigurationBuilder()
+            .AddInMemoryCollection(inMemorySettings)
+            .Build();
+        _handler = new Login.Handler(_contextMock.Object, configuration);
     }
 
     [Test]
     public async Task Handle_Returns_Success_When_Credentials_Are_Valid()
     {
-        var userSet = new Mock<DbSet<User>>();
         // Arrange
         var user = new User { Id = 1, Email = "test@example.com", PasswordHash = BCrypt.Net.BCrypt.HashPassword("password123"), FullName = "Test User", IsActive = true };
-        userSet.Setup(x => x.Include(It.IsAny<string>())).Returns(userSet.Object);
+        var users = new System.Collections.Generic.List<User> { user };
+        var userSet = MockQueryable.Moq.MoqExtensions.BuildMockDbSet(users.AsQueryable());
         _contextMock.Setup(x => x.Users).Returns(userSet.Object);
-        userSet.Setup(x => x.FirstOrDefaultAsync(It.IsAny<System.Linq.Expressions.Expression<System.Func<User, bool>>>(), It.IsAny<CancellationToken>())).ReturnsAsync(user);
         _contextMock.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
 
         var request = new Login.Request("test@example.com", "password123");
@@ -87,12 +88,11 @@ public class LoginHandlerTests
     public async Task Handle_Returns_Failure_When_User_Not_Found()
     {
         // Arrange
-        var userSet = new Mock<DbSet<User>>();
         // Arrange
         var user = new User { Id = 1, Email = "test@example.com", PasswordHash = BCrypt.Net.BCrypt.HashPassword("password123"), FullName = "Test User", IsActive = true };
-        userSet.Setup(x => x.Include(It.IsAny<string>())).Returns(userSet.Object);
+        var users = new System.Collections.Generic.List<User> { user };
+        var userSet = MockQueryable.Moq.MoqExtensions.BuildMockDbSet(users.AsQueryable());
         _contextMock.Setup(x => x.Users).Returns(userSet.Object);
-        userSet.Setup(x => x.FirstOrDefaultAsync(It.IsAny<System.Linq.Expressions.Expression<System.Func<User, bool>>>(), It.IsAny<CancellationToken>())).ReturnsAsync(user);
         _contextMock.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
         var request = new Login.Request("nonexistent@example.com", "password123");
 
@@ -107,12 +107,11 @@ public class LoginHandlerTests
     public async Task Handle_Returns_Failure_When_Password_Is_Wrong()
     {
         // Arrange
-        var userSet = new Mock<DbSet<User>>();
         // Arrange
         var user = new User { Id = 1, Email = "test@example.com", PasswordHash = BCrypt.Net.BCrypt.HashPassword("password123"), FullName = "Test User", IsActive = true };
-        userSet.Setup(x => x.Include(It.IsAny<string>())).Returns(userSet.Object);
+        var users = new System.Collections.Generic.List<User> { user };
+        var userSet = MockQueryable.Moq.MoqExtensions.BuildMockDbSet(users.AsQueryable());
         _contextMock.Setup(x => x.Users).Returns(userSet.Object);
-        userSet.Setup(x => x.FirstOrDefaultAsync(It.IsAny<System.Linq.Expressions.Expression<System.Func<User, bool>>>(), It.IsAny<CancellationToken>())).ReturnsAsync(user);
         _contextMock.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
         var request = new Login.Request("test@example.com", "wrongpassword");
 
@@ -127,12 +126,11 @@ public class LoginHandlerTests
     public async Task Handle_Returns_Failure_When_Account_Is_Disabled()
     {
         // Arrange
-        var userSet = new Mock<DbSet<User>>();
         // Arrange
-        var user = new User { Id = 1, Email = "test@example.com", PasswordHash = BCrypt.Net.BCrypt.HashPassword("password123"), FullName = "Test User", IsActive = true };
-        userSet.Setup(x => x.Include(It.IsAny<string>())).Returns(userSet.Object);
+        var user = new User { Id = 1, Email = "test@example.com", PasswordHash = BCrypt.Net.BCrypt.HashPassword("password123"), FullName = "Test User", IsActive = false };
+        var users = new System.Collections.Generic.List<User> { user };
+        var userSet = MockQueryable.Moq.MoqExtensions.BuildMockDbSet(users.AsQueryable());
         _contextMock.Setup(x => x.Users).Returns(userSet.Object);
-        userSet.Setup(x => x.FirstOrDefaultAsync(It.IsAny<System.Linq.Expressions.Expression<System.Func<User, bool>>>(), It.IsAny<CancellationToken>())).ReturnsAsync(user);
         _contextMock.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
 
         var request = new Login.Request("test@example.com", "password123");

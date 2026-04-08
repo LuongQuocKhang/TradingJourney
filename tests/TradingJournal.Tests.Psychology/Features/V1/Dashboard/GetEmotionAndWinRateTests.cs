@@ -140,3 +140,4 @@ public class GetEmotionAndWinRateHandlerTests
         result.Value[0].WinRate.Should().Be(50);
     }
 }
+

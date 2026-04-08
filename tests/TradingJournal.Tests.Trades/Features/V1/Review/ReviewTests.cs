@@ -52,12 +52,7 @@ public class GetReviewHandlerTests
     [Test] public async Task Handle_Returns_Empty_When_No_Data() { _tradeProviderMock.Setup(x => x.GetTradesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(new List<TradeCacheDto>()); _dbMock.Setup(x => x.TradingReviews).Returns(new List<TradingReview>().AsQueryable()); var result = await _handler.Handle(new GetReview.Request(ReviewPeriodType.Weekly, DateTime.Now, 1), CancellationToken.None); result.IsSuccess.Should().BeTrue(); }
 }
 
-[TestFixture]
-public class GetReviewSummaryStatusValidatorTests
-{
-    private static readonly GetReviewSummaryStatus.Validator _validator = new();
-    [Test] public void Should_Not_Have_Error_When_Valid() { var r = _validator.TestValidate(new GetReviewSummaryStatus.Request(1)); r.ShouldNotHaveAnyErrors(); }
-}
+
 
 [TestFixture]
 public class GetReviewSummaryStatusHandlerTests

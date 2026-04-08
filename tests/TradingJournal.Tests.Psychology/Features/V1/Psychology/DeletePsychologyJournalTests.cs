@@ -14,9 +14,9 @@ public class DeletePsychologyJournalValidatorTests
     [Test]
     public void Should_Not_Have_Error_When_Valid()
     {
-        var request = new DeletePsychologyJournal.Request(1, 1);
-        var result = _validator.TestValidate(request);
-        result.ShouldNotHaveAnyErrors();
+        var request = new DeletePsychologyJournal.Request { Id = 1, UserId = 1 };
+        var result = _validator.Validate(request);
+        result.IsValid.Should().BeTrue();
     }
 }
 
@@ -35,7 +35,7 @@ public class DeletePsychologyJournalHandlerTests
     public async Task Handle_Returns_Failure_When_Journal_Not_Found()
     {
         _contextMock.Setup(x => x.PsychologyJournals.FindAsync(It.IsAny<object[]>(), It.IsAny<CancellationToken>())).ReturnsAsync((PsychologyJournal?)null);
-        var result = await _handler.Handle(new DeletePsychologyJournal.Request(99, 1), CancellationToken.None);
+        var result = await _handler.Handle(new DeletePsychologyJournal.Request { Id = 99, UserId = 1 }, CancellationToken.None);
         result.IsFailure.Should().BeTrue();
     }
     [Test]
@@ -43,7 +43,7 @@ public class DeletePsychologyJournalHandlerTests
     {
         var journal = new PsychologyJournal { Id = 1, Date = DateTime.Now, CreatedBy = 1 };
         _contextMock.Setup(x => x.PsychologyJournals.FindAsync(It.IsAny<object[]>(), It.IsAny<CancellationToken>())).ReturnsAsync(journal);
-        var result = await _handler.Handle(new DeletePsychologyJournal.Request(1, 1), CancellationToken.None);
+        var result = await _handler.Handle(new DeletePsychologyJournal.Request { Id = 1, UserId = 1 }, CancellationToken.None);
         result.IsSuccess.Should().BeTrue();
         _contextMock.Verify(x => x.PsychologyJournals.Remove(journal), Times.Once);
         _contextMock.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);

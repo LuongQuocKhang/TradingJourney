@@ -14,7 +14,7 @@ public sealed class GetPsychologyJournals
         List<int>? EmotionTags = null,
         int UserId = 0) : IQuery<Result<PaginationViewModel<PsychologyJournalViewModel>>>;
 
-    internal sealed class Handler(IPsychologyDbContext context, ICacheRepository cacheRepository) : IQueryHandler<Request, Result<PaginationViewModel<PsychologyJournalViewModel>>>
+    public sealed class Handler(IPsychologyDbContext context, ICacheRepository cacheRepository) : IQueryHandler<Request, Result<PaginationViewModel<PsychologyJournalViewModel>>>
     {
         public async Task<Result<PaginationViewModel<PsychologyJournalViewModel>>> Handle(Request request, CancellationToken cancellationToken)
         {

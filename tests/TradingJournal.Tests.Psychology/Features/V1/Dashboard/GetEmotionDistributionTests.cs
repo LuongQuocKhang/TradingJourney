@@ -145,3 +145,4 @@ public class GetEmotionDistributionHandlerTests
         result.Value.Should().BeEmpty();
     }
 }
+

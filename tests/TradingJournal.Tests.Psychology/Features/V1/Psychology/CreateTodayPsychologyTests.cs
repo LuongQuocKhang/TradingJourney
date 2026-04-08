@@ -67,3 +67,4 @@ public class CreateTodayPsychologyHandlerTests
         _contextMock.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
 }
+

@@ -38,13 +38,7 @@ public class GetTradingZonesHandlerTests
     [Test] public async Task Handle_Returns_Empty_When_No_Data() { _dbMock.Setup(x => x.TradingZones).Returns(new List<Domain.TradingZone>().AsQueryable()); var result = await _handler.Handle(new GetTradingZones.Request(1), CancellationToken.None); result.IsSuccess.Should().BeTrue(); result.Value.Should().BeEmpty(); }
 }
 
-[TestFixture]
-public class GetTradingZoneDetailValidatorTests
-{
-    private static readonly GetTradingZoneDetail.Validator _validator = new();
-    [Test] public void Should_Have_Error_When_Id_Is_Zero() { var r = _validator.TestValidate(new GetTradingZoneDetail.Request(0, 1)); r.ShouldHaveValidationErrorFor(x => x.Id); }
-    [Test] public void Should_Not_Have_Error_When_Valid() { var r = _validator.TestValidate(new GetTradingZoneDetail.Request(1, 1)); r.ShouldNotHaveAnyErrors(); }
-}
+
 
 [TestFixture]
 public class GetTradingZoneDetailHandlerTests

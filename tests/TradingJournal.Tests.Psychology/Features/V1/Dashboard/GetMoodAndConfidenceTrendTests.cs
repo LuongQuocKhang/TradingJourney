@@ -1,8 +1,11 @@
+using MockQueryable.Moq;
 using FluentAssertions;
 using Moq;
 using TradingJournal.Modules.Psychology.Features.V1.Dashboard;
 using TradingJournal.Modules.Psychology.Infrastructure.Persistance;
-using TradingJournal.Shared.Common.Enum;
+using TradingJournal.Modules.Psychology.Common.Enum;
+using TradingJournal.Modules.Psychology.ViewModel;
+
 using TradingJournal.Shared.Interfaces;
 
 namespace TradingJournal.Tests.Psychology.Features.V1.Dashboard;
@@ -28,7 +31,7 @@ public class GetMoodAndConfidenceTrendHandlerTests
         _cacheMock
             .Setup(x => x.GetOrCreateAsync(
                 It.IsAny<string>(),
-                It.IsAny<Func<CancellationToken, Task<List<MoodAndConfidenceTrendViewModel>>>(),
+                It.IsAny<Func<CancellationToken, Task<List<MoodAndConfidenceTrendViewModel>>>>(),
                 It.IsAny<TimeSpan>(),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync((List<MoodAndConfidenceTrendViewModel>?)null);
@@ -45,15 +48,15 @@ public class GetMoodAndConfidenceTrendHandlerTests
     {
         var cachedResult = new List<MoodAndConfidenceTrendViewModel>
         {
-            new() { Date = new DateTime(2026, 1, 1), Mood = (int)OverallMood.Happy, Confidence = (int)TradingJournal.Modules.Psychology.Domain.ConfidentLevel.High },
+            new() { Date = new DateTime(2026, 1, 1), Mood = (int)OverallMood.Good, Confidence = (int)TradingJournal.Modules.Psychology.Domain.ConfidentLevel.High },
             new() { Date = new DateTime(2026, 1, 2), Mood = (int)OverallMood.Neutral, Confidence = (int)TradingJournal.Modules.Psychology.Domain.ConfidentLevel.Neutral },
-            new() { Date = new DateTime(2026, 1, 3), Mood = (int)OverallMood.Happy, Confidence = (int)TradingJournal.Modules.Psychology.Domain.ConfidentLevel.VeryHigh },
+            new() { Date = new DateTime(2026, 1, 3), Mood = (int)OverallMood.Good, Confidence = (int)TradingJournal.Modules.Psychology.Domain.ConfidentLevel.VeryHigh },
         };
 
         _cacheMock
             .Setup(x => x.GetOrCreateAsync(
                 It.IsAny<string>(),
-                It.IsAny<Func<CancellationToken, Task<List<MoodAndConfidenceTrendViewModel>>>(),
+                It.IsAny<Func<CancellationToken, Task<List<MoodAndConfidenceTrendViewModel>>>>(),
                 It.IsAny<TimeSpan>(),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(cachedResult);
@@ -64,7 +67,7 @@ public class GetMoodAndConfidenceTrendHandlerTests
         result.IsSuccess.Should().BeTrue();
         result.Value.Should().HaveCount(3);
         result.Value[0].Date.Should().Be(new DateTime(2026, 1, 1));
-        result.Value[0].Mood.Should().Be((int)OverallMood.Happy);
+        result.Value[0].Mood.Should().Be((int)OverallMood.Good);
         result.Value[0].Confidence.Should().Be((int)TradingJournal.Modules.Psychology.Domain.ConfidentLevel.High);
     }
 
@@ -74,7 +77,7 @@ public class GetMoodAndConfidenceTrendHandlerTests
         var emptyResult = new List<MoodAndConfidenceTrendViewModel>();
         _cacheMock.Setup(x => x.GetOrCreateAsync(
                 It.IsAny<string>(),
-                It.IsAny<Func<CancellationToken, Task<List<MoodAndConfidenceTrendViewModel>>>(),
+                It.IsAny<Func<CancellationToken, Task<List<MoodAndConfidenceTrendViewModel>>>>(),
                 It.IsAny<TimeSpan>(),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(emptyResult);
@@ -86,3 +89,5 @@ public class GetMoodAndConfidenceTrendHandlerTests
         result.Value.Should().BeEmpty();
     }
 }
+
+
