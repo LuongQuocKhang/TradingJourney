@@ -6,5 +6,6 @@ public enum AnalyticsFilter
     OneMonth = 1,
     ThreeMonths = 2,
     SixMonths = 3,
-    AllTime = 4
+    AllTime = 4,
+    OneYear = 5,
 }

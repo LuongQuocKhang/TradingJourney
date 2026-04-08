@@ -12,12 +12,11 @@ public sealed class GetPsychologyHeatmap
     {
         public async Task<Result<List<PsychologyHeatmapViewModel>>> Handle(Request request, CancellationToken cancellationToken)
         {
-            List<TradeCacheDto> allTrades = await tradeProvider.GetTradesAsync(cancellationToken);
-            List<TradeCacheDto> trades = [.. allTrades.Where(t => t.CreatedBy == request.UserId)];
+            List<TradeCacheDto> trades = await tradeProvider.GetTradesAsync(request.UserId, cancellationToken);
             List<EmotionTagCacheDto> tags = await emotionTagProvider.GetEmotionTagsAsync(cancellationToken);
 
             // Only consider closed trades that have a Pnl
-            var closedTrades = allTrades.Where(t => t.ClosedDate.HasValue && t.Pnl.HasValue && t.EmotionTags != null && t.EmotionTags.Count > 0).ToList();
+            var closedTrades = trades.Where(t => t.ClosedDate.HasValue && t.Pnl.HasValue && t.EmotionTags != null && t.EmotionTags.Count > 0).ToList();
 
             Dictionary<int, EmotionStats> tagStats = new();
 

@@ -15,4 +15,8 @@
     <ProjectReference Include="..\..\..\shared\TradingJournal.Shared\TradingJournal.Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="TradingJournal.Tests.Analytics" />
+  </ItemGroup>
+
 </Project>

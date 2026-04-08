@@ -2,9 +2,18 @@ namespace TradingJournal.Modules.Trades.Features.V1.ChecklistModels;
 
 public sealed class GetChecklistModels
 {
-    internal record Request(int UserId = 0) : ICommand<Result<IReadOnlyCollection<ChecklistModelViewModel>>>;
+    public record Request(int UserId = 0, int PageIndex = 1, int PageSize = 10) : ICommand<Result<IReadOnlyCollection<ChecklistModelViewModel>>>;
 
-    internal sealed class Handler(ITradeDbContext context) : ICommandHandler<Request, Result<IReadOnlyCollection<ChecklistModelViewModel>>>
+    public sealed class Validator : AbstractValidator<Request>
+    {
+        public Validator()
+        {
+            RuleFor(r => r.PageIndex).GreaterThan(0).WithMessage("Page index must be greater than 0.");
+            RuleFor(r => r.PageSize).GreaterThan(0).WithMessage("Page size must be greater than 0.");
+        }
+    }
+
+    public sealed class Handler(ITradeDbContext context) : ICommandHandler<Request, Result<IReadOnlyCollection<ChecklistModelViewModel>>>
     {
         public async Task<Result<IReadOnlyCollection<ChecklistModelViewModel>>> Handle(Request request, CancellationToken cancellationToken)
         {

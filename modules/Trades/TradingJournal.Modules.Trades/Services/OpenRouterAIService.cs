@@ -203,7 +203,8 @@ internal sealed class OpenRouterAIService(
         }
         else
         {
-            request.Headers.Add("HTTP-Referer", "http://localhost:3000");
+            string fallbackUrl = string.IsNullOrWhiteSpace(options.Value.FrontendUrl) ? "http://localhost:3000" : options.Value.FrontendUrl;
+            request.Headers.Add("HTTP-Referer", fallbackUrl);
         }
         request.Headers.Add("X-Title", "TradingJournal");
 
@@ -307,9 +308,8 @@ internal sealed class OpenRouterAIService(
     private async Task<((int TotalTrades, int Wins, int Losses, double TotalPnl, double WinRate) Metrics, string TradesList)> BuildReviewMetricsAndTrades(
         ReviewSummaryRequestDto request, CancellationToken cancellationToken)
     {
-        List<TradeCacheDto> allTrades = await tradeProvider.GetTradesAsync(cancellationToken);
+        List<TradeCacheDto> allTrades = await tradeProvider.GetTradesAsync(request.UserId, cancellationToken);
         List<TradeCacheDto> periodTrades = [.. allTrades
-            .Where(t => t.CreatedBy == request.UserId)
             .Where(t => t.Status == TradeStatus.Closed && t.Pnl.HasValue)
             .Where(t => t.ClosedDate.HasValue && t.ClosedDate.Value >= request.PeriodStart && t.ClosedDate.Value <= request.PeriodEnd)];
 

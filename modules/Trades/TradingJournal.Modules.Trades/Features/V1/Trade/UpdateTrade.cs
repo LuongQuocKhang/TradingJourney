@@ -30,7 +30,7 @@ public sealed class UpdateTrade
         int? TradingSessionId,
         int UserId = 0) : ICommand<Result<bool>>;
 
-    internal sealed class Validator : AbstractValidator<Request>
+    public sealed class Validator : AbstractValidator<Request>
     {
         public Validator()
         {
@@ -91,7 +91,7 @@ public sealed class UpdateTrade
         }
     }
 
-    internal sealed class Handler(ITradeDbContext context, IWebHostEnvironment env) : ICommandHandler<Request, Result<bool>>
+    public sealed class Handler(ITradeDbContext context, IWebHostEnvironment env) : ICommandHandler<Request, Result<bool>>
     {
         public async Task<Result<bool>> Handle(Request request, CancellationToken cancellationToken)
         {

@@ -6,6 +6,15 @@ public sealed class CreateTodayPsychology
         OverallMood OverallMood = OverallMood.Neutral,
         ConfidentLevel ConfidentLevel = ConfidentLevel.None) : ICommand<Result<int>>;
 
+    public sealed class Validator : AbstractValidator<Request>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.ConfidentLevel)
+                .IsInEnum().WithMessage("Invalid confident level.");
+        }
+    }
+
     internal sealed class Handler(IPsychologyDbContext context) : ICommandHandler<Request, Result<int>>
     {
         public async Task<Result<int>> Handle([FromBody] Request request, CancellationToken cancellationToken)

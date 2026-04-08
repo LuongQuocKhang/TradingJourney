@@ -4,9 +4,16 @@ namespace TradingJournal.Modules.Trades.Features.V1.TechnicalAnalysis;
 
 public sealed class GetTechnicalAnalysis
 {
-    internal sealed record Request() : IQuery<Result<IReadOnlyCollection<TechnicalAnalysisViewModel>>>;
+    public sealed record Request() : IQuery<Result<IReadOnlyCollection<TechnicalAnalysisViewModel>>>;
 
-    internal sealed class Handler(ITradeDbContext context) : IQueryHandler<Request, Result<IReadOnlyCollection<TechnicalAnalysisViewModel>>>
+    public sealed class Validator : AbstractValidator<Request>
+    {
+        public Validator()
+        {
+        }
+    }
+
+    public sealed class Handler(ITradeDbContext context) : IQueryHandler<Request, Result<IReadOnlyCollection<TechnicalAnalysisViewModel>>>
     {
         public async Task<Result<IReadOnlyCollection<TechnicalAnalysisViewModel>>> Handle(Request request, CancellationToken cancellationToken)
         {

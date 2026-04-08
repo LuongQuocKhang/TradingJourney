@@ -81,9 +81,8 @@ public sealed class GetReview
             // No saved review — compute metrics from cached trades
             DateTime periodEnd = GetPeriodEnd(request.PeriodType, request.PeriodStart);
 
-            List<TradeCacheDto> allTrades = await tradeProvider.GetTradesAsync(cancellationToken);
+            List<TradeCacheDto> allTrades = await tradeProvider.GetTradesAsync(request.UserId, cancellationToken);
             List<TradeCacheDto> periodTrades = [.. allTrades
-                .Where(t => t.CreatedBy == request.UserId)
                 .Where(t => t.Status == TradeStatus.Closed && t.Pnl.HasValue)
                 .Where(t => t.ClosedDate.HasValue && t.ClosedDate.Value >= request.PeriodStart && t.ClosedDate.Value <= periodEnd)];
 

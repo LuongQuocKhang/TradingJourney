@@ -18,7 +18,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Dtos\" />
+    <InternalsVisibleTo Include="TradingJournal.Tests.Psychology" />
   </ItemGroup>
-
 </Project>

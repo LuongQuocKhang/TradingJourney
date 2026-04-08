@@ -4,7 +4,7 @@ public sealed class GetTradeSessions
 {
     public sealed record Request(int PageNumber, int PageSize, string? Search, int UserId = 0) : IQuery<Result<List<Domain.TradingSession>>>;
 
-    internal sealed class Handler(ITradeDbContext context) : IQueryHandler<Request, Result<List<Domain.TradingSession>>>
+    public sealed class Handler(ITradeDbContext context) : IQueryHandler<Request, Result<List<Domain.TradingSession>>>
     {
         public async Task<Result<List<Domain.TradingSession>>> Handle(Request request, CancellationToken cancellationToken)
         {

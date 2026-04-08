@@ -7,6 +7,7 @@ namespace TradingJournal.Shared.Contracts;
 public static class CacheKeys
 {
     public const string EmotionTags = "shared:emotions";
-    public const string Trades = "shared:trades";
     public const string Reviews = "shared:reviews";
+
+    public static string UserTrades(int userId) => $"shared:trades:{userId}";
 }

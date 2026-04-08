@@ -2,12 +2,9 @@
 
 public sealed class DeleteEmotion
 {
-    public sealed class Request : ICommand<Result<bool>>
-    {
-        public int Id { get; set; }
-    }
+    public sealed record Request(int Id) : ICommand<Result<bool>>;
 
-    internal sealed class Validator : AbstractValidator<Request>
+    public sealed class Validator : AbstractValidator<Request>
     {
         public Validator() 
         { 
@@ -19,7 +16,7 @@ public sealed class DeleteEmotion
         }
     }
 
-    internal sealed class Handler(IPsychologyDbContext context, ICacheRepository cacheRepository) : ICommandHandler<Request, Result<bool>>
+    public sealed class Handler(IPsychologyDbContext context, ICacheRepository cacheRepository) : ICommandHandler<Request, Result<bool>>
     {
         public async Task<Result<bool>> Handle(Request request, CancellationToken cancellationToken)
         {
@@ -48,7 +45,7 @@ public sealed class DeleteEmotion
 
             group.MapDelete("{id}", async (int id, IMediator mediator) =>
             {
-                Result<bool> result = await mediator.Send(new Request { Id = id });
+                Result<bool> result = await mediator.Send(new Request(id));
                 return result;
             })
             .Produces<Result<bool>>(StatusCodes.Status200OK)

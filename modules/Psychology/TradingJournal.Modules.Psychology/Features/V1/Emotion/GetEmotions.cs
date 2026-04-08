@@ -8,7 +8,7 @@ public sealed class GetEmotions
     {
     }
 
-    internal sealed class Handler(IEmotionTagProvider emotionTagProvider) : IQueryHandler<Request, Result<List<EmotionTagCacheDto>>>
+    public sealed class Handler(IEmotionTagProvider emotionTagProvider) : IQueryHandler<Request, Result<List<EmotionTagCacheDto>>>
     {
         public async Task<Result<List<EmotionTagCacheDto>>> Handle(Request request, CancellationToken cancellationToken)
         {

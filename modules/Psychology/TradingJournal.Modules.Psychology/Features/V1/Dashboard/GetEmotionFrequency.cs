@@ -5,15 +5,14 @@ namespace TradingJournal.Modules.Psychology.Features.V1.Dashboard;
 
 public sealed class GetEmotionFrequency
 {
-    internal record Request(int UserId = 0) : IQuery<Result<List<EmotionFrequencyViewModel>>>;
+    public record Request(int UserId = 0) : IQuery<Result<List<EmotionFrequencyViewModel>>>;
 
-    internal sealed class Handler(ITradeProvider tradeProvider, IEmotionTagProvider emotionTagProvider)
+    public sealed class Handler(ITradeProvider tradeProvider, IEmotionTagProvider emotionTagProvider)
         : IQueryHandler<Request, Result<List<EmotionFrequencyViewModel>>>
     {
         public async Task<Result<List<EmotionFrequencyViewModel>>> Handle(Request request, CancellationToken cancellationToken)
         {
-            List<TradeCacheDto> allTrades = await tradeProvider.GetTradesAsync(cancellationToken);
-            List<TradeCacheDto> trades = [.. allTrades.Where(t => t.CreatedBy == request.UserId)];
+            List<TradeCacheDto> trades = await tradeProvider.GetTradesAsync(request.UserId, cancellationToken);
             List<EmotionTagCacheDto> tags = await emotionTagProvider.GetEmotionTagsAsync(cancellationToken);
 
             Dictionary<int, int> freq = [];

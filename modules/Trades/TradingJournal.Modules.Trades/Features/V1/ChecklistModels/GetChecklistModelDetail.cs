@@ -2,9 +2,14 @@ namespace TradingJournal.Modules.Trades.Features.V1.ChecklistModels;
 
 public sealed class GetChecklistModelDetail
 {
-    internal record Request(int Id, int UserId = 0) : ICommand<Result<ChecklistModelDetailViewModel>>;
+    public record Request(int Id, int UserId = 0) : ICommand<Result<ChecklistModelDetailViewModel>>;
 
-    internal sealed class Handler(ITradeDbContext context) : ICommandHandler<Request, Result<ChecklistModelDetailViewModel>>
+    public sealed class Validator() : AbstractValidator<Request>
+    {
+        
+    }
+
+    public sealed class Handler(ITradeDbContext context) : ICommandHandler<Request, Result<ChecklistModelDetailViewModel>>
     {
         public async Task<Result<ChecklistModelDetailViewModel>> Handle(Request request, CancellationToken cancellationToken)
         {
