@@ -88,11 +88,6 @@ app.UseSwaggerDoc();
 
 app.UseHttpsRedirection();
 
-app.UseCors(cors => cors
-    .AllowAnyOrigin()
-    .AllowAnyMethod()
-    .AllowAnyHeader());
-
 app.UseAuthentication();
 app.UseAuthorization();
 
@@ -103,5 +98,10 @@ app.MapOpenApi();
 app.MapScalarApiReference(options =>
 {
 });
+
+app.UseCors(cors => cors
+    .AllowAnyOrigin()
+    .AllowAnyMethod()
+    .AllowAnyHeader());
 
 await app.RunAsync();

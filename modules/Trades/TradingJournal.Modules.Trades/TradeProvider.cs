@@ -1,20 +1,18 @@
 using TradingJournal.Shared.Contracts;
 using TradingJournal.Shared.Dtos;
-using Microsoft.EntityFrameworkCore;
 
 namespace TradingJournal.Modules.Trades;
 
 internal sealed class TradeProvider(ITradeDbContext context, ICacheRepository cacheRepository) : ITradeProvider
 {
-    public async Task<List<TradeCacheDto>> GetTradesAsync(int userId, CancellationToken cancellationToken = default)
+    public async Task<List<TradeCacheDto>> GetTradesAsync(CancellationToken cancellationToken = default)
     {
         return await cacheRepository.GetOrCreateAsync<List<TradeCacheDto>>(
-            CacheKeys.UserTrades(userId),
+            CacheKeys.Trades,
             async ct =>
             {
                 var trades = await context.TradeHistories
                     .AsNoTracking()
-                    .Where(x => x.CreatedBy == userId)
                     .Include(x => x.TradeEmotionTags)
                     .ToListAsync(ct);
 

@@ -33,8 +33,9 @@ public sealed class SaveReview
         public async Task<Result<int>> Handle(Request request, CancellationToken cancellationToken)
         {
             // Compute fresh metrics
-            List<TradeCacheDto> allTrades = await tradeProvider.GetTradesAsync(request.UserId, cancellationToken);
+            List<TradeCacheDto> allTrades = await tradeProvider.GetTradesAsync(cancellationToken);
             List<TradeCacheDto> periodTrades = [.. allTrades
+                .Where(t => t.CreatedBy == request.UserId)
                 .Where(t => t.Status == TradeStatus.Closed && t.Pnl.HasValue)
                 .Where(t => t.ClosedDate.HasValue && t.ClosedDate.Value >= request.PeriodStart && t.ClosedDate.Value <= request.PeriodEnd)];
 

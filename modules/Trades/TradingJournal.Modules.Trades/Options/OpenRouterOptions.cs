@@ -9,6 +9,4 @@ public sealed class OpenRouterOptions
     public string Model { get; set; } = string.Empty;
 
     public string BaseUrl { get; set; } = string.Empty;
-
-    public string FrontendUrl { get; set; } = string.Empty;
 }

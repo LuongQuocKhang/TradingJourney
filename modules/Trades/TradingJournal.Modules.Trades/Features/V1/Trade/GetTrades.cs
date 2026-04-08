@@ -39,10 +39,8 @@ public class GetTrades
             RuleFor(x => x.PageSize)
                 .Cascade(CascadeMode.Stop)
                 .GreaterThan(0)
-                .WithMessage("Page size must be greater than 0.")
-                .LessThanOrEqualTo(500)
                 .WithErrorCode(HttpStatusCode.BadRequest.ToString())
-                .WithMessage("Page size cannot exceed 500.");
+                .WithMessage("Page size must be greater than 0.");
         }
     }
 
